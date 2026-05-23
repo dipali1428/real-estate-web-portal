@@ -299,14 +299,15 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
   const getTenureLabel = () => tenureUnit === 'years' ? 'Years' : 'Months';
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
+    <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row p-4 sm:p-6 lg:p-8 font-sans gap-6 lg:gap-8">
+          
           {/* Input Section */}
-          <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
+          <div className="flex-1 min-w-0">
             {/* Principal Amount */}
-            <div className="mb-6">
-              <label htmlFor="principal" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-5 sm:mb-6">
+              <label htmlFor="principal" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Principal Amount (₹)
               </label>
               <div className="slider-container mb-2">
@@ -320,7 +321,7 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                   onChange={handlePrincipalChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>₹1,000</span>
                   <span>₹1,00,00,000</span>
                 </div>
@@ -331,16 +332,16 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                   id="principalInput"
                   value={getPrincipalDisplayValue()}
                   onChange={handlePrincipalInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-10 sm:pr-12 text-gray-800 text-sm sm:text-base"
                   placeholder="Enter principal amount"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">₹</span>
               </div>
             </div>
 
             {/* Interest Rate */}
-            <div className="mb-6">
-              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-5 sm:mb-6">
+              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Annual Interest Rate (%)
               </label>
               <div className="slider-container mb-2">
@@ -354,7 +355,7 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                   onChange={handleInterestRateChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>1%</span>
                   <span>25%</span>
                 </div>
@@ -368,15 +369,15 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                   step="0.1"
                   value={getInterestRateDisplayValue()}
                   onChange={handleInterestRateInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-10 sm:pr-12 text-gray-800 text-sm sm:text-base"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">%</span>
               </div>
             </div>
 
             {/* Tenure */}
-            <div className="mb-8">
-              <label htmlFor="tenureValue" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-6 sm:mb-8">
+              <label htmlFor="tenureValue" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Time Period ({getTenureLabel()})
               </label>
               <div className="slider-container mb-2">
@@ -390,12 +391,12 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                   onChange={handleTenureValueChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>1 {tenureUnit}</span>
                   <span>{getTenureMax()} {tenureUnit}</span>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
                   <input
                     type="number"
@@ -404,13 +405,13 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                     max={getTenureMax()}
                     value={getTenureValueDisplayValue()}
                     onChange={handleTenureValueInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800 placeholder:text-gray-500"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800 text-sm sm:text-base"
                   />
                 </div>
                 <select
                   value={tenureUnit}
                   onChange={(e) => setTenureUnit(e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800"
+                  className="px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors text-gray-800 text-sm sm:text-base"
                 >
                   <option value="years">Years</option>
                   <option value="months">Months</option>
@@ -419,11 +420,11 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
             </div>
 
             {/* Compounding Frequency */}
-            <div className="mb-8">
-              <label className="block text-[#2076C7] font-semibold mb-3">
+            <div className="mb-6 sm:mb-8">
+              <label className="block text-[#2076C7] font-semibold mb-3 text-sm sm:text-base">
                 Compounding Frequency
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                 {[
                   { id: 'yearly', label: 'Yearly' },
                   { id: 'halfyearly', label: 'Half-Yearly' },
@@ -433,70 +434,70 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                   <button
                     key={freq.id}
                     onClick={() => setFrequency(freq.id)}
-                    className={`py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
+                    className={`py-2 sm:py-3 px-2 sm:px-4 rounded-lg border-2 transition-all duration-200 text-xs sm:text-sm ${
                       frequency === freq.id 
                         ? 'bg-[#1CADA3] text-white border-[#1CADA3] shadow-md' 
                         : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-700'
                     }`}
                   >
-                    <div className="text-sm font-medium">{freq.label}</div>
+                    <div className="font-medium">{freq.label}</div>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Results Section */}
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
-              <div className="text-3xl font-bold text-[#1CADA3] font-sans text-center mb-6">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+              <div className="text-2xl sm:text-3xl font-bold text-[#1CADA3] font-sans text-center mb-4 sm:mb-6 break-all">
                 {finalAmount > 0 ? formatCurrency(finalAmount) : '₹0'}
               </div>
-              <div className="flex justify-between">
-                <div className="text-center flex-1 px-4">
-                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+              <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
+                <div className="text-center flex-1 px-2 sm:px-4">
+                  <div className="text-base sm:text-lg font-medium font-sans text-[#1CADA3] break-all">
                     {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </div>
-                  <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                  <div className="text-xs sm:text-sm text-[#1CADA3] mt-1">Total Interest</div>
                 </div>
-                <div className="text-center flex-1 px-4">
-                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                <div className="text-center flex-1 px-2 sm:px-4">
+                  <div className="text-base sm:text-lg font-medium font-sans text-[#1CADA3] break-all">
                     {principal > 0 ? formatCurrency(principal) : '₹0'}
                   </div>
-                  <div className="text-sm text-[#1CADA3] mt-1">Principal</div>
+                  <div className="text-xs sm:text-sm text-[#1CADA3] mt-1">Principal</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Visualization Section */}
-          <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
-            <div className="chart-container h-64 mb-6">
+          <div className="flex-1 min-w-0">
+            <div className="chart-container h-48 sm:h-56 md:h-64 mb-4 sm:mb-6">
               <canvas ref={doughnutCanvasRef}></canvas>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-6">
-              <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Investment Summary</h5>
-              <div className="space-y-4">
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Principal Amount</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-4 sm:mb-6">
+              <h5 className="text-[#2076C7] font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Investment Summary</h5>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Principal Amount</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {principal > 0 ? formatCurrency(principal) : '₹0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Total Interest Earned</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Total Interest Earned</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Compounding Frequency</span>
-                  <span className="font-medium font-sans text-[#1CADA3] capitalize">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Compounding Frequency</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base capitalize">
                     {frequency}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Final Amount</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Final Amount</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {finalAmount > 0 ? formatCurrency(finalAmount) : '₹0'}
                   </span>
                 </div>
@@ -504,12 +505,12 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
             </div>
 
             {/* Insights Section */}
-            <div className="bg-white rounded-xl border shadow-md p-5">
-              <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+            <div className="bg-white rounded-xl border shadow-md p-4 sm:p-5">
+              <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 Key Insights
               </h2>
 
-              <div className="text-gray-700 leading-relaxed text-xs">
+              <div className="text-gray-700 leading-relaxed text-xs sm:text-sm">
                 <ul className="list-disc pl-4 space-y-1.5">
                   <li>
                     <span className="font-medium">The magic of interest earning interest</span> - Your investment grows from{' '}
@@ -599,14 +600,14 @@ export const CompoundInterestCalculatorContent: React.FC = () => {
                   </li>
                 </ul>
                 
-                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="mt-3 p-2.5 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-xs text-yellow-800">
                     <strong>Pro Tip:</strong> Start investing early, stay consistent, and let compounding work its magic over time.
                     Even small, regular investments can grow into significant wealth.
                   </p>
                 </div>
                 
-                <p className="text-[11px] text-gray-500 mt-2">
+                <p className="text-[10px] sm:text-[11px] text-gray-500 mt-2">
                   <strong>Note:</strong> This calculation assumes consistent returns and doesn&apos;t account for inflation or taxes. 
                   Actual returns may vary based on market conditions.
                 </p>
@@ -633,26 +634,26 @@ const CompoundInterestCalculatorStandalone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Compound Interest Calculator</h1>
-        <p className="text-blue-100">Calculate your investment growth with compounding</p>
+      {/* Header - Responsive */}
+      <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 sm:py-6 px-4 sm:px-8 text-center">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">Compound Interest Calculator</h1>
+        <p className="text-blue-100 text-sm sm:text-base px-2">Calculate your investment growth with compounding</p>
       </div>
 
-      {/* Dropdown */}
-      <div className="container mx-auto px-4 py-4 max-w-md">
+      {/* Dropdown - Responsive */}
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-md">
         <div className="relative">
           <button 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+            className="w-full bg-white border-2 border-gray-200 p-3 sm:p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                <activeData.icon className="w-5 h-5 text-teal-600" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
               </div>
-              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+              <span className="font-semibold text-gray-800 text-base sm:text-lg">{activeData.label}</span>
             </div>
-            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <AnimatePresence>
@@ -670,27 +671,27 @@ const CompoundInterestCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                    className={`w-full text-left p-3 sm:p-4 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 transition-colors ${
                       calc.id === 'compoundinterest' ? 'bg-teal-500/5' : ''
                     }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${
                       calc.id === 'compoundinterest' 
                         ? 'bg-teal-500 text-white' 
                         : 'bg-gray-100 text-gray-500'
                     }`}>
-                      <calc.icon className="w-4 h-4" />
+                      <calc.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${
+                      <span className={`font-medium text-sm sm:text-base ${
                         calc.id === 'compoundinterest' ? 'text-teal-600' : 'text-gray-700'
                       }`}>
                         {calc.label}
                       </span>
-                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                      <p className="text-xs text-gray-400 line-clamp-1 hidden sm:block">{calc.desc}</p>
                     </div>
                     {calc.id === 'compoundinterest' && (
-                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500 ml-auto" />
                     )}
                   </button>
                 ))}

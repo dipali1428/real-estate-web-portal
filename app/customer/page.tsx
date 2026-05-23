@@ -232,62 +232,70 @@ export default function CustomerDashboard() {
                         Consolidated view of all your financial holdings and liabilities.
                     </p>
 
-                    <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
-                        {/* Chart Area */}
-                        <div className="w-full md:w-1/2">
-                            <div className="w-full h-[300px] sm:h-[350px] relative rounded-2xl overflow-hidden">
-                                {chartReady ? (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={chartData.filter(d => d.value > 0 || d.name === 'Unlisted Shares')} 
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={60}
-                                                outerRadius={100}
-                                                paddingAngle={5}
-                                                dataKey="value"
-                                                isAnimationActive={true}
-                                            >
-                                                {chartData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip 
-                                                contentStyle={{ 
-                                                    borderRadius: '12px', 
-                                                    border: 'none', 
-                                                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', 
-                                                    fontWeight: 'bold',
-                                                    fontSize: '12px'
-                                                }}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <p className="text-gray-400">Loading analysis...</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Details/Legend Area */}
-                        <div className="w-full md:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {chartData.map((item, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-gray-50/50 border border-gray-100 transition-all hover:bg-white hover:shadow-sm">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }}></div>
-                                        <span className="text-[11px] sm:text-xs font-medium text-gray-700 truncate max-w-[80px]">{item.name}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xs font-bold text-gray-900">{item.value}</span>
-                                        <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0" />
-                                    </div>
-                                </div>
+<div className="flex flex-col xl:flex-row items-stretch gap-6 xl:gap-8">
+    {/* Chart Area */}
+    <div className="w-full xl:w-1/2">
+        <div className="w-full aspect-square max-h-[400px] mx-auto rounded-2xl overflow-hidden bg-gray-50/30 p-3 sm:p-4">
+            {chartReady ? (
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie
+                            data={chartData.filter(d => d.value > 0)} 
+                            cx="50%"
+                            cy="50%"
+                            innerRadius="35%"
+                            outerRadius="65%"
+                            paddingAngle={2}
+                            dataKey="value"
+                            isAnimationActive={true}
+                        >
+                            {chartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(255,255,255,0.5)" strokeWidth={2} />
                             ))}
-                        </div>
+                        </Pie>
+                        <Tooltip 
+                            contentStyle={{ 
+                                borderRadius: '8px', 
+                                border: 'none', 
+                                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                                fontSize: '11px',
+                                padding: '6px 10px'
+                            }}
+                        />
+                    </PieChart>
+                </ResponsiveContainer>
+            ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                        <p className="text-gray-400 text-xs">Loading...</p>
                     </div>
+                </div>
+            )}
+        </div>
+    </div>
+
+    {/* Legend Area */}
+    <div className="w-full xl:w-1/2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {chartData.map((item, idx) => (
+                <div 
+                    key={idx} 
+                    className="group flex items-center justify-between p-2.5 rounded-lg bg-gray-50/50 hover:bg-white transition-all duration-200 border border-transparent hover:border-gray-200 cursor-pointer"
+                >
+                    <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }}></div>
+                        <span className="text-xs font-medium text-gray-700 truncate">{item.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-gray-900">{item.value}%</span>
+                        <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0 opacity-60 group-hover:opacity-100" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</div>
                 </motion.div>
             </section>
         </div>

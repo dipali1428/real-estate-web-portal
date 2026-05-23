@@ -2,30 +2,6 @@
 import toast from "react-hot-toast";
 import api from "./api";
 
-export interface EnquiryPayload {
-  company_id?: number;
-  company_name?: string;
-  enquiry_type: 'buy' | 'sell' | 'other';
-  full_name: string;
-  email: string;
-  phone: string;
-  quantity?: number;
-  message?: string;
-}
-
-export interface EnquiryResponse {
-  data: {
-    id: number;
-    company_id: number;
-    enquiry_type: 'buy' | 'sell' | 'other';
-    full_name: string;
-    email: string;
-    phone: string;
-    quantity: number;
-    created_at: string;
-  };
-}
-
 // Top Movers Interfaces
 export interface TopMover {
   id: number;
@@ -168,19 +144,6 @@ export const fetchTopLosers = async (limit: number = 5): Promise<TopMoversRespon
   } catch (error: any) {
     toast.error("DEBUG - Top Losers URL called:", error.config?.url);
     toast.error("DEBUG - Top Losers Error:", error.response?.data);
-    throw error;
-  }
-};
-
-// Create Enquiry
-export const createEnquiry = async (payload: EnquiryPayload): Promise<EnquiryResponse> => {
-  try {
-    const response = await api.post("/api/unlisted/public/enquiries", payload); 
-    return response.data;
-  } catch (error: any) {
-    toast.error("DEBUG - Enquiry URL called:", error.config?.url);
-    toast.error("DEBUG - Enquiry Status code:", error.response?.status);
-    toast.error("DEBUG - Enquiry Error:", error.response?.data);
     throw error;
   }
 };

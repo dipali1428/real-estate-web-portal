@@ -421,15 +421,15 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
+    <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row p-4 sm:p-6 lg:p-8 font-sans gap-6 lg:gap-8">
+          
           {/* Input Section */}
-          <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
-
+          <div className="flex-1 min-w-0">
             {/* Loan Amount */}
-            <div className="mb-6">
-              <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-5 sm:mb-6">
+              <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Loan Amount (₹)
               </label>
               <div className="slider-container mb-2">
@@ -443,7 +443,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                   onChange={handleLoanAmountChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>₹10,000</span>
                   <span>₹1,00,00,000</span>
                 </div>
@@ -455,16 +455,16 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                   value={getLoanAmountDisplayValue()}
                   onChange={handleLoanAmountInputChange}
                   onWheel={handleWheel}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors pr-10 sm:pr-12 text-gray-800 text-sm sm:text-base"
                   placeholder="Enter loan amount"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">₹</span>
               </div>
             </div>
 
             {/* Interest Rate */}
-            <div className="mb-6">
-              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-5 sm:mb-6">
+              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Annual Interest Rate (%)
               </label>
               <div className="slider-container mb-2">
@@ -478,7 +478,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                   onChange={handleInterestRateChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>0.1%</span>
                   <span>30%</span>
                 </div>
@@ -493,15 +493,15 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                   value={getInterestRateDisplayValue()}
                   onChange={handleInterestRateInputChange}
                   onWheel={handleNumberInputWheel}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors pr-10 sm:pr-12 text-gray-800 text-sm sm:text-base"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">%</span>
               </div>
             </div>
 
             {/* Loan Tenure */}
-            <div className="mb-6">
-              <label htmlFor="loanTerm" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-5 sm:mb-6">
+              <label htmlFor="loanTerm" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Loan Tenure (Months)
               </label>
               <div className="slider-container mb-2">
@@ -515,7 +515,7 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                   onChange={handleTenureChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>1 Month</span>
                   <span>120 Months</span>
                 </div>
@@ -530,32 +530,33 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                   value={getTenureDisplayValue()}
                   onChange={handleTenureInputChange}
                   onWheel={handleNumberInputWheel}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-24 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white transition-colors pr-16 sm:pr-24 text-gray-800 text-sm sm:text-base"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-xs sm:text-sm">
                   Months
                 </span>
               </div>
-              <div className="mt-2 text-xs text-gray-600">
+              <div className="mt-2 text-xs sm:text-sm text-gray-600">
                 Current: {formatLoanTerm(loanTermMonths)}
               </div>
             </div>
 
             {/* Payment Frequency */}
-            <div className="mb-8">
-              <label className="block text-[#2076C7] font-semibold mb-3">
+            <div className="mb-6 sm:mb-8">
+              <label className="block text-[#2076C7] font-semibold mb-3 text-sm sm:text-base">
                 Payment Frequency
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                 {frequencyOptions.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => setPaymentFrequency(option.value)}
-                    className={`py-2 px-3 rounded-lg border text-sm transition-all ${paymentFrequency === option.value
-                      ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
-                      : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                      }`}
+                    className={`py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg border text-xs sm:text-sm transition-all ${
+                      paymentFrequency === option.value
+                        ? 'border-[#1CADA3] bg-teal-50 text-[#1CADA3] font-medium'
+                        : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -564,78 +565,78 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
             </div>
 
             {/* Results Section */}
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
-              <div className="text-center mb-6">
-                <div className="text-sm text-[#2076C7] font-medium mb-1">Payment Amount</div>
-                <div className="text-3xl font-bold text-[#1CADA3] font-sans">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+              <div className="text-center mb-4 sm:mb-6">
+                <div className="text-xs sm:text-sm text-[#2076C7] font-medium mb-1">Payment Amount</div>
+                <div className="text-2xl sm:text-3xl font-bold text-[#1CADA3] font-sans break-all">
                   {paymentAmount > 0 ? formatCurrency(paymentAmount) : '₹0'}
                 </div>
               </div>
-              <div className="flex justify-between">
-                <div className="text-center flex-1 px-4">
-                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+              <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
+                <div className="text-center flex-1 px-2 sm:px-4">
+                  <div className="text-base sm:text-lg font-medium font-sans text-[#1CADA3] break-all">
                     {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </div>
-                  <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                  <div className="text-xs sm:text-sm text-[#1CADA3] mt-1">Total Interest</div>
                 </div>
-                <div className="text-center flex-1 px-4">
-                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                <div className="text-center flex-1 px-2 sm:px-4">
+                  <div className="text-base sm:text-lg font-medium font-sans text-[#1CADA3] break-all">
                     {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
                   </div>
-                  <div className="text-sm text-[#1CADA3] mt-1">Total Payment</div>
+                  <div className="text-xs sm:text-sm text-[#1CADA3] mt-1">Total Payment</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Visualization Section */}
-          <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
-            <div className="chart-container h-64 mb-6">
+          <div className="flex-1 min-w-0">
+            <div className="chart-container h-48 sm:h-56 md:h-64 mb-4 sm:mb-6">
               <canvas ref={canvasRef}></canvas>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-6">
-              <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Loan Summary</h5>
-              <div className="space-y-4">
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Loan Amount</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-4 sm:mb-6">
+              <h5 className="text-[#2076C7] font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Loan Summary</h5>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Loan Amount</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {loanAmount > 0 ? formatCurrency(loanAmount) : '₹0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Interest Rate</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Interest Rate</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base">
                     {annualInterestRate > 0 ? `${annualInterestRate}%` : '0%'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Loan Tenure</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Loan Tenure</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {loanTermMonths > 0 ? formatLoanTerm(loanTermMonths) : '0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Payment Frequency</span>
-                  <span className="font-medium font-sans text-[#1CADA3] capitalize">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Payment Frequency</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base capitalize">
                     {paymentFrequency}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Total Payments</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Total Payments</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base">
                     {calculateTotalPayments()}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Effective Annual Rate</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200 flex-wrap gap-2">
+                  <span className="text-gray-600 text-sm sm:text-base">Effective Annual Rate</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base">
                     {effectiveAnnualRate > 0 ? `${effectiveAnnualRate.toFixed(2)}%` : '0%'}
                   </span>
                 </div>
-                <div className="flex justify-between pt-2">
-                  <span className="text-gray-600 font-semibold">Total Interest</span>
-                  <span className="font-bold font-sans text-[#1CADA3]">
+                <div className="flex justify-between pt-2 flex-wrap gap-2">
+                  <span className="text-gray-600 font-semibold text-sm sm:text-base">Total Interest</span>
+                  <span className="font-bold font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </span>
                 </div>
@@ -644,15 +645,15 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
 
             {/* Amortization Schedule Section */}
             {fullAmortizationSchedule.length > 0 && (
-              <div className="bg-white rounded-xl border shadow-md p-5 mt-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Payment Schedule</h3>
-                  <div className="flex items-center gap-4">
-                    <label className="text-sm text-gray-600">Show:</label>
+              <div className="bg-white rounded-xl border shadow-md p-4 sm:p-5 mt-4 sm:mt-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800">Payment Schedule</h3>
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <label className="text-xs sm:text-sm text-gray-600">Show:</label>
                     <select
                       value={itemsPerPage}
                       onChange={handleItemsPerPageChange}
-                      className="px-2 py-1 border rounded text-sm"
+                      className="px-2 py-1 border rounded text-xs sm:text-sm text-gray-700"
                     >
                       <option value={6}>6</option>
                       <option value={12}>12</option>
@@ -662,25 +663,26 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                {/* Only add horizontal scroll on mobile, normal table on desktop */}
+                <div className="overflow-x-auto lg:overflow-x-visible">
+                  <table className="w-full text-xs sm:text-sm min-w-[500px] lg:min-w-0">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-2 text-left">Period</th>
-                        <th className="px-4 py-2 text-right">Payment</th>
-                        <th className="px-4 py-2 text-right">Principal</th>
-                        <th className="px-4 py-2 text-right">Interest</th>
-                        <th className="px-4 py-2 text-right">Balance</th>
+                        <th className="px-2 sm:px-4 py-2 text-gray-600 text-left">Period</th>
+                        <th className="px-2 sm:px-4 py-2 text-gray-600 text-right">Payment</th>
+                        <th className="px-2 sm:px-4 py-2 text-gray-600 text-right">Principal</th>
+                        <th className="px-2 sm:px-4 py-2 text-gray-600 text-right">Interest</th>
+                        <th className="px-2 sm:px-4 py-2 text-gray-600 text-right">Balance</th>
                       </tr>
                     </thead>
                     <tbody>
                       {amortizationSchedule.map((row) => (
                         <tr key={row.period} className="border-t">
-                          <td className="px-4 py-2">{row.period}</td>
-                          <td className="px-4 py-2 text-right">{formatCurrency(row.payment)}</td>
-                          <td className="px-4 py-2 text-right">{formatCurrency(row.principal)}</td>
-                          <td className="px-4 py-2 text-right">{formatCurrency(row.interest)}</td>
-                          <td className="px-4 py-2 text-right">{formatCurrency(row.balance)}</td>
+                          <td className="px-2 sm:px-4 py-2 text-gray-600">{row.period}</td>
+                          <td className="px-2 sm:px-4 py-2 text-gray-600 text-right break-all">{formatCurrency(row.payment)}</td>
+                          <td className="px-2 sm:px-4 py-2 text-gray-600 text-right break-all">{formatCurrency(row.principal)}</td>
+                          <td className="px-2 sm:px-4 py-2 text-gray-600 text-right break-all">{formatCurrency(row.interest)}</td>
+                          <td className="px-2 sm:px-4 py-2 text-gray-600 text-right break-all">{formatCurrency(row.balance)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -689,21 +691,21 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex justify-between items-center mt-4">
+                  <div className="flex justify-between items-center mt-4 gap-2">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="px-3 py-1 text-sm bg-gray-100 rounded disabled:opacity-50"
+                      className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-gray-100 text-gray-600 rounded disabled:opacity-50 hover:bg-gray-200 transition-colors"
                     >
                       Previous
                     </button>
-                    <span className="text-sm">
+                    <span className="text-xs sm:text-sm text-gray-600">
                       Page {currentPage} of {totalPages}
                     </span>
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="px-3 py-1 text-sm bg-gray-100 rounded disabled:opacity-50"
+                      className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-gray-100 text-gray-600 rounded disabled:opacity-50 hover:bg-gray-200 transition-colors"
                     >
                       Next
                     </button>
@@ -713,12 +715,12 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
             )}
 
             {/* Key Insights Section */}
-            <div className="bg-white rounded-xl border shadow-md p-5 mt-6">
-              <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+            <div className="bg-white rounded-xl border shadow-md p-4 sm:p-5 mt-4 sm:mt-6">
+              <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 Key Insights
               </h2>
 
-              <div className="text-gray-700 leading-relaxed text-xs">
+              <div className="text-gray-700 leading-relaxed text-xs sm:text-sm">
                 <ul className="list-disc pl-4 space-y-1.5">
                   <li>
                     Your payment amount of{' '}
@@ -836,14 +838,14 @@ export const PersonalLoanCalculatorContent: React.FC = () => {
                   </li>
                 </ul>
 
-                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="mt-3 p-2.5 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-xs text-yellow-800">
                     <strong>Pro Tip:</strong> Consider making at least one extra payment each year.
                     Since personal loans have higher interest rates, early repayments can save significant interest costs.
                   </p>
                 </div>
 
-                <p className="text-[11px] text-gray-500 mt-2">
+                <p className="text-[10px] sm:text-[11px] text-gray-500 mt-2">
                   <strong>Note:</strong> Personal loans typically come with processing fees (1-3%), prepayment charges,
                   and other costs. Actual terms may vary based on lender policies, credit score, and loan purpose.
                 </p>
@@ -871,28 +873,28 @@ const PersonalLoanCalculatorStandalone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <i className="fas fa-user text-white text-2xl"></i>
-          <h1 className="text-3xl font-bold">Personal Loan Calculator</h1>
+      {/* Header - Responsive */}
+      <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 sm:py-6 px-4 sm:px-8 text-center">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+          <i className="fas fa-user text-white text-xl sm:text-2xl"></i>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Personal Loan Calculator</h1>
         </div>
-        <p className="text-blue-100">Calculate your personal loan EMI and repayment schedule</p>
+        <p className="text-blue-100 text-sm sm:text-base px-2">Calculate your personal loan EMI and repayment schedule</p>
       </div>
 
-      {/* Dropdown */}
-      <div className="container mx-auto px-4 py-4 max-w-md">
+      {/* Dropdown - Responsive */}
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-md">
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                <activeData.icon className="w-5 h-5 text-teal-600" />
+            className="w-full bg-white border-2 border-gray-200 p-3 sm:p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
               </div>
-              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+              <span className="font-semibold text-gray-800 text-base sm:text-lg">{activeData.label}</span>
             </div>
-            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <AnimatePresence>
@@ -910,23 +912,26 @@ const PersonalLoanCalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${calc.id === 'personalloan' ? 'bg-teal-500/5' : ''
-                      }`}>
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${calc.id === 'personalloan'
-                      ? 'bg-teal-500 text-white'
-                      : 'bg-gray-100 text-gray-500'
-                      }`}>
-                      <calc.icon className="w-4 h-4" />
+                    className={`w-full text-left p-3 sm:p-4 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 transition-colors ${
+                      calc.id === 'personalloan' ? 'bg-teal-500/5' : ''
+                    }`}>
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${
+                      calc.id === 'personalloan'
+                        ? 'bg-teal-500 text-white'
+                        : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      <calc.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${calc.id === 'personalloan' ? 'text-teal-600' : 'text-gray-700'
-                        }`}>
+                      <span className={`font-medium text-sm sm:text-base ${
+                        calc.id === 'personalloan' ? 'text-teal-600' : 'text-gray-700'
+                      }`}>
                         {calc.label}
                       </span>
-                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                      <p className="text-xs text-gray-400 line-clamp-1 hidden sm:block">{calc.desc}</p>
                     </div>
                     {calc.id === 'personalloan' && (
-                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500 ml-auto" />
                     )}
                   </button>
                 ))}

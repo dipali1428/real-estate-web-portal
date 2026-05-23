@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { useModal } from '../../../context/ModalContext';
-import { createEnquiry } from '../../../services/unlistedservices';
+import CustomerService from '../../../services/customerService';
 import { 
     Send, 
     X, 
@@ -11,18 +11,25 @@ import {
     Loader2, 
     Building,
     Calculator,
-    CheckCircle, ArrowRight
+    CheckCircle, 
+    ArrowRight,
+    Briefcase,
+    MapPin,
+    Mail,
+    Phone,
+    MessageCircle
 } from 'lucide-react';
 
-// Define Enquiry type for API calls
+// Define Enquiry type for API calls matching the backend
 interface EnquiryPayload {
-    company_id?: number;
-    enquiry_type: 'buy' | 'sell';
     full_name: string;
     email: string;
     phone: string;
-    quantity?: number;
-    message?: string;
+    city: string;
+    message: string;
+    product_type: string;
+    product_name: string;
+    product_id: number;
 }
 
 export default function UnlistedCTA() {
@@ -35,13 +42,16 @@ export default function UnlistedCTA() {
     const [enquiryError, setEnquiryError] = useState<string | null>(null);
     const [notifications, setNotifications] = useState<{ id: number; message: string; type?: 'success' | 'error' }[]>([]);
 
-    // Form Data - All required fields
+    // Form Data - Updated to match API requirements
     const [formData, setFormData] = useState({
-        companyId: '',
-        fullName: '',
+        product_id: '',
+        product_name: '',
+        product_type: 'SHARE',
+        full_name: '',
         email: '',
         phone: '',
-        quantity: ''
+        city: '',
+        message: ''
     });
 
     // NOTIFICATION HANDLER
@@ -60,11 +70,15 @@ export default function UnlistedCTA() {
         e.preventDefault();
         
         // Validate all required fields
-        if (!formData.companyId.trim()) {
-            setEnquiryError('Company ID is required');
+        if (!formData.product_id.trim()) {
+            setEnquiryError('Product/Company ID is required');
             return;
         }
-        if (!formData.fullName.trim()) {
+        if (!formData.product_name.trim()) {
+            setEnquiryError('Product/Company name is required');
+            return;
+        }
+        if (!formData.full_name.trim()) {
             setEnquiryError('Full name is required');
             return;
         }
@@ -76,22 +90,19 @@ export default function UnlistedCTA() {
             setEnquiryError('Phone number is required');
             return;
         }
-        if (!formData.quantity.trim()) {
-            setEnquiryError('Quantity is required');
+        if (!formData.city.trim()) {
+            setEnquiryError('City is required');
+            return;
+        }
+        if (!formData.message.trim()) {
+            setEnquiryError('Message is required');
             return;
         }
         
-        // Validate company ID
-        const companyIdNum = parseInt(formData.companyId);
-        if (isNaN(companyIdNum) || companyIdNum <= 0) {
-            setEnquiryError('Please enter a valid company ID');
-            return;
-        }
-        
-        // Validate quantity
-        const quantityNum = parseInt(formData.quantity);
-        if (isNaN(quantityNum) || quantityNum <= 0) {
-            setEnquiryError('Please enter a valid quantity');
+        // Validate product ID
+        const productIdNum = parseInt(formData.product_id);
+        if (isNaN(productIdNum) || productIdNum <= 0) {
+            setEnquiryError('Please enter a valid product/company ID');
             return;
         }
         
@@ -114,25 +125,30 @@ export default function UnlistedCTA() {
         
         try {
             const payload: EnquiryPayload = {
-                company_id: companyIdNum,
-                enquiry_type: 'buy',
-                full_name: formData.fullName.trim(),
+                full_name: formData.full_name.trim(),
                 email: formData.email.trim(),
                 phone: formData.phone.trim(),
-                quantity: quantityNum,
-                message: `Enquiry for company ID ${companyIdNum} - ${quantityNum} shares`
+                city: formData.city.trim(),
+                message: formData.message.trim(),
+                product_type: formData.product_type,
+                product_name: formData.product_name.trim(),
+                product_id: productIdNum
             };
 
-            await createEnquiry(payload);
+            // Using CustomerService.submitEnquiry (which should be corrected to use /enquiries)
+            await CustomerService.submitEnquiry(payload);
             
             setShowEnquiryModal(false);
             setShowSuccess(true);
             setFormData({
-                companyId: '',
-                fullName: '',
+                product_id: '',
+                product_name: '',
+                product_type: 'SHARE',
+                full_name: '',
                 email: '',
                 phone: '',
-                quantity: ''
+                city: '',
+                message: ''
             });
             
             showNotification('Enquiry submitted successfully!', 'success');
@@ -206,112 +222,182 @@ export default function UnlistedCTA() {
                 </div>
             </section>
 
-            {/* ENQUIRY MODAL - Compact with all required fields */}
+            {/* ENQUIRY MODAL - Updated to match API requirements */}
             {showEnquiryModal && (
-                <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="bg-gradient-to-r from-teal-600 to-teal-500 p-4 text-white flex justify-between items-center">
+                <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
+                        <div className="bg-gradient-to-r from-teal-600 to-teal-500 p-5 text-white flex justify-between items-center sticky top-0">
                             <div>
-                                <h3 className="text-lg font-black uppercase tracking-tight">Investor Enquiry</h3>
-                                <p className="text-xs text-white/80">Fill details to get started</p>
+                                <h3 className="text-xl font-black uppercase tracking-tight">Investor Enquiry</h3>
+                                <p className="text-sm text-white/80">Fill details to get started with unlisted shares</p>
                             </div>
                             <button 
                                 onClick={() => setShowEnquiryModal(false)} 
-                                className="hover:bg-white/20 p-1 rounded-full transition-all"
+                                className="hover:bg-white/20 p-2 rounded-full transition-all"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
                         
-                        <form className="p-5 space-y-4" onSubmit={handleFormSubmit}>
+                        <form className="p-6 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto" onSubmit={handleFormSubmit}>
                             {enquiryError && (
-                                <div className="bg-rose-50 text-rose-600 text-xs p-2 rounded-lg border border-rose-200 flex items-start gap-2">
-                                    <X className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                                <div className="bg-rose-50 text-rose-600 text-sm p-3 rounded-lg border border-rose-200 flex items-start gap-2">
+                                    <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                     <span>{enquiryError}</span>
                                 </div>
                             )}
                             
-                            {/* Company ID */}
-                            <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                                    Company ID <span className="text-rose-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                    <input 
-                                        type="number"
-                                        value={formData.companyId}
-                                        onChange={(e) => handleInputChange('companyId', e.target.value)}
-                                        required 
-                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                        placeholder="Enter company ID" 
-                                        min="1"
-                                    />
+                            {/* Product/Company Details Section */}
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
+                                    <Briefcase className="w-4 h-4 text-teal-600" />
+                                    Product/Company Details
+                                </h4>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                            Product/Company ID <span className="text-rose-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                            <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <input 
+                                                type="number"
+                                                value={formData.product_id}
+                                                onChange={(e) => handleInputChange('product_id', e.target.value)}
+                                                required 
+                                                className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                                placeholder="Enter company ID" 
+                                                min="1"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                            Product Name <span className="text-rose-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <input 
+                                                type="text"
+                                                value={formData.product_name}
+                                                onChange={(e) => handleInputChange('product_name', e.target.value)}
+                                                required 
+                                                className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                                placeholder="e.g., Tata Technologies" 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            {/* Full Name */}
-                            <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                                    Full Name <span className="text-rose-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                    <input 
-                                        value={formData.fullName}
-                                        onChange={(e) => handleInputChange('fullName', e.target.value)}
-                                        required 
-                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                        placeholder="John Doe" 
-                                    />
-                                </div>
-                            </div>
-                            
-                            {/* Email and Phone - Side by side */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
+                                <div className="mt-3">
                                     <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                                        Email <span className="text-rose-500">*</span>
+                                        Product Type
                                     </label>
-                                    <input 
-                                        type="email"
-                                        value={formData.email}
-                                        onChange={(e) => handleInputChange('email', e.target.value)}
-                                        required 
-                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                        placeholder="john@email.com" 
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                                        Phone <span className="text-rose-500">*</span>
-                                    </label>
-                                    <input 
-                                        type="tel"
-                                        value={formData.phone}
-                                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                                        required 
-                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                        placeholder="9876543210" 
-                                    />
+                                    <select
+                                        value={formData.product_type}
+                                        onChange={(e) => handleInputChange('product_type', e.target.value)}
+                                        className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black"
+                                    >
+                                        <option value="SHARE">SHARE</option>
+                                        <option value="MUTUAL_FUND">MUTUAL FUND</option>
+                                        <option value="BOND">BOND</option>
+                                        <option value="NCD">NCD</option>
+                                        <option value="PMS">PMS</option>
+                                        <option value="AIF">AIF</option>
+                                    </select>
                                 </div>
                             </div>
                             
-                            {/* Quantity */}
+                            {/* Personal Details Section */}
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
+                                    <User className="w-4 h-4 text-teal-600" />
+                                    Personal Information
+                                </h4>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                            Full Name <span className="text-rose-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <input 
+                                                value={formData.full_name}
+                                                onChange={(e) => handleInputChange('full_name', e.target.value)}
+                                                required 
+                                                className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                                placeholder="Rutuja Shitole" 
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                                Email <span className="text-rose-500">*</span>
+                                            </label>
+                                            <div className="relative">
+                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                                <input 
+                                                    type="email"
+                                                    value={formData.email}
+                                                    onChange={(e) => handleInputChange('email', e.target.value)}
+                                                    required 
+                                                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                                    placeholder="rutujas@gmail.com" 
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                                Phone <span className="text-rose-500">*</span>
+                                            </label>
+                                            <div className="relative">
+                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                                <input 
+                                                    type="tel"
+                                                    value={formData.phone}
+                                                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                                                    required 
+                                                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                                    placeholder="9876543210" 
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
+                                            City <span className="text-rose-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <input 
+                                                type="text"
+                                                value={formData.city}
+                                                onChange={(e) => handleInputChange('city', e.target.value)}
+                                                required 
+                                                className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
+                                                placeholder="Pune" 
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Message Section */}
                             <div>
                                 <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                                    Quantity (Shares) <span className="text-rose-500">*</span>
+                                    Your Message <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <Calculator className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                    <input 
-                                        type="number"
-                                        value={formData.quantity}
-                                        onChange={(e) => handleInputChange('quantity', e.target.value)}
+                                    <MessageCircle className="absolute left-3 top-3 w-4 h-4 text-gray-300" />
+                                    <textarea 
+                                        value={formData.message}
+                                        onChange={(e) => handleInputChange('message', e.target.value)}
                                         required 
-                                        className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                        placeholder="Number of shares" 
-                                        min="1"
+                                        rows={4}
+                                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black resize-none" 
+                                        placeholder="I want more details about this share. Please share the investment memorandum and historical performance data."
                                     />
                                 </div>
                             </div>
@@ -320,24 +406,27 @@ export default function UnlistedCTA() {
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting} 
-                                className="w-full py-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-lg font-bold text-base hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="w-full py-3.5 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-xl font-bold text-base hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        Processing...
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Submitting Enquiry...
                                     </>
                                 ) : (
                                     <>
-                                        <Send className="w-4 h-4" />
+                                        <Send className="w-5 h-5" />
                                         Submit Enquiry
                                     </>
                                 )}
                             </button>
                             
                             {/* Trust message */}
-                            <p className="text-[10px] text-gray-400 text-center pt-1">
-                                ✓ Your information is secure and will not be shared
+                            <p className="text-xs text-gray-400 text-center pt-2 flex items-center justify-center gap-2">
+                                <CheckCircle className="w-3 h-3" />
+                                Your information is secure and will not be shared
+                                <CheckCircle className="w-3 h-3" />
+                                Our RM will contact you within 24 hours
                             </p>
                         </form>
                     </div>
@@ -347,13 +436,13 @@ export default function UnlistedCTA() {
             {/* SUCCESS MODAL */}
             {showSuccess && (
                 <div className="fixed inset-0 z-[7000] bg-black/60 flex items-center justify-center p-4">
-                    <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="bg-white p-8 rounded-2xl max-w-md w-full text-center shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <CheckCircle className="w-8 h-8 text-green-600" />
                         </div>
-                        <h3 className="text-xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
+                        <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Enquiry Sent!</h3>
                         <p className="text-gray-500 text-sm mb-4 leading-relaxed">
-                            Our relationship manager will contact you within 24 hours with more information.
+                            Thank you for your interest! Our relationship manager will contact you within 24 hours with more information about <span className="font-semibold text-teal-600">{formData.product_name}</span>.
                         </p>
                         <button 
                             onClick={() => setShowSuccess(false)} 

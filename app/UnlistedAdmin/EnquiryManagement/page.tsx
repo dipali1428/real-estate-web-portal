@@ -1,288 +1,105 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { AdminService } from '../../services/unlistedadminservices';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MessageSquare, Search, CheckCircle, User, Mail, Phone, Calendar, Eye, ShoppingCart, X,
-  Archive, Clock, Filter, Tag, HandCoins, Building2, Package, Inbox
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AdminService, Enquiry } from "../../services/unlistedadminservices";
+import {
+  Bookmark,
+  Search,
+  Layers,
+  TrendingUp,
+  BarChart3,
+  Building2,
+  Trash2,
+  Eye,
+  MapPin,
+  Mail,
+  Phone,
+  User,
+  Package,
+  MessageSquare,
+  X // Added X for the modal close button
 } from "lucide-react";
-import { toast } from 'react-hot-toast';
+import toast from "react-hot-toast";
 
-// Define the Enquiry type locally to match your API response
-interface LocalEnquiry {
-  id: number;
-  company_id: number;
-  enquiry_type: 'buy' | 'sell';
-  full_name: string;
-  email: string;
-  phone: string;
-  quantity: number;
-  created_at: string;
-  status?: 'PENDING' | 'RESOLVED' | 'ARCHIVED';
-  updatedAt?: string;
-}
-
-type EnquiryStatus = 'ALL' | 'PENDING' | 'RESOLVED' | 'ARCHIVED';
-type SortOption = 'newest' | 'oldest' | 'name-asc' | 'name-desc';
-
-// --- ENQUIRY DETAIL MODAL ---
-interface EnquiryDetailModalProps {
-  enquiry: LocalEnquiry | null;
-  onClose: () => void;
-  onResolve?: (id: number) => void;
-  onArchive?: (id: number) => void;
-}
-
-const EnquiryDetailModal: React.FC<EnquiryDetailModalProps> = ({ enquiry, onClose, onResolve, onArchive }) => {
-  const [activeTab, setActiveTab] = useState<'details' | 'notes'>('details');
-  
-  if (!enquiry) return null;
-
+/* ---------------- DETAIL MODAL COMPONENT ---------------- */
+const EnquiryDetailModal = ({ item, onClose }: { item: Enquiry; onClose: () => void }) => {
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <motion.div 
-        initial={{ scale: 0.95, opacity: 0, y: 20 }} 
-        animate={{ scale: 1, opacity: 1, y: 0 }} 
-        exit={{ scale: 0.95, opacity: 0, y: 20 }} 
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden"
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="bg-white rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl"
       >
-        {/* Header with Gradient */}
-        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] px-8 py-6 text-white">
-          <div className="flex justify-between items-start">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                <MessageSquare className="w-7 h-7" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-black tracking-tight">Enquiry Details</h3>
-                <p className="text-white/80 text-sm mt-1 flex items-center gap-2">
-                  <span>ID: #{enquiry.id}</span>
-                  <span className="w-1 h-1 bg-white/40 rounded-full"></span>
-                  <span>{new Date(enquiry.created_at).toLocaleDateString('en-IN', { 
-                    day: 'numeric', 
-                    month: 'long', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}</span>
-                </p>
-              </div>
+        {/* Header Gradient */}
+        <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] p-6 text-white flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
+              <MessageSquare size={20} />
             </div>
-            <button 
-              onClick={onClose} 
-              className="hover:bg-white/20 p-2 rounded-xl transition-all duration-200"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <h3 className="font-bold text-lg">Enquiry Details</h3>
           </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex border-b border-gray-100 bg-gray-50/50 px-8">
-          <button
-            onClick={() => setActiveTab('details')}
-            className={`px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all relative ${
-              activeTab === 'details' 
-                ? 'text-[#2076C7]' 
-                : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            Details
-            {activeTab === 'details' && (
-              <motion.div layoutId="enquiryTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2076C7]" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab('notes')}
-            className={`px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all relative ${
-              activeTab === 'notes' 
-                ? 'text-[#2076C7]' 
-                : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            Activity Notes
-            {activeTab === 'notes' && (
-              <motion.div layoutId="enquiryTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2076C7]" />
-            )}
+          <button onClick={onClose} className="hover:bg-white/20 p-2 rounded-full transition-colors">
+            <X size={20} />
           </button>
         </div>
 
-        <div className="p-8">
-          {activeTab === 'details' ? (
-            <div className="space-y-6">
-              {/* Status Badge & Enquiry Type */}
-              <div className="flex justify-between items-center">
-                <span className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold ${
-                  enquiry.enquiry_type === 'buy' 
-                    ? 'bg-emerald-100 text-emerald-700' 
-                    : 'bg-amber-100 text-amber-700'
-                }`}>
-                  {enquiry.enquiry_type === 'buy' ? (
-                    <><ShoppingCart className="w-4 h-4" /> BUY ENQUIRY</>
-                  ) : (
-                    <><HandCoins className="w-4 h-4" /> SELL ENQUIRY</>
-                  )}
-                </span>
-                <span className={`px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 ${
-                  enquiry.status === 'RESOLVED' 
-                    ? 'bg-emerald-100 text-emerald-700' 
-                    : enquiry.status === 'ARCHIVED'
-                    ? 'bg-gray-100 text-gray-700'
-                    : 'bg-amber-100 text-amber-700'
-                }`}>
-                  {enquiry.status === 'RESOLVED' && <CheckCircle className="w-4 h-4" />}
-                  {enquiry.status === 'ARCHIVED' && <Archive className="w-4 h-4" />}
-                  {(!enquiry.status || enquiry.status === 'PENDING') && <Clock className="w-4 h-4" />}
-                  {enquiry.status || 'PENDING'}
-                </span>
-              </div>
-
-              {/* Quick Stats Cards */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <Building2 className="w-5 h-5 text-gray-400 mx-auto mb-2" />
-                  <p className="text-xs text-gray-500">Company ID</p>
-                  <p className="text-lg font-bold text-gray-900">{enquiry.company_id}</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <Package className="w-5 h-5 text-gray-400 mx-auto mb-2" />
-                  <p className="text-xs text-gray-500">Quantity</p>
-                  <p className="text-lg font-bold text-gray-900">{enquiry.quantity.toLocaleString()}</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <Tag className="w-5 h-5 text-gray-400 mx-auto mb-2" />
-                  <p className="text-xs text-gray-500">Type</p>
-                  <p className="text-lg font-bold text-gray-900 uppercase">{enquiry.enquiry_type}</p>
-                </div>
-              </div>
-
-              {/* Contact Information */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-                <h4 className="text-xs font-black uppercase text-[#2076C7] mb-4 tracking-wider flex items-center gap-2">
-                  <User className="w-4 h-4" /> Contact Information
-                </h4>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-[#2076C7] font-bold text-xl">
-                      {enquiry.full_name?.charAt(0).toUpperCase() || 'U'}
-                    </div>
-                    <div>
-                      <p className="text-xl font-bold text-gray-900">{enquiry.full_name}</p>
-                      <p className="text-sm text-gray-500">Customer</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <div className="bg-white rounded-xl p-4">
-                      <Mail className="w-4 h-4 text-gray-400 mb-2" />
-                      <p className="text-xs text-gray-500 mb-1">Email Address</p>
-                      <a href={`mailto:${enquiry.email}`} className="text-sm font-bold text-[#2076C7] hover:underline break-all">
-                        {enquiry.email}
-                      </a>
-                    </div>
-                    <div className="bg-white rounded-xl p-4">
-                      <Phone className="w-4 h-4 text-gray-400 mb-2" />
-                      <p className="text-xs text-gray-500 mb-1">Phone Number</p>
-                      <a href={`tel:${enquiry.phone}`} className="text-sm font-bold text-gray-900">
-                        {enquiry.phone}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Metadata */}
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Created</p>
-                  <p className="text-sm font-bold text-gray-900">
-                    {new Date(enquiry.created_at).toLocaleString()}
-                  </p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Last Updated</p>
-                  <p className="text-sm font-bold text-gray-900">
-                    {enquiry.updatedAt ? new Date(enquiry.updatedAt).toLocaleString() : new Date(enquiry.created_at).toLocaleString()}
-                  </p>
-                </div>
-              </div>
+        <div className="p-8 space-y-6 max-h-[80vh] overflow-y-auto">
+          {/* Product Section */}
+          <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-[#2076C7] shadow-sm flex-shrink-0">
+              <Package size={24} />
             </div>
-          ) : (
-            // Activity Notes Tab
-            <div className="space-y-4">
-              <div className="bg-gray-50 rounded-xl p-5">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#2076C7]/10 flex items-center justify-center text-[#2076C7] text-xs font-bold">
-                    S
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-bold text-gray-900">System</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {enquiry.enquiry_type.toUpperCase()} enquiry created for {enquiry.quantity} shares
-                    </p>
-                    <p className="text-[10px] text-gray-400 mt-2">{new Date(enquiry.created_at).toLocaleString()}</p>
-                  </div>
-                </div>
-              </div>
-              {enquiry.status === 'RESOLVED' && (
-                <div className="bg-emerald-50 rounded-xl p-5 border border-emerald-100">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                      <CheckCircle className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-emerald-700">Resolved</p>
-                      <p className="text-xs text-emerald-600 mt-0.5">Enquiry marked as resolved</p>
-                      <p className="text-[10px] text-emerald-500 mt-2">{new Date().toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {enquiry.status === 'ARCHIVED' && (
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
-                      <Archive className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-gray-700">Archived</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Enquiry archived</p>
-                      <p className="text-[10px] text-gray-400 mt-2">{new Date().toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Product Interested In</p>
+              <h4 className="font-bold text-gray-900 text-lg leading-tight">{item.product_name || "General Inquiry"}</h4>
+              <span className="text-xs font-bold text-[#1CADA3] uppercase">{item.product_type}</span>
             </div>
-          )}
+          </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
-            {(!enquiry.status || enquiry.status === 'PENDING') && onResolve && (
-              <button
-                onClick={() => onResolve(enquiry.id)}
-                className="flex-1 py-3.5 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-100"
-              >
-                <CheckCircle className="w-4 h-4" />
-                Mark as Resolved
-              </button>
-            )}
-            {(!enquiry.status || enquiry.status === 'PENDING') && onArchive && (
-              <button
-                onClick={() => onArchive(enquiry.id)}
-                className="flex-1 py-3.5 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
-              >
-                <Archive className="w-4 h-4" />
-                Archive
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="px-6 py-3.5 border border-gray-200 text-gray-500 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all"
-            >
-              Close
-            </button>
+          {/* Info Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Name</p>
+              <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <User size={14} className="text-[#2076C7]" /> {item.full_name}
+              </p>
+            </div>
+            <div className="space-y-1 text-right">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Location</p>
+              <p className="text-sm font-bold text-gray-800 flex items-center justify-end gap-2">
+                <MapPin size={14} className="text-red-400" /> {item.city || "N/A"}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone Number</p>
+              <p className="text-sm font-black text-[#2076C7]">{item.phone}</p>
+            </div>
+            <div className="space-y-1 text-right">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Platform</p>
+              <span className="inline-block px-2 py-0.5 bg-purple-50 text-purple-600 text-[10px] font-bold rounded uppercase">
+                {item.platform || "WEB"}
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center gap-3">
+            <Mail size={16} className="text-[#2076C7]" />
+            <span className="text-sm font-medium text-gray-600 truncate">{item.email}</span>
+          </div>
+
+          {/* Message Content */}
+          <div className="space-y-2">
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Message</p>
+             <div className="p-4 bg-slate-50 rounded-2xl border-l-4 border-[#2076C7] text-sm text-gray-600 italic leading-relaxed">
+                "{item.message || "No message provided."}"
+             </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-400 font-bold uppercase">
+             <span>Received On: {new Date(item.created_at).toLocaleDateString()}</span>
+             <button onClick={onClose} className="text-[#2076C7] hover:underline">Close View</button>
           </div>
         </div>
       </motion.div>
@@ -290,472 +107,263 @@ const EnquiryDetailModal: React.FC<EnquiryDetailModalProps> = ({ enquiry, onClos
   );
 };
 
-// --- STATS CARD COMPONENT ---
-interface StatsCardProps {
-  icon: React.ElementType;
-  label: string;
-  value: number;
-  color: string;
-  subText?: string;
-}
+/* ---------------- MAIN COMPONENT ---------------- */
 
-const StatsCard: React.FC<StatsCardProps> = ({ icon: Icon, label, value, color, subText }) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 10 }} 
-    animate={{ opacity: 1, y: 0 }} 
-    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all"
-  >
-    <div className={`w-12 h-12 bg-linear-to-r ${color} rounded-2xl flex items-center justify-center text-white shadow-sm mb-4`}>
-      <Icon className="w-6 h-6" />
-    </div>
-    <p className="text-gray-500 text-sm font-medium">{label}</p>
-    <h2 className="text-2xl font-black text-gray-900 mt-1">{value.toLocaleString()}</h2>
-    {subText && (
-      <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider mt-2 flex items-center gap-1">
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-        </svg> 
-        {subText}
-      </p>
-    )}
-  </motion.div>
-);
-
-// --- MAIN ENQUIRY MANAGEMENT COMPONENT ---
-const EnquiryManagement: React.FC = () => {
-  const [enquiries, setEnquiries] = useState<LocalEnquiry[]>([]);
-  const [filteredEnquiries, setFilteredEnquiries] = useState<LocalEnquiry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'buy' | 'sell'>('all');
-  const [statusFilter, setStatusFilter] = useState<EnquiryStatus>('ALL');
-  const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const [selectedEnquiry, setSelectedEnquiry] = useState<LocalEnquiry | null>(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [dateRange, setDateRange] = useState<'today' | 'week' | 'month' | 'all'>('all');
-
-  useEffect(() => {
-    fetchEnquiries();
-  }, []);
-
-  useEffect(() => {
-    let filtered = [...enquiries];
-
-    if (typeFilter !== 'all') {
-      filtered = filtered.filter(e => e.enquiry_type === typeFilter);
-    }
-
-    if (statusFilter !== 'ALL') {
-      filtered = filtered.filter(e => 
-        statusFilter === 'PENDING' ? (!e.status || e.status === 'PENDING') : e.status === statusFilter
-      );
-    }
-
-    const now = new Date();
-    if (dateRange === 'today') {
-      const today = new Date(now.setHours(0, 0, 0, 0));
-      filtered = filtered.filter(e => new Date(e.created_at) >= today);
-    } else if (dateRange === 'week') {
-      const weekAgo = new Date(now.setDate(now.getDate() - 7));
-      filtered = filtered.filter(e => new Date(e.created_at) >= weekAgo);
-    } else if (dateRange === 'month') {
-      const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
-      filtered = filtered.filter(e => new Date(e.created_at) >= monthAgo);
-    }
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(e => 
-        e.full_name?.toLowerCase().includes(term) ||
-        e.email?.toLowerCase().includes(term) ||
-        e.phone?.includes(term) ||
-        e.id?.toString().includes(term) ||
-        e.enquiry_type?.includes(term)
-      );
-    }
-
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        case 'oldest':
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-        case 'name-asc':
-          return (a.full_name || '').localeCompare(b.full_name || '');
-        case 'name-desc':
-          return (b.full_name || '').localeCompare(a.full_name || '');
-        default:
-          return 0;
-      }
-    });
-
-    setFilteredEnquiries(filtered);
-  }, [enquiries, searchTerm, typeFilter, statusFilter, sortBy, dateRange]);
-
-const fetchEnquiries = async () => {
-  setLoading(true);
-  try {
-    const response = await AdminService.getEnquiries();
-    const enquiriesData = Array.isArray(response) ? response : (response as any)?.data || [];
-    const mappedData: LocalEnquiry[] = enquiriesData.map((e: any) => ({
-      id: e.id,
-      company_id: e.company_id,
-      enquiry_type: e.enquiry_type || 'buy',
-      full_name: e.full_name || '',
-      email: e.email || '',
-      phone: e.phone || '',
-      quantity: e.quantity || 0,
-      created_at: e.created_at || new Date().toISOString(),
-      status: e.status || 'PENDING'
-    }));
-    setEnquiries(mappedData);
-  } catch (error) {
-    toast.error('Error fetching enquiries:');
-  } finally {
-    setLoading(false);
-  }
+const productTypeToCategoryId: Record<string, string> = {
+  SHARE: "unlisted",
+  MUTUAL_FUND: "mutual-funds",
+  PMS: "pms",
+  BOND: "bonds",
+  REAL_ESTATE: "real-estate",
+  NCD: "ncd",
 };
 
-  const handleResolveEnquiry = async (id: number) => {
+const initialCategories = [
+  { id: "all", name: "All Enquiries", icon: Layers },
+  { id: "unlisted", name: "Unlisted", icon: Building2 },
+  { id: "pms", name: "PMS", icon: BarChart3 },
+  { id: "ncd", name: "NCD", icon: TrendingUp },
+  { id: "bonds", name: "Bonds", icon: Layers },
+  { id: "real-estate", name: "Real Estate", icon: Building2 },
+  { id: "mutual-funds", name: "Mutual Funds", icon: TrendingUp },
+];
+
+export default function EnquiryManagement() {
+  const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null); // Added state for Modal
+  
+  const [categories, setCategories] = useState(
+    initialCategories.map((c) => ({ ...c, count: 0 }))
+  );
+
+  const loadEnquiries = useCallback(async () => {
     try {
-      setEnquiries(prev => prev.map(e => 
-        e.id === id ? { ...e, status: 'RESOLVED', updatedAt: new Date().toISOString() } : e
-      ));
-      setShowDetailModal(false);
+      const response = await AdminService.getEnquiries();
+      const data = Array.isArray(response) ? response : (response as any).data || [];
+      setEnquiries(data);
+      updateCategoryCounts(data);
     } catch (error) {
-      toast.error('Failed to resolve enquiry:');
+      toast.error("Error loading enquiries");
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const handleArchiveEnquiry = async (id: number) => {
-    try {
-      setEnquiries(prev => prev.map(e => 
-        e.id === id ? { ...e, status: 'ARCHIVED', updatedAt: new Date().toISOString() } : e
-      ));
-      setShowDetailModal(false);
-    } catch (error) {
-      toast.error('Failed to archive enquiry:');
-    }
-  };
+  useEffect(() => { loadEnquiries(); }, [loadEnquiries]);
 
-  const getTypeCount = (type: 'buy' | 'sell') => {
-    return enquiries.filter(e => e.enquiry_type === type).length;
-  };
-
-  const clearFilters = () => {
-    setSearchTerm('');
-    setTypeFilter('all');
-    setStatusFilter('ALL');
-    setSortBy('newest');
-    setDateRange('all');
-  };
-
-  const totalSharesRequested = enquiries.reduce((sum, e) => sum + e.quantity, 0);
-
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-[#2076C7]/20 border-t-[#2076C7] rounded-full animate-spin mx-auto"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full animate-pulse"></div>
-            </div>
-          </div>
-          <p className="text-gray-600 font-medium mt-6 animate-pulse">Loading enquiries...</p>
-        </div>
-      </div>
+  const updateCategoryCounts = (items: Enquiry[]) => {
+    setCategories((prev) =>
+      prev.map((cat) => {
+        if (cat.id === "all") return { ...cat, count: items.length };
+        const count = items.filter((item) => productTypeToCategoryId[item.product_type || ""] === cat.id).length;
+        return { ...cat, count };
+      })
     );
-  }
+  };
+
+  const filteredItems = useMemo(() => {
+    return enquiries.filter((item) => {
+      const matchesCategory = selectedCategory === "all" || productTypeToCategoryId[item.product_type || ""] === selectedCategory;
+      const matchesSearch = 
+        item.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.product_name?.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [enquiries, selectedCategory, searchQuery]);
+
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-10 h-10 border-4 border-[#2076C7] border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
-    /* ADJUSTED OUTER PADDING, BACKGROUND, AND MIN-HEIGHT HERE */
-    <div className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] min-h-screen font-sans">
-      <div className="space-y-8 animate-fade-in pb-10">
-        
-        {/* Header Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row justify-between items-center gap-4"
-        >
+    <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen font-sans">
+      
+      {/* HEADER BANNER */}
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg">
+        <div className="flex items-center gap-3">
+          <Bookmark className="w-8 h-8 text-white" />
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-              <MessageSquare className="w-6 h-6" /> Enquiry Management
-            </h2>
-            <p className="text-sm opacity-90">Manage and respond to customer buy/sell enquiries.</p>
+            <h2 className="text-2xl font-bold">Lead Management</h2>
+            <p className="text-sm opacity-80">Distinguishing Products from Customer Enquiries</p>
           </div>
-        </motion.div>
+        </div>
+      </motion.div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard 
-            icon={Inbox}
-            label="Total Enquiries"
-            value={enquiries.length}
-            color="from-blue-500 to-cyan-500"
-            subText="Active Requests"
-          />
-          <StatsCard 
-            icon={ShoppingCart}
-            label="Buy Requests"
-            value={getTypeCount('buy')}
-            color="from-green-500 to-emerald-500"
-            subText="Purchase Intent"
-          />
-          <StatsCard 
-            icon={HandCoins}
-            label="Sell Requests"
-            value={getTypeCount('sell')}
-            color="from-orange-500 to-yellow-500"
-            subText="Sell Orders"
-          />
-          <StatsCard 
-            icon={Package}
-            label="Total Shares"
-            value={totalSharesRequested}
-            color="from-rose-500 to-pink-500"
-            subText="Volume Requested"
+      {/* PILL TABS */}
+      <div className="flex justify-center mb-6 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="p-1 bg-slate-100/80 rounded-full flex items-center gap-1 shadow-inner border border-slate-200/50">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`relative px-5 py-2 rounded-full text-xs font-bold uppercase transition-all duration-300 z-10 flex items-center gap-2 ${
+                selectedCategory === cat.id ? "text-white" : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {selectedCategory === cat.id && (
+                <motion.div layoutId="activeTab" className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
+              )}
+              <span>{cat.name}</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${selectedCategory === cat.id ? "bg-white/20 text-white" : "bg-slate-200 text-slate-600"}`}>
+                {cat.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* SEARCH */}
+      <div className="mb-8 flex justify-center">
+        <div className="relative w-full max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by product or customer name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#2076C7]/10 outline-none"
           />
         </div>
+      </div>
 
-        {/* Search and Filter Bar */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search by name, email, phone, or ID..."
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:border-[#2076C7] focus:ring-2 focus:ring-[#2076C7]/10 outline-none transition-all text-gray-900"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+      {/* TABLE */}
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-50 bg-gray-50/50">
+              <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Enquired Product</th>
+              <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Customer Identity</th>
+              <th className="px-6 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Contact Info</th>
+              <th className="px-6 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">City</th>
+              <th className="px-6 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Date</th>
+              <th className="px-6 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {filteredItems.map((item) => (
+              <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                {/* PRODUCT COLUMN */}
+                <td className="px-6 py-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#2076C7]/10 flex items-center justify-center text-[#2076C7]">
+                      <Package size={20} />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-gray-900">{item.product_name || "N/A"}</div>
+                      <div className="text-[10px] font-black text-[#2076C7] uppercase">{item.product_type}</div>
+                    </div>
+                  </div>
+                </td>
+                {/* CUSTOMER COLUMN */}
+                <td className="px-6 py-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[#2076C7] border border-blue-100 font-bold text-xs">
+                      {item.full_name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-gray-700">{item.full_name}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-5 text-center">
+                  <div className="text-sm font-black text-[#2076C7]">{item.phone}</div>
+                  <div className="text-[10px] text-gray-400">{item.email}</div>
+                </td>
+                <td className="px-6 py-5 text-center">
+                   <span className="inline-flex items-center gap-1 text-xs font-bold text-gray-600">
+                    <MapPin size={12} className="text-gray-400" /> {item.city || "N/A"}
+                   </span>
+                </td>
+                <td className="px-6 py-5 text-center text-xs font-bold text-gray-500">
+                  {new Date(item.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                </td>
+                <td className="px-6 py-5 text-center">
+                  <div className="flex justify-center gap-2">
+                    {/* Updated Click Handler */}
+                    <button 
+                      onClick={() => setSelectedEnquiry(item)}
+                      className="p-2 bg-[#2076C7]/10 text-[#2076C7] rounded-lg hover:bg-[#2076C7] hover:text-white transition-all"
+                    >
+                      <Eye size={16}/>
+                    </button>
+                    <button className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
+                      <Trash2 size={16}/>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* MOBILE CARD VIEW */}
+      <div className="md:hidden space-y-4">
+        {filteredItems.map((item) => (
+          <motion.div layout key={item.id} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+            {/* Header: Product Focus */}
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center text-[#2076C7]">
+                  <Package size={24} />
+                </div>
+                <div>
+                  <h3 className="font-black text-slate-800 text-sm leading-tight">{item.product_name}</h3>
+                  <span className="text-[9px] font-bold text-[#1CADA3] uppercase">{item.product_type}</span>
+                </div>
               </div>
-              
-              <div className="flex gap-3 w-full md:w-auto">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all ${
-                    showFilters 
-                      ? 'bg-[#2076C7] text-white shadow-lg shadow-blue-100' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+              <span className="text-[10px] font-bold text-slate-300">#{item.id}</span>
+            </div>
+
+            {/* Content: Customer Focus */}
+            <div className="bg-slate-50 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+                <User size={14} className="text-slate-400" />
+                <span className="text-xs font-bold text-slate-700">{item.full_name}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase">Phone</span>
+                  <span className="text-xs font-black text-[#2076C7]">{item.phone}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase">Location</span>
+                  <span className="text-xs font-bold text-slate-700">{item.city || "N/A"}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-between items-center">
+              <div className="text-[10px] font-bold text-slate-400">
+                {new Date(item.created_at).toLocaleDateString()}
+              </div>
+              <div className="flex gap-2">
+                {/* Updated Mobile Click Handler */}
+                <button 
+                  onClick={() => setSelectedEnquiry(item)}
+                  className="p-2 bg-blue-50 text-[#2076C7] rounded-lg"
                 >
-                  <Filter className="w-4 h-4" />
-                  Filters
-                  {(typeFilter !== 'all' || statusFilter !== 'ALL' || dateRange !== 'all' || sortBy !== 'newest') && (
-                    <span className="w-5 h-5 bg-white text-[#2076C7] rounded-full text-xs flex items-center justify-center font-bold">
-                      1
-                    </span>
-                  )}
+                  <Eye size={18}/>
+                </button>
+                <button className="p-2 bg-red-50 text-red-500 rounded-lg">
+                  <Trash2 size={18}/>
                 </button>
               </div>
             </div>
-
-            <AnimatePresence>
-              {showFilters && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4 pt-6 mt-2 border-t border-gray-100">
-                    <div>
-                      <label className="block text-xs font-black uppercase text-gray-400 mb-2">Enquiry Type</label>
-                      <select
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium outline-none focus:border-[#2076C7]"
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value as 'all' | 'buy' | 'sell')}
-                      >
-                        <option value="all">All Types</option>
-                        <option value="buy">Buy Only</option>
-                        <option value="sell">Sell Only</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black uppercase text-gray-400 mb-2">Status</label>
-                      <select
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium outline-none focus:border-[#2076C7]"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as EnquiryStatus)}
-                      >
-                        <option value="ALL">All Status</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="RESOLVED">Resolved</option>
-                        <option value="ARCHIVED">Archived</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black uppercase text-gray-400 mb-2">Date Range</label>
-                      <select
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium outline-none focus:border-[#2076C7]"
-                        value={dateRange}
-                        onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
-                      >
-                        <option value="all">All Time</option>
-                        <option value="today">Today</option>
-                        <option value="week">Last 7 Days</option>
-                        <option value="month">Last 30 Days</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black uppercase text-gray-400 mb-2">Sort By</label>
-                      <select
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 font-medium outline-none focus:border-[#2076C7]"
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as SortOption)}
-                      >
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="name-asc">Name A-Z</option>
-                        <option value="name-desc">Name Z-A</option>
-                      </select>
-                    </div>
-
-                    <div className="flex items-end">
-                      <button
-                        onClick={clearFilters}
-                        className="w-full px-4 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
-                      >
-                        <X className="w-4 h-4" />
-                        Clear Filters
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-gray-600">
-                Showing {filteredEnquiries.length} of {enquiries.length} enquiries
-              </span>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 text-gray-400 text-[11px] font-black uppercase tracking-widest">
-                  <th className="px-6 py-5 text-left">ID & Date</th>
-                  <th className="px-6 py-5 text-left">Customer</th>
-                  <th className="px-6 py-5 text-left">Contact</th>
-                  <th className="px-6 py-5 text-left">Type & Quantity</th>
-                  <th className="px-6 py-5 text-center">Company</th>
-                  <th className="px-6 py-5 text-center">Status</th>
-                  <th className="px-6 py-5 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredEnquiries.length > 0 ? (
-                  filteredEnquiries.map((enquiry, index) => (
-                    <motion.tr
-                      key={enquiry.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="hover:bg-gray-50/80 transition-colors"
-                    >
-                      <td className="px-6 py-5">
-                        <div className="font-mono font-bold text-gray-400 text-xs">#{enquiry.id}</div>
-                        <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(enquiry.created_at).toLocaleDateString('en-IN', {
-                            day: '2-digit',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center text-[#2076C7] font-bold text-sm">
-                            {enquiry.full_name?.charAt(0).toUpperCase() || 'U'}
-                          </div>
-                          <div className="font-bold text-gray-900 text-sm">{enquiry.full_name}</div>
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-5">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 text-xs text-gray-600">
-                            <Mail className="w-3.5 h-3.5 text-gray-400" />
-                            <span className="truncate max-w-[150px]">{enquiry.email}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-gray-600">
-                            <Phone className="w-3.5 h-3.5 text-gray-400" />
-                            {enquiry.phone}
-                          </div>
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold ${
-                            enquiry.enquiry_type === 'buy' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                          }`}>
-                            {enquiry.enquiry_type.toUpperCase()}
-                          </span>
-                          <span className="text-sm font-bold text-gray-900">{enquiry.quantity.toLocaleString()}</span>
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-5 text-center">
-                        <span className="text-sm font-medium text-gray-900">#{enquiry.company_id}</span>
-                      </td>
-                      
-                      <td className="px-6 py-5 text-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold ${
-                          enquiry.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                        }`}>
-                          {enquiry.status || 'PENDING'}
-                        </span>
-                      </td>
-                      
-                      <td className="px-6 py-5">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => { setSelectedEnquiry(enquiry); setShowDetailModal(true); }}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))
-                ) : (
-                  <tr><td colSpan={7} className="px-6 py-16 text-center text-gray-400">No enquiries found</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+          </motion.div>
+        ))}
       </div>
 
+      {/* DETAIL MODAL OVERLAY */}
       <AnimatePresence>
-        {showDetailModal && selectedEnquiry && (
-          <EnquiryDetailModal
-            enquiry={selectedEnquiry}
-            onClose={() => { setShowDetailModal(false); setSelectedEnquiry(null); }}
-            onResolve={handleResolveEnquiry}
-            onArchive={handleArchiveEnquiry}
+        {selectedEnquiry && (
+          <EnquiryDetailModal 
+            item={selectedEnquiry} 
+            onClose={() => setSelectedEnquiry(null)} 
           />
         )}
       </AnimatePresence>
     </div>
   );
-};
-
-export default EnquiryManagement;
+}

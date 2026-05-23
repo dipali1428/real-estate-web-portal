@@ -599,120 +599,188 @@ const BuyShares: FC = () => {
         </section>
       </main>
 
-      {/* DETAIL MODAL (FULL ORIGINAL LOGIC PRESERVED) */}
+      {/* RESPONSIVE DETAIL MODAL - FULLY ADAPTED FOR MOBILE */}
       {detailCompany && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 animate-fadeIn overflow-hidden flex flex-col border border-gray-100">
-            <div className="bg-white border-b border-gray-100 p-6 flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
-                  {detailCompany.logo ? <Image src={detailCompany.logo} width={200} height={120} className="w-full h-full object-contain p-2" alt={detailCompany.name} /> : <span className="text-2xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>}
+          <div className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl my-8 animate-fadeIn overflow-hidden flex flex-col border border-gray-100 max-h-[95vh] md:max-h-[90vh]">
+            {/* Modal Header - Responsive stacking on mobile */}
+            <div className="bg-white border-b border-gray-100 p-4 md:p-6 flex flex-col md:flex-row md:items-start justify-between gap-4">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="w-12 h-12 md:w-20 md:h-20 rounded-lg bg-white border border-gray-100 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
+                  {detailCompany.logo ? (
+                    <Image src={detailCompany.logo} width={200} height={120} className="w-full h-full object-contain p-1 md:p-2" alt={detailCompany.name} />
+                  ) : (
+                    <span className="text-xl md:text-2xl font-bold text-[#2076C7]">{detailCompany.name.charAt(0)}</span>
+                  )}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 mb-1"><span className="px-3 py-1 bg-blue-50 text-[#2076C7] text-xs font-bold rounded-full">{detailCompany.category}</span></div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{detailCompany.name}</h2>
-                  <p className="text-sm text-gray-500 mt-1 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {detailCompany.headquarters} • Est. {detailCompany.founded_year}</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 md:px-3 md:py-1 bg-blue-50 text-[#2076C7] text-[10px] md:text-xs font-bold rounded-full">
+                      {detailCompany.category}
+                    </span>
+                  </div>
+                  <h2 className="text-lg md:text-2xl lg:text-3xl font-bold text-gray-900 line-clamp-2">{detailCompany.name}</h2>
+                  <p className="text-xs text-gray-500 mt-0.5 md:mt-1 flex items-center gap-1">
+                    <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5" /> {detailCompany.headquarters} • Est. {detailCompany.founded_year}
+                  </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-center justify-between md:justify-end gap-4">
                 <div className="text-right">
-                  <p className="text-xs text-gray-500 font-medium">Current Price</p>
-                  <div className="text-2xl md:text-3xl font-bold text-[#10b981]">₹{detailCompany.price.toLocaleString('en-IN')}</div>
+                  <p className="text-[10px] md:text-xs text-gray-500 font-medium">Current Price</p>
+                  <div className="text-lg md:text-2xl lg:text-3xl font-bold text-[#10b981]">₹{detailCompany.price.toLocaleString('en-IN')}</div>
                 </div>
-                <button onClick={() => setDetailCompany(null)} className="p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"><X size={24} /></button>
+                <button 
+                  onClick={() => setDetailCompany(null)} 
+                  className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
+                >
+                  <X size={20} className="md:w-6 md:h-6" />
+                </button>
               </div>
             </div>
 
-            <div className="p-6 md:p-8 bg-gray-50/30 overflow-y-auto max-h-[calc(90vh-120px)]">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {/* Scrollable Content - Adjusted padding for mobile */}
+            <div className="p-4 md:p-6 lg:p-8 bg-gray-50/30 overflow-y-auto">
+              {/* Stats Grid - Responsive: 2x2 on mobile, 4 on desktop */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
                 {[
                   { label: 'Minimum Lot', value: `${detailCompany.lotSize.toLocaleString()} Shares`, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
                   { label: 'Min Investment', value: calculateMinInvestment(detailCompany.price, detailCompany.lotSize), icon: IndianRupee, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                   { label: 'Face Value', value: `₹${detailCompany.face_value}`, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50' },
                   { label: 'Market Cap', value: detailCompany.market_cap, icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
                 ].map((item, i) => (
-                  <div key={i} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <div className={`w-10 h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-3`}><item.icon size={20} /></div>
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{item.label}</p>
-                    <p className="text-lg font-bold text-gray-900">{item.value}</p>
+                  <div key={i} className="bg-white p-3 md:p-4 lg:p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                    <div className={`w-7 h-7 md:w-9 md:h-9 lg:w-10 lg:h-10 ${item.bg} ${item.color} rounded-lg flex items-center justify-center mb-2 md:mb-3`}>
+                      <item.icon size={16} className="md:w-5 md:h-5 lg:w-5 lg:h-5" />
+                    </div>
+                    <p className="text-[10px] md:text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5 md:mb-1">{item.label}</p>
+                    <p className="text-sm md:text-base lg:text-lg font-bold text-gray-900 break-words">{item.value}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                  <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
+              {/* Main Content - Responsive stacking */}
+              <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+                {/* Left Column - Chart & About */}
+                <div className="lg:w-2/3 space-y-4 md:space-y-6">
+                  {/* Chart Section - Fully responsive */}
+                  <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
                       <div>
-                        <div className="flex items-center gap-2 mb-1"><span className="text-xs font-medium text-gray-500">Price History</span><span className="text-[10px] text-gray-400">• {graphTimeRange}</span></div>
-                        <h3 className="text-2xl font-bold text-gray-900">₹{detailCompany.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h3>
+                        <div className="flex items-center gap-2 mb-0.5 md:mb-1">
+                          <span className="text-xs md:text-sm font-medium text-gray-500">Price History</span>
+                          <span className="text-[9px] md:text-[10px] text-gray-400">• {graphTimeRange}</span>
+                        </div>
+                        <h3 className="text-xl md:text-2xl font-bold text-gray-900">₹{detailCompany.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h3>
                       </div>
-                      <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80">
+                      <div className="flex gap-1 bg-gray-50/80 p-1 rounded-lg border border-gray-200/80 self-start sm:self-auto">
                         {['All', '3M', '1M', '1W'].map(r => (
-                          <button key={r} onClick={() => setGraphTimeRange(r)} className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all ${graphTimeRange === r ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}>{r}</button>
+                          <button
+                            key={r}
+                            onClick={() => setGraphTimeRange(r)}
+                            className={`px-2.5 md:px-3.5 py-1 md:py-1.5 text-xs font-medium rounded-md transition-all ${
+                              graphTimeRange === r 
+                                ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
+                                : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                          >
+                            {r}
+                          </button>
                         ))}
                       </div>
                     </div>
-                    <div className="h-64 w-full relative mb-8">
-                      {isGraphLoading ? <div className="h-full flex items-center justify-center"><Loader2 className="animate-spin text-[#2076C7]" size={32} /></div> : graphData.length > 0 ? <canvas ref={chartRef}></canvas> : <div className="h-full flex items-center justify-center text-gray-400">No price data available</div>}
+                    <div className="h-48 sm:h-56 md:h-64 w-full relative">
+                      {isGraphLoading ? (
+                        <div className="h-full flex items-center justify-center">
+                          <Loader2 className="animate-spin text-[#2076C7]" size={28} />
+                        </div>
+                      ) : graphData.length > 0 ? (
+                        <canvas ref={chartRef} className="w-full h-full"></canvas>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-gray-400 text-sm">No price data available</div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Description Card */}
-                  <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                    <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2"><Info className="text-[#1CADA3]" size={20} /> About the Company</h3>
-                    <p className="text-gray-600 leading-relaxed text-sm">
+                  {/* About Company - Responsive text sizing */}
+                  <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
+                    <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 md:mb-3 flex items-center gap-2">
+                      <Info className="text-[#1CADA3]" size={18} /> About the Company
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">
                       {detailCompany.description || `${detailCompany.name} is a leading player in the ${detailCompany.category} sector with strong growth potential and a proven track record of innovation. The company has shown consistent performance and is poised for significant expansion in the coming years.`}
                     </p>
                     
-                    <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
+                    {/* Company Details Grid - Responsive */}
+                    <div className="grid grid-cols-2 gap-3 md:gap-4 mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100">
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">ISIN</p>
-                        <p className="text-sm font-semibold text-gray-900">{detailCompany.isin}</p>
+                        <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">ISIN</p>
+                        <p className="text-xs md:text-sm font-semibold text-gray-900 break-words">{detailCompany.isin}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Depository</p>
-                        <p className="text-sm font-semibold text-gray-900">{detailCompany.depository}</p>
+                        <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">Depository</p>
+                        <p className="text-xs md:text-sm font-semibold text-gray-900">{detailCompany.depository}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Face Value</p>
-                        <p className="text-sm font-semibold text-gray-900">₹{detailCompany.face_value}</p>
+                        <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">Face Value</p>
+                        <p className="text-xs md:text-sm font-semibold text-gray-900">₹{detailCompany.face_value}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Lot Size</p>
-                        <p className="text-sm font-semibold text-gray-900">{detailCompany.lotSize.toLocaleString()} shares</p>
+                        <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">Lot Size</p>
+                        <p className="text-xs md:text-sm font-semibold text-gray-900">{detailCompany.lotSize.toLocaleString()} shares</p>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="space-y-6">
-                  <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                    <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><Activity size={16} className="text-[#2076C7]" /> Key Statistics</h4>
-                    <div className="space-y-4">
-                      {[ { label: 'P/E Ratio', value: detailCompany.pe_ratio }, { label: 'P/B Ratio', value: detailCompany.pb_ratio }, { label: 'ROE', value: `${detailCompany.roe}%` } ].map((stat, i) => (
-                        <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0"><span className="text-xs text-gray-500">{stat.label}</span><span className="text-sm font-bold text-gray-900">{stat.value}</span></div>
+                {/* Right Column - Stats & CTA */}
+                <div className="lg:w-1/3 space-y-4 md:space-y-6">
+                  {/* Key Statistics */}
+                  <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
+                    <h4 className="text-sm md:text-base font-bold text-gray-900 mb-3 md:mb-4 flex items-center gap-2">
+                      <Activity size={16} className="text-[#2076C7]" /> Key Statistics
+                    </h4>
+                    <div className="space-y-3 md:space-y-4">
+                      {[
+                        { label: 'P/E Ratio', value: detailCompany.pe_ratio },
+                        { label: 'P/B Ratio', value: detailCompany.pb_ratio },
+                        { label: 'ROE', value: `${detailCompany.roe}%` }
+                      ].map((stat, i) => (
+                        <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                          <span className="text-xs md:text-sm text-gray-500">{stat.label}</span>
+                          <span className="text-sm md:text-base font-bold text-gray-900">{stat.value}</span>
+                        </div>
                       ))}
                     </div>
                   </div>
-                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                    <h4 className="text-sm font-bold text-gray-900 mb-3 text-center">Ready to Invest?</h4>
-                    <p className="text-xs text-gray-500 mb-6 text-center font-bold">Min investment: {calculateMinInvestment(detailCompany.price, detailCompany.lotSize)}</p>
-                    <button onClick={() => { setDetailCompany(null); handleBuyNowClick(detailCompany); }} className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white font-bold rounded-lg hover:opacity-90 transition-all">Buy Now</button>
+
+                  {/* Investment CTA - Sticky on desktop, not on mobile */}
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-200 shadow-sm lg:sticky lg:top-4">
+                    <h4 className="text-sm md:text-base font-bold text-gray-900 mb-2 text-center">Ready to Invest?</h4>
+                    <p className="text-xs md:text-sm text-gray-500 mb-4 md:mb-6 text-center font-bold">
+                      Min investment: {calculateMinInvestment(detailCompany.price, detailCompany.lotSize)}
+                    </p>
+                    <button 
+                      onClick={() => { setDetailCompany(null); handleBuyNowClick(detailCompany); }} 
+                      className="w-full py-2.5 md:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm md:text-base font-bold rounded-lg hover:opacity-90 transition-all"
+                    >
+                      Buy Now
+                    </button>
                   </div>
-                                    {/* Valuation Progress Bars */}
-                  <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                    <h4 className="text-sm font-bold text-gray-900 mb-4">Valuation Metrics</h4>
-                    <div className="space-y-5">
+
+                  {/* Valuation Metrics - Responsive */}
+                  <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
+                    <h4 className="text-sm md:text-base font-bold text-gray-900 mb-3 md:mb-4">Valuation Metrics</h4>
+                    <div className="space-y-4 md:space-y-5">
                       {[
                         { label: 'Industry Position', value: '85%', percent: 85 },
                         { label: 'Growth Potential', value: '72%', percent: 72 },
                         { label: 'Market Demand', value: '68%', percent: 68 }
                       ].map((metric, i) => (
                         <div key={i}>
-                          <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-xs text-gray-600">{metric.label}</span>
-                            <span className="text-xs font-bold text-gray-900">{metric.value}</span>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-xs md:text-sm text-gray-600">{metric.label}</span>
+                            <span className="text-xs md:text-sm font-bold text-gray-900">{metric.value}</span>
                           </div>
                           <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                             <div 

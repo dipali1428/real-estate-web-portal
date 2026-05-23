@@ -193,14 +193,14 @@ const EMICalculatorContent: React.FC = () => {
   }, [loanTenure]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row p-6 lg:p-8 font-sans">
+    <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row p-4 sm:p-6 lg:p-8 font-sans">
           {/* Input Section */}
-          <div className="flex-1 min-w-0 lg:pr-8 lg:border-r border-gray-200">
+          <div className="flex-1 min-w-0 lg:pr-6 xl:pr-8 lg:border-r border-gray-200">
             {/* Loan Amount */}
-            <div className="mb-6">
-              <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-5 sm:mb-6">
+              <label htmlFor="loanAmount" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Loan Amount (₹)
               </label>
               <div className="slider-container mb-2">
@@ -214,7 +214,7 @@ const EMICalculatorContent: React.FC = () => {
                   onChange={handleLoanAmountChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>₹1,00,000</span>
                   <span>₹5,00,00,000</span>
                 </div>
@@ -225,16 +225,16 @@ const EMICalculatorContent: React.FC = () => {
                   id="loanAmountInput"
                   value={getLoanAmountDisplayValue()}
                   onChange={handleLoanAmountInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-10 sm:pr-12 text-gray-800 placeholder:text-gray-500 text-sm sm:text-base"
                   placeholder="Enter loan amount"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">₹</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">₹</span>
               </div>
             </div>
 
             {/* Interest Rate */}
-            <div className="mb-6">
-              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-5 sm:mb-6">
+              <label htmlFor="interestRate" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Interest Rate (% per annum)
               </label>
               <div className="slider-container mb-2">
@@ -248,7 +248,7 @@ const EMICalculatorContent: React.FC = () => {
                   onChange={handleInterestRateChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>7%</span>
                   <span>50%</span>
                 </div>
@@ -262,15 +262,15 @@ const EMICalculatorContent: React.FC = () => {
                   step="0.1"
                   value={getInterestRateDisplayValue()}
                   onChange={handleInterestRateInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-12 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-10 sm:pr-12 text-gray-800 placeholder:text-gray-500 text-sm sm:text-base"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">%</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">%</span>
               </div>
             </div>
 
             {/* Loan Tenure */}
-            <div className="mb-8">
-              <label htmlFor="loanTenure" className="block text-[#2076C7] font-semibold mb-2">
+            <div className="mb-6 sm:mb-8">
+              <label htmlFor="loanTenure" className="block text-[#2076C7] font-semibold mb-2 text-sm sm:text-base">
                 Loan Tenure (Years)
               </label>
               <div className="slider-container mb-2">
@@ -284,7 +284,7 @@ const EMICalculatorContent: React.FC = () => {
                   onChange={handleLoanTenureChange}
                   className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer slider"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>1 Year</span>
                   <span>30 Years</span>
                 </div>
@@ -297,58 +297,58 @@ const EMICalculatorContent: React.FC = () => {
                   max="30"
                   value={getLoanTenureDisplayValue()}
                   onChange={handleLoanTenureInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-20 text-gray-800 placeholder:text-gray-500"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded focus:outline-none focus:border-[#1CADA3] bg-gray-100 focus:bg-white focus:ring-0 focus:ring-teal-200 transition-colors pr-16 sm:pr-20 text-gray-800 placeholder:text-gray-500 text-sm sm:text-base"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">Years</span>
+                <span className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">Years</span>
               </div>
             </div>
 
             {/* Results Section */}
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
-              <div className="text-3xl font-bold text-[#1CADA3] font-sans text-center mb-6">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#1CADA3]">
+              <div className="text-2xl sm:text-3xl font-bold text-[#1CADA3] font-sans text-center mb-4 sm:mb-6 break-all">
                 {emi > 0 ? formatCurrency(emi) : '₹0'}
               </div>
-              <div className="flex justify-between">
-                <div className="text-center flex-1 px-4">
-                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+              <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
+                <div className="text-center flex-1 px-2 sm:px-4">
+                  <div className="text-base sm:text-lg font-medium font-sans text-[#1CADA3] break-all">
                     {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
                   </div>
-                  <div className="text-sm text-[#1CADA3] mt-1">Total Payment</div>
+                  <div className="text-xs sm:text-sm text-[#1CADA3] mt-1">Total Payment</div>
                 </div>
-                <div className="text-center flex-1 px-4">
-                  <div className="text-lg font-medium font-sans text-[#1CADA3]">
+                <div className="text-center flex-1 px-2 sm:px-4">
+                  <div className="text-base sm:text-lg font-medium font-sans text-[#1CADA3] break-all">
                     {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </div>
-                  <div className="text-sm text-[#1CADA3] mt-1">Total Interest</div>
+                  <div className="text-xs sm:text-sm text-[#1CADA3] mt-1">Total Interest</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Visualization Section */}
-          <div className="flex-1 min-w-0 lg:pl-8 mt-8 lg:mt-0">
-            <div className="chart-container h-64 mb-6">
+          <div className="flex-1 min-w-0 lg:pl-6 xl:pl-8 mt-6 lg:mt-0">
+            <div className="chart-container h-48 sm:h-56 md:h-64 mb-4 sm:mb-6">
               <canvas ref={canvasRef}></canvas>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-6">
-              <h5 className="text-[#2076C7] font-semibold mb-4 text-lg">Loan Summary</h5>
-              <div className="space-y-4">
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Principal Amount</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#2076C7] mb-4 sm:mb-6">
+              <h5 className="text-[#2076C7] font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Loan Summary</h5>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200">
+                  <span className="text-gray-600 text-sm sm:text-base">Principal Amount</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {loanAmount > 0 ? formatCurrency(loanAmount) : '₹0'}
                   </span>
                 </div>
-                <div className="flex justify-between pb-3 border-b border-gray-200">
-                  <span className="text-gray-600">Total Interest Payable</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                <div className="flex justify-between pb-2 sm:pb-3 border-b border-gray-200">
+                  <span className="text-gray-600 text-sm sm:text-base">Total Interest Payable</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {totalInterest > 0 ? formatCurrency(totalInterest) : '₹0'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Total Amount Payable</span>
-                  <span className="font-medium font-sans text-[#1CADA3]">
+                  <span className="text-gray-600 text-sm sm:text-base">Total Amount Payable</span>
+                  <span className="font-medium font-sans text-[#1CADA3] text-sm sm:text-base break-all">
                     {totalPayment > 0 ? formatCurrency(totalPayment) : '₹0'}
                   </span>
                 </div>
@@ -356,12 +356,12 @@ const EMICalculatorContent: React.FC = () => {
             </div>
 
             {/* Insights Section */}
-            <div className="bg-white rounded-xl border shadow-md p-5">
-              <h2 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+            <div className="bg-white rounded-xl border shadow-md p-4 sm:p-5">
+              <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 Key Insights
               </h2>
 
-              <div className="text-gray-700 leading-relaxed text-xs">
+              <div className="text-gray-700 leading-relaxed text-xs sm:text-sm">
                 <ul className="list-disc pl-4 space-y-1.5">
                   <li>
                     <span className="font-medium">Your monthly commitment</span> - You need to pay{' '}
@@ -446,14 +446,14 @@ const EMICalculatorContent: React.FC = () => {
                   </li>
                 </ul>
                 
-                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="mt-3 p-2.5 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-xs text-yellow-800">
                     <strong>Pro Tip:</strong> Aim to make at least one extra EMI payment each year. 
                     This can reduce your loan tenure by several years and save lakhs in interest payments.
                   </p>
                 </div>
                 
-                <p className="text-[11px] text-gray-500 mt-2">
+                <p className="text-[10px] sm:text-[11px] text-gray-500 mt-2">
                   <strong>Note:</strong> This calculation doesn&apos;t account for processing fees, insurance, or any other charges. 
                   Actual EMI may vary based on lender policies.
                 </p>
@@ -478,26 +478,26 @@ const EMICalculatorStandalone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-6 px-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">EMI Calculator</h1>
-        <p className="text-blue-100">Calculate your Equated Monthly Installment</p>
+      {/* Header - Responsive */}
+      <div className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white py-4 sm:py-6 px-4 sm:px-8 text-center">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">EMI Calculator</h1>
+        <p className="text-blue-100 text-sm sm:text-base px-2">Calculate your Equated Monthly Installment</p>
       </div>
 
-      {/* Dropdown */}
-      <div className="container mx-auto px-4 py-4 max-w-md">
+      {/* Dropdown - Responsive */}
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-md">
         <div className="relative">
           <button 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full bg-white border-2 border-gray-200 p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
+            className="w-full bg-white border-2 border-gray-200 p-3 sm:p-4 rounded-xl flex items-center justify-between hover:border-teal-500 transition-colors shadow-sm"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
-                <activeData.icon className="w-5 h-5 text-teal-600" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-500/10 rounded-lg flex items-center justify-center">
+                <activeData.icon className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
               </div>
-              <span className="font-semibold text-gray-800 text-lg">{activeData.label}</span>
+              <span className="font-semibold text-gray-800 text-base sm:text-lg">{activeData.label}</span>
             </div>
-            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <AnimatePresence>
@@ -515,27 +515,27 @@ const EMICalculatorStandalone: React.FC = () => {
                       handleCalculatorChange(calc.path);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                    className={`w-full text-left p-3 sm:p-4 flex items-center gap-2 sm:gap-3 hover:bg-gray-50 transition-colors ${
                       calc.id === 'emi' ? 'bg-teal-500/5' : ''
                     }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${
                       calc.id === 'emi' 
                         ? 'bg-teal-500 text-white' 
                         : 'bg-gray-100 text-gray-500'
                     }`}>
-                      <calc.icon className="w-4 h-4" />
+                      <calc.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <div className="flex-1">
-                      <span className={`font-medium ${
+                      <span className={`font-medium text-sm sm:text-base ${
                         calc.id === 'emi' ? 'text-teal-600' : 'text-gray-700'
                       }`}>
                         {calc.label}
                       </span>
-                      <p className="text-xs text-gray-400 line-clamp-1">{calc.desc}</p>
+                      <p className="text-xs text-gray-400 line-clamp-1 hidden sm:block">{calc.desc}</p>
                     </div>
                     {calc.id === 'emi' && (
-                      <CheckCircle2 className="w-4 h-4 text-teal-500 ml-auto" />
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500 ml-auto" />
                     )}
                   </button>
                 ))}
