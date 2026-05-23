@@ -7,6 +7,7 @@ import { IconCheck, IconSchool, IconBuildingBank, IconWorld, IconAward, IconCurr
 import { useModal } from '../../../context/ModalContext';
 import EMICalculator from './EMICalculator';
 import MarketComparison from './MarketComparision';
+import EducationLoanForm from '@/app/dashboard/leadmanagement/forms/educationloanform';
 
 const loanTypes = [
     {
@@ -80,6 +81,7 @@ const comparison = [
 export default function LoanTypesSection({ showOnlyLive = false, isDashboard = false }: { showOnlyLive?: boolean, isDashboard?: boolean }) {
     const { openLogin, openApplyNow } = useModal();
     const [activeTab, setActiveTab] = useState<'plans' | 'details' | 'calculator'>('plans');
+    const [isFormOpen, setIsFormOpen] = useState(false);
 
     return (
         <section className={isDashboard ? '' : "py-2 bg-white relative overflow-hidden"}>
@@ -236,7 +238,13 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                                             {/* Apply Now Button */}
                                             <div className="mt-auto flex justify-center">
                                                 <button
-                                                    onClick={() => openApplyNow(loan.title, isDashboard)}
+                                                    onClick={() => {
+                                                        if (isDashboard) {
+                                                            setIsFormOpen(true);
+                                                        } else {
+                                                            openApplyNow(loan.title, isDashboard);
+                                                        }
+                                                    }}
                                                     className="relative inline-flex items-center gap-2 px-10 py-3.5 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group whitespace-nowrap"
                                                     style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                                                 >
@@ -528,6 +536,9 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                     )}
                 </AnimatePresence>
             </div>
+            {isFormOpen && (
+                <EducationLoanForm onClose={() => setIsFormOpen(false)} />
+            )}
         </section>
     );
 }

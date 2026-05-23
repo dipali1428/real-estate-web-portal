@@ -88,7 +88,7 @@ export default function FDAdminPage() {
     const fetchPlans = async () => {
         setIsLoading(true);
         try {
-            const data = await FDAdminService.getFDPlans();
+            const data = await FDAdminService.getAllPlans();
             setPlans(Array.isArray(data) ? data : []);
         } catch {
             showToast('Failed to load FD plans', 'error');

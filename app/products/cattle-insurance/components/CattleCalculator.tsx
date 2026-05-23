@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -20,6 +19,7 @@ import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend
 } from 'recharts';
 import { useModal } from '../../../context/ModalContext';
+import CattleInsuranceForm from '@/app/dashboard/leadmanagement/forms/cattleinsuranceform';
 
 type CattleCalculatorProps = {
     isDashboard?: boolean;
@@ -62,9 +62,10 @@ export default function CattleCalculator({
 }: CattleCalculatorProps) {
     const { openLogin } = useModal();
     const [step, setStep] = useState(1);
+    const [showForm, setShowForm] = useState(false);
     const [animal, setAnimal] = useState(LIVESTOCK_TYPES[0]);
     const [marketValue, setMarketValue] = useState(0);
-    const [age, setAge] = useState(3);
+    const [age, setAge] = useState(36);
     const [breedType, setBreedType] = useState('indigenous');
     const [purpose, setPurpose] = useState('');
     const [scheme, setScheme] = useState(SCHEMES[0]);
@@ -75,8 +76,8 @@ export default function CattleCalculator({
         const rafId = requestAnimationFrame(() => {
             setMarketValue(animal.baseValue);
 
-            if (age > animal.maxAge) {
-                setAge(animal.maxAge);
+            if (age > animal.maxAge * 12) {
+                setAge(animal.maxAge * 12);
             }
         });
 
@@ -85,7 +86,7 @@ export default function CattleCalculator({
 
     useEffect(() => {
         let baseRate = animal.rate;
-        if (age > animal.maxAge * 0.7) baseRate += 0.005;
+        if (age > animal.maxAge * 12 * 0.7) baseRate += 0.005;
         if (breedType === 'exotic') baseRate += 0.01;
         if (breedType === 'cross') baseRate += 0.005;
         if (purpose === 'milch') baseRate += 0.005;
@@ -115,12 +116,12 @@ export default function CattleCalculator({
     ];
 
     return (
-        <section className="py-8 bg-white relative overflow-hidden" id="calculator">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden">
+        <section className={`py-8 relative overflow-hidden ${isDashboard ? 'px-4 lg:px-8 bg-transparent' : 'bg-white'}`} id="calculator">
+            <div className={isDashboard ? "w-full" : "max-w-7xl mx-auto px-6"}>
+                <div className={isDashboard ? "" : "bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden"}>
 
                     {/* Header */}
-                    <div className="bg-white border-b border-slate-50 py-10 px-6 text-center">
+                    <div className={isDashboard ? "pb-10 px-6 text-center" : "bg-white border-b border-slate-50 py-10 px-6 text-center"}>
                         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                             <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
                                 Cattle Insurance Calculator
@@ -194,28 +195,28 @@ export default function CattleCalculator({
                                             {/* Age */}
                                             <div className="space-y-4">
                                                 <label className="block text-base md:text-lg font-extrabold text-[#2076C7]">
-                                                    <span className="flex items-center gap-2"><IconActivity size={20} />Age (Years)</span>
+                                                    <span className="flex items-center gap-2"><IconActivity size={20} />Age (Months)</span>
                                                 </label>
                                                 <input
                                                     type="range"
                                                     min="1"
-                                                    max={animal.maxAge}
+                                                    max={animal.maxAge * 12}
                                                     step="1"
                                                     value={age}
                                                     onChange={(e) => setAge(Number(e.target.value))}
                                                     className="w-full h-2 rounded-lg appearance-none cursor-pointer transition-all"
-                                                    style={getSliderStyle(age, 1, animal.maxAge)}
+                                                    style={getSliderStyle(age, 1, animal.maxAge * 12)}
                                                 />
                                                 <div className="flex justify-between text-xs md:text-sm font-bold text-slate-400">
-                                                    <span>1 Year</span><span>{animal.maxAge} Years</span>
+                                                    <span>1 Month</span><span>{animal.maxAge * 12} Months</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <div className="relative flex-grow">
                                                         <input type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-4 pr-10 py-2.5 text-base font-extrabold text-slate-700 focus:outline-none focus:ring-4 focus:ring-[#2076C7]/5 transition-all text-center" />
-                                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 font-bold text-sm">Yr</span>
+                                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 font-bold text-sm">Mo</span>
                                                     </div>
                                                     <button onClick={() => setAge(Math.max(1, age - 1))} className="p-2 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50 hover:text-[#2076C7] transition-all">−</button>
-                                                    <button onClick={() => setAge(Math.min(animal.maxAge, age + 1))} className="p-2 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50 hover:text-[#2076C7] transition-all">+</button>
+                                                    <button onClick={() => setAge(Math.min(animal.maxAge * 12, age + 1))} className="p-2 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50 hover:text-[#2076C7] transition-all">+</button>
                                                 </div>
                                             </div>
 
@@ -313,7 +314,7 @@ export default function CattleCalculator({
                                                 if (marketValue <= 0) { toast.error('Please enter Market Value'); return; }
                                                 if (purpose === '') { toast.error('Please select Usage Purpose'); return; }
                                             }
-                                            if (step < 3) { nextStep(); } else { toast.success('Quote Confirmed!'); document.getElementById('coverage')?.scrollIntoView({ behavior: 'smooth' }); }
+                                            if (step < 3) { nextStep(); } else { toast.success('Quote Confirmed!'); if (onShowPlans) { onShowPlans(); } else { document.getElementById('coverage')?.scrollIntoView({ behavior: 'smooth' }); } }
                                         }}
                                         disabled={step === 1 && (marketValue <= 0 || purpose === '')}
                                         className={`flex-grow py-4 text-white font-black uppercase tracking-widest text-sm rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-3 ${step === 1 && (marketValue <= 0 || purpose === '') ? 'bg-slate-300 cursor-not-allowed' : 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] hover:shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:-translate-y-0.5'}`}
@@ -431,7 +432,7 @@ export default function CattleCalculator({
                                         </div>
                                         <div className="flex justify-between items-center py-2 border-b border-slate-100">
                                             <span className="text-sm font-bold text-slate-500">Age</span>
-                                            <span className="text-base font-extrabold text-[#1CADA3]">{age} Year{age > 1 ? 's' : ''}</span>
+                                            <span className="text-base font-extrabold text-[#1CADA3]">{age} Month{age > 1 ? 's' : ''}</span>
                                         </div>
                                         <div className="flex justify-between items-center py-2 border-b border-slate-100">
                                             <span className="text-sm font-bold text-slate-500">Purpose</span>
@@ -448,7 +449,13 @@ export default function CattleCalculator({
                                     </div>
 
                                     <button
-                                        onClick={openLogin}
+                                        onClick={() => {
+                                            if (isDashboard) {
+                                                setShowForm(true);
+                                            } else {
+                                                openLogin();
+                                            }
+                                        }}
                                         className="w-full mt-10 md:mt-12 group relative flex items-center justify-center gap-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white py-5 px-8 rounded-2xl font-black text-sm tracking-widest uppercase overflow-hidden shadow-[0_20px_40px_-15px_rgba(28,173,163,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(28,173,163,0.6)] hover:-translate-y-1 transition-all duration-300"
                                     >
                                         Apply For Cattle Insurance
@@ -470,6 +477,15 @@ export default function CattleCalculator({
                     </div>
                 </div>
             </div>
+
+            {/* Form Modal */}
+            {showForm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative my-8">
+                        <CattleInsuranceForm onClose={() => setShowForm(false)} />
+                    </div>
+                </div>
+            )}
 
             <style>{`
                 input[type='range']::-webkit-slider-thumb {

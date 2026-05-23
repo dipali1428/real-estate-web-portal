@@ -24,8 +24,8 @@ export const FDAdminService = {
   /**
    * Get Current FD Plans (optional, for previewing in admin if needed)
    */
-  getFDPlans: async () => {
-    const response = await api.get("/api/unlisted/admin/fd/plans");
+   getAllPlans: async () => {
+    const response = await api.get("/api/products/investments/fd/plans");
     return response.data?.data || [];
   },
 

@@ -457,6 +457,7 @@ const CompanyDetailModal: React.FC<{
               </p>
             </div>
           </div>
+          
           <div className="flex items-center justify-between md:justify-end gap-4">
             <div className="text-right">
               <p className="text-[10px] md:text-xs text-gray-500 font-medium">Current Price</p>
