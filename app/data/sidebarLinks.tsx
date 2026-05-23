@@ -138,11 +138,12 @@ export const sidebarLinks = {
         { label: "My Profile", href: "/accounts/profile", icon: <User className="h-5 w-5 text-neutral-700" /> },
         { label: "KYC Management", href: "/accounts/kycmanagement", icon: <ShieldCheck className="h-5 w-5 text-neutral-700" /> },
         {
-            label: "All Leads", href: "/accounts/allleads", icon: <Layers className="h-5 w-5 text-neutral-700" />,
+            label: "Lead Confirmation", href: "/accounts/allleads", icon: <Layers className="h-5 w-5 text-neutral-700" />,
             children:
                 [
-                    { label: "Refferal Leads", href: "/accounts/referralleads", icon: <Share2 className="h-4 w-4 text-neutral-700" /> },
                     { label: "Detailed Leads", href: "/accounts/detailedleads", icon: <FileUp className="h-4 w-4 text-neutral-700" /> },
+                    { label: "Final Conifrmed Leads", href: "/accounts/referralleads", icon: <Share2 className="h-4 w-4 text-neutral-700" /> },
+
                 ],
         },
         { label: "Receivables", href: "/accounts/reciveable", icon: <Wallet className="h-5 w-5 text-neutral-700" /> },
@@ -242,7 +243,7 @@ export const sidebarLinks = {
         { label: "Transaction Management", href: "/UnlistedAdmin/TransactionManagement", icon: <CreditCard className="h-5 w-5 text-neutral-700" /> },
 
         { label: "Shares Management", href: "/UnlistedAdmin/SharesManagement", icon: <TrendingUp className="h-5 w-5 text-neutral-700" /> },
-
+        { label: "Ticket Management", href: "/UnlistedAdmin/ticketmanagement", icon: <FileText className="h-5 w-5 text-neutral-700" /> },
         { label: "Demat Management", href: "/UnlistedAdmin/DematManagement", icon: <Shield className="h-5 w-5 text-neutral-700" /> },
         {
             label: "Meetings",
@@ -293,7 +294,16 @@ export const sidebarLinks = {
                     href: "/UnlistedAdmin/products/investments/aif",
                     icon: <Layers className="h-5 w-5 text-neutral-600" />
                 },
-
+                {
+                    label: "Home Loan",
+                    href: "/UnlistedAdmin/products/finance/home-loan",
+                    icon: <Landmark className="h-5 w-5 text-neutral-600" />
+                },
+                {
+                    label: "Mortgage Loan",
+                    href: "/UnlistedAdmin/products/finance/mortgage-loan",
+                    icon: <Building2 className="h-5 w-5 text-neutral-600" />
+                }
             ],
         },
     ],

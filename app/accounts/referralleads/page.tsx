@@ -1,219 +1,318 @@
-'use client';
-import { useState, useEffect, useMemo } from 'react';
-import * as XLSX from 'xlsx';
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import toast from 'react-hot-toast';
-import { AccountService } from '@/app/services/accountsService'; // Adjust path if necessary
+"use client";
 
-const statusStyles: Record<string, string> = {
-  completed: "bg-green-50 text-green-700 border-green-100",
-  submitted: "bg-blue-50 text-blue-700 border-blue-100",
-  in_progress: "bg-yellow-50 text-yellow-700 border-yellow-100",
-  rejected: "bg-red-50 text-red-700 border-red-100",
-  follow_up: "bg-purple-50 text-purple-700 border-purple-100",
-  pending: "bg-gray-50 text-gray-700 border-gray-100",
-};
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Search, Download, RefreshCw, X,
+  Briefcase, Calendar, CreditCard, Landmark, 
+  UserCheck, Save, ClipboardList, Wallet, CheckCircle2, AlertCircle,
+  MoreHorizontal
+} from 'lucide-react';
+import { AccountService } from '@/app/services/accountsService';
 
-interface ReferralLead {
+export interface Lead {
   id: number;
-  lead_name: string;
-  contact_number: string;
-  email: string | null;
-  department: string;
-  sub_category: string;
-  notes: string;
-  referral_lead_status?: string;
-  rejection_note?: string;
-  status: string;
-  created_at: string;
-  dsa_id: number;
-  dsa_name: string;
-  dsa_adv_id: string;
-  assigned_rm_department: string;
-  assigned_rm_name: string;
-  ref_id: string;
+  full_name: string;
+  email: string;
+  phone_number: string;
+  final_lead_confirm_status: boolean;
+  source?: string;
+  loan_amount?: string | number;
+  created_at?: string;
+  detail_lead_id?: string;
+  product_type?: string;
+  lead_name?: string;
+  contact_number?: string;
+  dsa_name?: string;
+  dsa_mobile?: string;
+  dsa_id?: string;
+  dsa_adv_id?: string;
+  dsa_email?: string;
+  assigned_rm_id?: string;
+  assigned_rm_name?: string;
+  assigned_rm_email?: string;
+  assigned_rm_mobile?: string;
+  detail_lead_payout_percent?: number | string;
+  form_data?: Record<string, any>;
+  sub_category?: string;
+  department?: string;
+  lead_status?: string;
+  rm_acceptance_status?: string;
+  disbursement_amount?: number | string;
+  gross_payout_amount?: number | string;
+  gst_amount?: number | string;
+  tds_amount?: number | string;
+  net_payout_amount?: number | string;
+  payout_date?: string;
+  payout_id?: string;
+  payment_mode?: string;
+  transaction_reference_no?: string;
+  invoice_number?: string;
+  invoice_date?: string;
+  policy_number?: string;
+  agreement_charges?: number | string;
+  branch_payout?: number | string;
 }
 
-const formatDate = (dateString: string) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
-  } catch { return dateString; }
-};
+const allowedFields = [
+  "disbursement_amount", "gross_payout_amount", "gst_amount", "tds_amount",
+  "net_payout_amount", "payout_date", "payout_id", "payment_mode",
+  "transaction_reference_no", "invoice_number", "invoice_date",
+  "policy_number", "agreement_charges", "detail_lead_payout_percent", "branch_payout"
+];
 
-export default function ReferralLeadsDashboard() {
-  // Data States
-  const [leads, setLeads] = useState<ReferralLead[]>([]);
+export default function LeadsPage() {
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [isExporting, setIsExporting] = useState(false);
+  const [viewingLead, setViewingLead] = useState<Lead | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
-  // Fetch API Data
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        setLoading(true);
-        const response = await AccountService.getCompletedReferralLeads();
-        const data = Array.isArray(response) ? response : (response.data || []);
-        setLeads(data);
-      } catch (error) {
-        toast.error("Failed to load referral leads");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchLeads();
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await AccountService.getAllFinalDetailLeads();
+      setLeads(Array.isArray(response.detail_leads) ? response.detail_leads : []);
+    } catch (error: any) {
+      // Replaced console.error with toast
+      showToast(error.response?.data?.message || "Failed to fetch leads", "error");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Search Logic
-  const normalize = (str: string) => str?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
+  const handleUpdateLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!viewingLead) return;
+    setIsSaving(true);
+    try {
+      const numberFields = ["disbursement_amount", "gross_payout_amount", "gst_amount", "tds_amount", "net_payout_amount", "agreement_charges", "branch_payout", "detail_lead_payout_percent"];
+      const payload: any = {};
+      allowedFields.forEach((field) => {
+        const value = (viewingLead as any)[field];
+        if (numberFields.includes(field)) {
+          const num = parseFloat(value);
+          payload[field] = isNaN(num) ? 0 : num;
+        } else {
+          payload[field] = (value === "" || value === undefined) ? null : value;
+        }
+      });
+      await AccountService.updateLeadconfirmStatus(Number(viewingLead.id), payload);
+      showToast("Updated successfully!", "success");
+      setViewingLead(null);
+      await fetchData();
+    } catch (error: any) {
+      // Replaced console.error logic with standardized toast
+      showToast(error.response?.data?.message || "Update Failed", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-  const filteredLeads = useMemo(() => leads.filter(lead => {
-    const query = normalize(searchTerm);
-    return normalize(lead.lead_name).includes(query) || 
-           normalize(lead.contact_number).includes(query) ||
-           normalize(lead.dsa_name).includes(query) || 
-           normalize(lead.ref_id).includes(query);
-  }), [leads, searchTerm]);
+  const filteredLeads = leads.filter(l =>
+    l.lead_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    l.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    l.detail_lead_id?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredLeads.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredLeads, currentPage, itemsPerPage]);
+  const formatKey = (key: string) => key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 
-  const downloadExcel = () => {
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(leads);
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Leads');
-    XLSX.writeFile(workbook, `Referral_Leads_${new Date().toISOString().split('T')[0]}.xlsx`);
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      const response = await AccountService.exportLeads();
+      const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `leads-${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast("Export started", "success");
+    } catch (error: any) {
+      // Replaced console.error with toast
+      showToast(error.response?.data?.message || "Export failed", "error");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-full mx-auto">
-        <div className="mb-6 flex justify-between items-end">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans pb-10">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 right-4 left-4 md:left-auto z-[100] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl animate-in slide-in-from-top md:slide-in-from-right duration-300 ${toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+          {toast.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+          <p className="font-bold text-sm">{toast.message}</p>
+        </div>
+      )}
+
+      <div className="max-w-[1600px] mx-auto p-4 md:p-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Completed Referral Leads</h1>
-            <p className="text-gray-600">Overview of all leads from the system</p>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight flex items-center gap-3 text-slate-800">
+              <div className="p-2 bg-indigo-600 rounded-xl"><Briefcase className="text-white" size={24} /></div>
+              Final Detail Leads
+            </h1>
+            <p className="text-slate-500 font-medium text-xs md:text-sm ml-1">Verified Loan Disbursement Records</p>
           </div>
+          <button onClick={handleExport} disabled={isExporting} className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-lg active:scale-95 disabled:bg-slate-400">
+            {isExporting ? <RefreshCw className="animate-spin" size={18} /> : <Download size={18} />}
+            <span className="text-sm">Export to Excel</span>
+          </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-          {/* Filters Bar */}
-          <div className="p-4 border-b bg-white flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="relative w-full md:w-96">
-              <input 
-                type="text" 
-                value={searchTerm} 
-                onChange={(e) => setSearchTerm(e.target.value)} 
-                placeholder="Search by name, phone or ID..." 
-                className="w-full pl-10 pr-4 py-2 border rounded-lg text-gray-500 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none" 
-              />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" /></svg>
+        {/* Search & Refresh Bar */}
+        <div className="bg-white p-2 md:p-3 rounded-2xl shadow-sm border border-slate-200 mb-6 flex items-center gap-2 md:gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input type="text" placeholder="Search leads..." className="w-full pl-10 md:pl-12 pr-4 py-2.5 md:py-3 bg-slate-50 border-none rounded-xl text-sm outline-none" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          </div>
+          <button onClick={fetchData} className="p-2.5 md:p-3 bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-xl transition-all flex-shrink-0">
+            <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
+          </button>
+        </div>
+
+        {/* Table/List Container */}
+        <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+          <div className="md:hidden divide-y divide-slate-100">
+            {loading ? (
+              <div className="p-10 text-center text-slate-400 font-bold text-sm">Fetching records...</div>
+            ) : filteredLeads.map((lead) => (
+              <div key={lead.id} className="p-4 flex flex-col gap-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="font-black text-indigo-600 text-sm">{lead.detail_lead_id}</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase">{lead.product_type}</div>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700">Completed</span>
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 text-sm">{lead.lead_name}</div>
+                  <div className="text-xs text-slate-500">{lead.email}</div>
+                </div>
+                <button onClick={() => setViewingLead(lead)} className="w-full py-2.5 bg-slate-100 text-slate-600 rounded-lg font-bold text-xs">View & Update</button>
               </div>
-            </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <span>Rows per page:</span>
-              <select 
-                value={itemsPerPage} 
-                onChange={(e) => setItemsPerPage(Number(e.target.value))} 
-                className="border rounded px-2 py-1 outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                {[5, 10, 25, 50].map(v => <option key={v} value={v}>{v}</option>)}
-              </select>
-            </div>
+            ))}
           </div>
 
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
-              <p className="text-gray-500 font-medium">Fetching referral leads...</p>
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100">
+                  <th className="px-6 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400">Lead ID / Product</th>
+                  <th className="px-6 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400">Customer Info</th>
+                  <th className="px-6 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 text-center">Status</th>
+                  <th className="px-6 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {loading ? (<tr><td colSpan={4} className="py-20 text-center text-slate-400 font-bold">Fetching records...</td></tr>) : filteredLeads.map((lead) => (
+                  <tr key={lead.id} className="hover:bg-slate-50/50 transition-all">
+                    <td className="px-6 py-5"><div className="font-bold text-indigo-600">{lead.detail_lead_id}</div><div className="text-xs font-black text-slate-400 uppercase mt-1">{lead.product_type}</div></td>
+                    <td className="px-6 py-5"><div className="font-bold text-slate-900">{lead.lead_name}</div><div className="text-sm text-slate-500 font-medium">{lead.email}</div></td>
+                    <td className="px-6 py-5 text-center"><span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700">Completed</span></td>
+                    <td className="px-6 py-5 text-right"><button onClick={() => setViewingLead(lead)} className="px-6 py-2 bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white rounded-lg transition-all font-bold text-xs shadow-sm">View</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Section */}
+      {viewingLead && (
+        <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center md:p-4">
+          <div className="absolute inset-0 backdrop-blur-md bg-black/30" onClick={() => setViewingLead(null)} />
+          <div className="relative w-full max-w-6xl bg-[#fcfdfe] rounded-t-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[92vh] md:max-h-[95vh] animate-in slide-in-from-bottom md:zoom-in-95 duration-300">
+            
+            <div className="px-6 md:px-8 py-5 md:py-6 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-xl md:text-2xl font-black text-slate-900 truncate">{viewingLead.lead_name}</h2>
+                <p className="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5 md:mt-1 truncate">ID: {viewingLead.detail_lead_id}</p>
+              </div>
+              <button onClick={() => setViewingLead(null)} className="p-2 ml-2 hover:bg-slate-50 text-slate-400 rounded-full transition-all flex-shrink-0"><X size={24} /></button>
             </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      {['ID', 'Ref_iD', 'DSA Information', 'Client Details', 'Department', 'Lead Action', 'Created At'].map(h => (
-                        <th key={h} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {paginatedData.length > 0 ? paginatedData.map(lead => (
-                      <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-gray-600">{lead.id}</td>
-                        <td className="px-6 py-4 text-sm font-mono text-gray-500">{lead.ref_id}</td>
-                        <td className="px-6 py-4 text-sm">
-                          <div className="flex flex-col">
-                              <span className="font-semibold text-gray-800">{lead.dsa_name}</span>
-                              <span className="text-xs text-gray-500">{lead.dsa_adv_id}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-sm">
-                          <div className="flex flex-col">
-                              <span className="font-bold text-gray-900">{lead.lead_name}</span>
-                              <span className="text-blue-600">{lead.contact_number}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">{lead.department}</td>
-                        <td className="px-6 py-4 text-sm">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${statusStyles.completed}`}>
-                            COMPLETED
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(lead.created_at)}</td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan={7} className="px-6 py-10 text-center text-gray-400">No leads found matching your search.</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+
+            <form onSubmit={handleUpdateLead} className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <InfoCard title="DSA Partner" icon={<Landmark size={14} />} items={[{ label: "DSA ID", value: viewingLead.dsa_id }, { label: "DSA ADV", value: viewingLead.dsa_adv_id }, { label: "DSA Name", value: viewingLead.dsa_name }, { label: "DSA Email", value: viewingLead.dsa_email }, { label: "DSA Mobile", value: viewingLead.dsa_mobile }]} />
+                <InfoCard title="Assigned RM" icon={<UserCheck size={14} />} items={[{ label: "RM ID", value: viewingLead.assigned_rm_id }, { label: "RM Name", value: viewingLead.assigned_rm_name }, { label: "RM Email", value: viewingLead.assigned_rm_email }, { label: "RM Mobile", value: viewingLead.assigned_rm_mobile }]} />
+                <InfoCard title="Lead Summary" icon={<ClipboardList size={14} />} items={[{ label: "Product", value: viewingLead.product_type }, { label: "Status", value: viewingLead.lead_status }, { label: "Name", value: viewingLead.lead_name }, { label: "Contact", value: viewingLead.contact_number }, { label: "Email", value: viewingLead.email }, { label: "Created", value: viewingLead.created_at ? new Date(viewingLead.created_at).toLocaleDateString() : 'N/A' }]} />
               </div>
 
-              {/* Pagination Footer */}
-              {filteredLeads.length > 0 && (
-                <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between">
-                  <span className="text-sm text-gray-600">
-                    Showing <span className="font-semibold">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-semibold">{Math.min(currentPage * itemsPerPage, filteredLeads.length)}</span> of <span className="font-semibold">{filteredLeads.length}</span> entries
-                  </span>
-                  <div className="flex space-x-2">
-                    <button 
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage(p => p - 1)}
-                      className="p-2 border rounded bg-white hover:bg-gray-100 disabled:opacity-50"
-                    >
-                      <ChevronLeft className="w-4 h-4 text-gray-600" />
-                    </button>
-                    <div className="flex items-center px-4 text-gray-600 text-sm font-medium">
-                      Page {currentPage} of {totalPages}
-                    </div>
-                    <button 
-                      disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage(p => p + 1)}
-                      className="p-2 border rounded bg-white hover:bg-gray-100 disabled:opacity-50"
-                    >
-                      <ChevronRight className="w-4 h-4 text-gray-600" />
-                    </button>
+              {viewingLead.form_data && (
+                <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm">
+                   <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2"><CreditCard size={16} /> Form Data</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {Object.entries(viewingLead.form_data).map(([key, val]: any) => (
+                      <div key={key} className="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                        <p className="text-[9px] text-slate-400 font-black uppercase mb-0.5 truncate">{formatKey(key)}</p>
+                        <p className="font-bold text-slate-700 text-[11px] truncate">{val || '---'}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
-            </>
-          )}
+
+              <div className="bg-white p-5 md:p-8 rounded-2xl md:rounded-3xl border-2 border-indigo-50 shadow-sm">
+                <h3 className="text-base md:text-lg font-black text-slate-800 flex items-center gap-3 mb-6"><Wallet className="text-indigo-600" size={20} /> Financial Updation</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+                  {allowedFields.map((field) => (
+                    <div key={field} className="space-y-1">
+                      <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">{formatKey(field)}</label>
+                      <input 
+                        type={field.includes('date') ? "date" : (field.includes('amount') || field.includes('percent') || field.includes('charges') || field.includes('payout')) ? "number" : "text"} 
+                        step="any" 
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-sm text-slate-700" 
+                        value={(viewingLead as any)[field] || ''} 
+                        onChange={(e) => setViewingLead({ ...viewingLead, [field]: e.target.value })} 
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col-reverse md:flex-row justify-end gap-3 sticky bottom-0 bg-white/90 backdrop-blur-md py-4 border-t border-slate-100 mt-auto">
+                <button type="button" onClick={() => setViewingLead(null)} className="w-full md:w-auto px-8 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm">Close</button>
+                <button type="submit" disabled={isSaving} className="w-full md:w-auto px-12 py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg disabled:bg-slate-400">
+                  {isSaving ? <RefreshCw className="animate-spin" size={18} /> : <Save size={18} />}
+                  {isSaving ? "Updating..." : "Update Lead"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+function InfoCard({ title, icon, items }: { title: string, icon: any, items: { label: string, value: any }[] }) {
+  return (
+    <div className="bg-white p-4 rounded-xl md:rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="p-1.5 bg-slate-50 rounded-lg text-slate-500">{icon}</div>
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800">{title}</h3>
+      </div>
+      <div className="space-y-2">
+        {items.map((item, idx) => (
+          <div key={idx} className="border-b border-slate-50 pb-1.5 last:border-0 last:pb-0">
+            <p className="text-[9px] text-slate-400 font-bold uppercase truncate">{item.label}</p>
+            <p className="font-bold text-slate-700 text-xs truncate">{item.value || '---'}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
