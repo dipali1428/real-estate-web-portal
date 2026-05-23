@@ -80,7 +80,6 @@ export default function BranchPage() {
             }
         } catch (err) {
             toast.error("Failed to fetch branch users");
-            console.error(err);
         } finally {
             setUsersLoading(false);
         }
