@@ -310,18 +310,24 @@ const AboutSection = () => {
                             About Us
                         </h2>
                         <div className="w-24 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
-                        <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed">
+                        <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed mb-5">
                             At <span className="font-semibold text-[#1CADA3]">Infinity Arthvishva</span>,
-                            we believe that your financial success is our true achievement. We are a one-stop financial advisory firm offering end-to-end solutions in loans, investments, insurance, and wealth management.
+                            we believe that your financial success is our true achievement. We are a one-stop financial advisory firm offering end-to-end solutions in loans, investments, insurance, and wealth management. With a strong foundation of trust, expertise, and innovation, we strive to simplify finance and empower individuals and businesses to achieve their goals with confidence.
+                        </p>
+                        <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed">
+                            At Infinity Arthvishva, we don't just manage finances — we build lasting relationships and craft infinite possibilities for your financial future.
                         </p>
 
                         {/* Leadership Team Section */}
                         <div className="py-12">
                             <div className="text-center mb-10">
-                                <h2 className="text-2xl md:text-3xl font-extrabold mb-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                                <h2 className="text-2xl md:text-4xl font-extrabold mb-2 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                                     Our Leadership Team
                                 </h2>
                                 <div className="w-20 h-1 mx-auto bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-full mb-4"></div>
+                                <p className="text-gray-700 max-w-3xl mx-auto text-lg leading-relaxed">
+                                    Meet the experienced professionals leading our success
+                                </p>
                             </div>
 
                             {/* Row 1: 5 Leaders */}
@@ -331,9 +337,9 @@ const AboutSection = () => {
                                 ))}
                             </div>
 
-                            {/* Row 2: 3 Leaders */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-14">
-                                {leaders.slice(5, 8).map((leader, index) => (
+                            {/* Row 2: Next 4 Leaders */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 max-w-6xl mx-auto mb-14">
+                                {leaders.slice(5, 9).map((leader, index) => (
                                     <LeaderCard key={index + 5} leader={leader} />
                                 ))}
                             </div>
@@ -347,8 +353,8 @@ const AboutSection = () => {
                             {/* Branch Heads Grid */}
                             <div className="max-w-[90rem] mx-auto">
                                 <div className="flex flex-wrap justify-center gap-5">
-                                    {leaders.slice(8).map((leader, index) => (
-                                        <div key={index + 8} className="w-full sm:w-[calc(50%-1.25rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.25rem)]">
+                                    {leaders.slice(9).map((leader, index) => (
+                                        <div key={index + 9} className="w-full sm:w-[calc(50%-1.25rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.25rem)]">
                                             <LeaderCard leader={leader} />
                                         </div>
                                     ))}
