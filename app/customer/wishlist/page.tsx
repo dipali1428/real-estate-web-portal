@@ -595,7 +595,7 @@ export default function Wishlist() {
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                  {isRealEstateSelected ? "Property" : "Company"}
+                  {isRealEstateSelected ? "Property" : selectedCategory === "mutual-funds" ? "Fund Name" : "Company"}
                 </th>
                 {isRealEstateSelected ? (
                   <>
@@ -632,6 +632,11 @@ export default function Wishlist() {
                     <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Min Investment</th>
                     <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Category</th>
                   </>
+                ) : selectedCategory === "mutual-funds" ? (
+                  <>
+                    <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Current NAV</th>
+                    <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider">Risk Profile</th>
+                  </>
                 ) : (
                   <>
                     <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase">{selectedCategory === 'bonds' || selectedCategory === 'ncd' ? 'Min Invest' : 'Price'}</th>
@@ -650,7 +655,7 @@ export default function Wishlist() {
               {filteredItems.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={selectedCategory === "mutual-funds" ? 4 : isFDSelected ? 6 : isRealEstateSelected ? 8 : 6}
                     className="px-6 py-20 text-center text-gray-400"
                   >
                     <Bookmark className="w-12 h-12 mx-auto mb-3 opacity-20" />
@@ -779,6 +784,17 @@ export default function Wishlist() {
                             </span>
                           </td>
                         </>
+                      ) : item.isMF ? (
+                        <>
+                          <td className="px-6 py-4 text-center font-bold text-[#2076C7]">
+                            ₹{item.price > 0 ? Number(item.price).toFixed(2) : "0.00"}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="px-3 py-1 rounded-md bg-[#2076C7]/10 text-[#2076C7] text-[10px] font-bold uppercase border border-[#2076C7]/20">
+                              {item.depository || "Moderate"}
+                            </span>
+                          </td>
+                        </>
                       ) : (
                         <>
                           <td className="px-6 py-4 text-center font-bold text-[#2076C7]">
@@ -868,60 +884,81 @@ export default function Wishlist() {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 py-3">
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                        {item.isFD ? 'Interest Rate' : item.product_type === 'pms' || item.product_type === 'aif' ? 'Returns' : 'Price'}
-                      </span>
-                      <span className="text-base font-bold text-[#2076C7]">
-                        {item.isFD ? `${Number(item.price).toFixed(2)}%` : item.product_type === 'pms' || item.product_type === 'aif' ? item.displayPrice : (item.product_type === "bonds" || item.isNCD ? `₹${item.price.toLocaleString("en-IN")}` : `₹${item.price.toFixed(2)}`)}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                        {item.isFD ? 'Senior Rate' : item.product_type === 'pms' || item.product_type === 'aif' ? 'Strategy' : (item.product_type === "bonds" || item.isNCD) ? 'Coupon' : 'Lot Size'}
-                      </span>
-                      <span className="text-base font-bold text-slate-800">
-                        {item.isFD ? (item.senior_rate ? `${item.senior_rate}%` : 'N/A') : item.product_type === 'pms' || item.product_type === 'aif' ? item.displayMinLot : (item.product_type === "bonds" || item.isNCD) ? `${item.coupon || 0}%` : (item.min_lot === 0 ? "-" : `${item.min_lot} Units`)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {item.isFD && (item.product_data as any)?.Special_Offer && (
-                    <div className="mt-2 p-2 bg-orange-50 rounded-xl border border-orange-100">
-                      <div className="text-[8px] text-orange-400 uppercase font-bold mb-1">Special Offer</div>
-                      <div className="text-xs text-orange-600 font-bold italic truncate">🎁 {(item.product_data as any).Special_Offer}</div>
-                    </div>
-                  )}
-
-                  <div className="mt-4 grid grid-cols-2 gap-4">
-                    {/* Min Investment / Tenure */}
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                        {item.isFD ? 'Tenure' : 'Min Invest'}
-                      </span>
-                      <span className="text-base font-black text-[#2076C7]">
-                        {item.isFD
-                          ? `${(item.product_data as any)?.Short_Term || '-'} / ${(item.product_data as any)?.Mega_Term || '-'}`
-                          : item.product_type === 'pms' || item.product_type === 'aif'
-                            ? item.displayMinInvestment
-                            : item.product_type === "mutual_fund"
-                              ? "-"
-                              : (item.product_type === 'bonds' || item.isNCD)
-                                ? `₹${item.price.toLocaleString("en-IN")}`
-                                : item.price && item.min_lot
-                                  ? `₹${(item.price * item.min_lot).toLocaleString("en-IN")}`
-                                  : "N/A"}
-                      </span>
-                    </div>
-
-                    {(item.product_type === "bonds" || item.isNCD) && (
+                  {item.isMF ? (
+                    <div className="grid grid-cols-2 gap-4 py-3">
                       <div className="flex flex-col">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Yield</span>
-                        <span className="text-base font-bold text-emerald-600">{item.yield || 0}%</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                          Current NAV
+                        </span>
+                        <span className="text-base font-bold text-[#2076C7]">
+                          ₹{item.price > 0 ? Number(item.price).toFixed(2) : "0.00"}
+                        </span>
                       </div>
-                    )}
-                  </div>
+                      <div className="flex flex-col">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                          Risk Profile
+                        </span>
+                        <span className="text-sm font-bold text-slate-800">
+                          {item.depository || "Moderate"}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-2 gap-4 py-3">
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                            {item.isFD ? 'Interest Rate' : item.product_type === 'pms' || item.product_type === 'aif' ? 'Returns' : 'Price'}
+                          </span>
+                          <span className="text-base font-bold text-[#2076C7]">
+                            {item.isFD ? `${Number(item.price).toFixed(2)}%` : item.product_type === 'pms' || item.product_type === 'aif' ? item.displayPrice : (item.product_type === "bonds" || item.isNCD ? `₹${item.price.toLocaleString("en-IN")}` : `₹${item.price.toFixed(2)}`)}
+                          </span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                            {item.isFD ? 'Senior Rate' : item.product_type === 'pms' || item.product_type === 'aif' ? 'Strategy' : (item.product_type === "bonds" || item.isNCD) ? 'Coupon' : 'Lot Size'}
+                          </span>
+                          <span className="text-base font-bold text-slate-800">
+                            {item.isFD ? (item.senior_rate ? `${item.senior_rate}%` : 'N/A') : item.product_type === 'pms' || item.product_type === 'aif' ? item.displayMinLot : (item.product_type === "bonds" || item.isNCD) ? `${item.coupon || 0}%` : (item.min_lot === 0 ? "-" : `${item.min_lot} Units`)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {item.isFD && (item.product_data as any)?.Special_Offer && (
+                        <div className="mt-2 p-2 bg-orange-50 rounded-xl border border-orange-100">
+                          <div className="text-[8px] text-orange-400 uppercase font-bold mb-1">Special Offer</div>
+                          <div className="text-xs text-orange-600 font-bold italic truncate">🎁 {(item.product_data as any).Special_Offer}</div>
+                        </div>
+                      )}
+
+                      <div className="mt-4 grid grid-cols-2 gap-4">
+                        {/* Min Investment / Tenure */}
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                            {item.isFD ? 'Tenure' : 'Min Invest'}
+                          </span>
+                          <span className="text-base font-black text-[#2076C7]">
+                            {item.isFD
+                              ? `${(item.product_data as any)?.Short_Term || '-'} / ${(item.product_data as any)?.Mega_Term || '-'}`
+                              : item.product_type === 'pms' || item.product_type === 'aif'
+                                ? item.displayMinInvestment
+                                : (item.product_type === 'bonds' || item.isNCD)
+                                  ? `₹${item.price.toLocaleString("en-IN")}`
+                                  : item.price && item.min_lot
+                                    ? `₹${(item.price * item.min_lot).toLocaleString("en-IN")}`
+                                    : "N/A"}
+                          </span>
+                        </div>
+
+                        {(item.product_type === "bonds" || item.isNCD) && (
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Yield</span>
+                            <span className="text-base font-bold text-emerald-600">{item.yield || 0}%</span>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </motion.div>
               ))
             )}
