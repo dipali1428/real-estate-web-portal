@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { HomeLoanService, HomeLoanPlan } from '../../../../services/homeLoanServices';
 import { motion, AnimatePresence } from 'framer-motion';
-import {Upload,FileSpreadsheet,X,Zap,Loader2,Database,Download,CheckCircle,AlertCircle,RefreshCw,Landmark,Package,Edit3,Trash2,Search} from "lucide-react";
+import { Upload, FileSpreadsheet, X, Zap, Loader2, Database, Download, CheckCircle, AlertCircle, RefreshCw, Landmark, Package, Edit3, Trash2, Search } from "lucide-react";
 const HomeLoanImportAdmin: React.FC = () => {
   // States for Import
   const [file, setFile] = useState<File | null>(null);
@@ -32,8 +32,11 @@ const HomeLoanImportAdmin: React.FC = () => {
     try {
       const data = await HomeLoanService.getAllHomeLoanPlans();
       setPlans(data);
-    } catch (err) {
-      console.error("Failed to fetch plans:", err);
+    } catch (err: any) {
+      setToast({
+        message: err?.message || "Failed to fetch plans",
+        type: "error",
+      });
     } finally {
       setIsLoadingPlans(false);
     }
@@ -141,10 +144,10 @@ const HomeLoanImportAdmin: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             className={`fixed top-24 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${toast.type === 'success'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                : toast.type === 'error'
-                  ? 'bg-red-50 border-red-200 text-red-700'
-                  : 'bg-blue-50 border-blue-200 text-blue-700'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+              : toast.type === 'error'
+                ? 'bg-red-50 border-red-200 text-red-700'
+                : 'bg-blue-50 border-blue-200 text-blue-700'
               }`}
           >
             {toast.type === 'success' ? (

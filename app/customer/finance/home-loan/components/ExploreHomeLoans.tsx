@@ -6,6 +6,7 @@ import { categorizedPlans, CATEGORIES } from "../loanConstants";
 import { motion, AnimatePresence } from "framer-motion";
 import { HomeLoanService, HomeLoanPlan } from "../../../../services/homeLoanServices";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 export default function ExploreHomeLoans({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
   const [showForm, setShowForm] = useState(false);
   const [apiPlans, setApiPlans] = useState<HomeLoanPlan[]>([]);
@@ -21,9 +22,12 @@ export default function ExploreHomeLoans({ activeTab, setActiveTab }: { activeTa
         if (data && data.length > 0) {
           setApiPlans(data);
         }
-      } catch (err) {
-        console.error("Failed to fetch home loan plans from API:", err);
-      }
+     } catch (err: any) {
+    toast.error(
+        err?.response?.data?.message || 
+        "Failed to fetch home loan plans"
+    );
+}
     };
     fetchApiPlans();
   }, []);

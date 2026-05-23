@@ -12,6 +12,7 @@ interface InsurancePlanComparisonProps {
     defaultVehicleType?: string;
     showVehicleSelection?: boolean;
     viewDetailsText?: string;
+    onViewDetails?: (company: any, vehicleType: string, planType: string, cc: string, idv: number) => void;
 }
 
 
@@ -20,7 +21,8 @@ export default function InsurancePlanComparison({
     setActiveVehicleType: setControlledVehicleType,
     defaultVehicleType = "car",
     showVehicleSelection = true,
-    viewDetailsText = "View Details" // ✅ ADDED ONLY
+    viewDetailsText = "View Details",
+    onViewDetails
 }: InsurancePlanComparisonProps) {
     const [internalVehicleType, setInternalVehicleType] = React.useState(defaultVehicleType);
     const [activePlanType, setActivePlanType] = useState("comprehensive");
@@ -107,10 +109,13 @@ export default function InsurancePlanComparison({
     };
 
     const handleViewDetails = (company: any) => {
-    if (!company) return;
-
-    // console.log("Selected Company:", company);
-};
+        if (!company) return;
+        if (onViewDetails) {
+            onViewDetails(company, activeVehicleType, activePlanType, activeCC, activeIDV);
+        } else {
+            // console.log("Selected Company:", company);
+        }
+    };
 
     return (
         <section id="plans" className="py-12 md:py-16 pt-32 sm:pt-16 bg-white font-sans">

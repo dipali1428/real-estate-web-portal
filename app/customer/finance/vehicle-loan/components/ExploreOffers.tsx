@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import BankDetailView from "./BankDetailView";
 import { VehicleLoanBanks, VehicleLoanBank } from "./data";
+import VehicleLoanForm from "../../../../dashboard/leadmanagement/forms/vahicleloanform";
 
 const extractRate = (rateStr: string): number => {
   const match = rateStr.match(/(\d+(\.\d+)?)/);
@@ -21,6 +22,7 @@ const extractRate = (rateStr: string): number => {
 
 export default function ExploreOffers({ searchQuery, sortBy }: { searchQuery: string, sortBy: string }) {
   const [selectedBank, setSelectedBank] = useState<VehicleLoanBank | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   const filteredAndSortedBanks = VehicleLoanBanks
     .filter((bank: VehicleLoanBank) => bank.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -57,11 +59,18 @@ export default function ExploreOffers({ searchQuery, sortBy }: { searchQuery: st
       )}
 
       {/* Detail View Overlay */}
-      <BankDetailView 
-        bank={selectedBank} 
-        isOpen={!!selectedBank} 
-        onClose={() => setSelectedBank(null)} 
+      <BankDetailView
+        bank={selectedBank}
+        isOpen={!!selectedBank}
+        onClose={() => setSelectedBank(null)}
+        onApplyNow={() => {
+          setSelectedBank(null);
+          setShowForm(true);
+        }}
       />
+
+      {/* Vehicle Loan Application Form — rendered at this level to avoid z-index conflicts */}
+      {showForm && <VehicleLoanForm onClose={() => setShowForm(false)} />}
     </div>
   );
 }

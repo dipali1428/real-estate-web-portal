@@ -1,6 +1,4 @@
 "use client";
-
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -18,59 +16,59 @@ interface BankDetailViewProps {
   bank: VehicleLoanBank | null;
   isOpen: boolean;
   onClose: () => void;
+  onApplyNow: () => void;
 }
 
-export default function BankDetailView({ bank, isOpen, onClose }: BankDetailViewProps) {
+export default function BankDetailView({ bank, isOpen, onClose, onApplyNow }: BankDetailViewProps) {
   if (!bank) return null;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — covers everything including bottom bank cards */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60]"
+            className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[60]"
           />
 
           {/* Modal Container */}
-          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 pointer-events-none">
+          <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-4 md:p-6 pointer-events-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 40 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 40 }}
               transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
-              className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-hidden pointer-events-auto border border-slate-200 flex flex-col font-sans"
+              className="relative bg-white rounded-2xl sm:rounded-[2.5rem] shadow-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[92vh] overflow-hidden pointer-events-auto border border-slate-200 flex flex-col font-sans"
             >
-              {/* ── Close Button ── */}
-              <div className="absolute top-6 right-6 z-10">
+              {/* ── Close Button (inside card, top-right) ── */}
+              <div className="absolute top-3 right-3 sm:top-5 sm:right-5 z-10">
                 <button
                   onClick={onClose}
-                  className="group w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-400 hover:bg-red-50 hover:border-red-200 hover:text-red-500 transition-all shadow-sm"
+                  className="group w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-slate-200 text-slate-400 hover:bg-red-50 hover:border-red-200 hover:text-red-500 transition-all shadow-sm"
                   title="Close"
                 >
-                  <X size={20} className="group-hover:rotate-90 transition-transform duration-200" />
+                  <X size={18} className="group-hover:rotate-90 transition-transform duration-200" />
                 </button>
               </div>
 
-              <div className="overflow-y-auto custom-scrollbar flex-1">
-                {/* ── Bank Identity Header (centered) ── */}
-                <div className="px-8 pb-8 pt-10 text-center border-b border-slate-100 bg-slate-50/30">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100/60 mb-4">
+              <div className="overflow-y-auto flex-1">
+                {/* ── Bank Identity Header ── */}
+                <div className="px-4 sm:px-8 pb-5 sm:pb-8 pt-8 sm:pt-10 text-center border-b border-slate-100 bg-slate-50/30">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100/60 mb-3 sm:mb-4">
                     Verified Vehicle Finance Partner
                   </span>
-                  <h1 className="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent">
                     {bank.name}
                   </h1>
-                  <p className="text-sm text-slate-500 font-medium mt-1 uppercase tracking-wider">{bank.tagline}</p>
-
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1 uppercase tracking-wider">{bank.tagline}</p>
                 </div>
 
                 {/* ── Two Content Cards ── */}
-                <div className="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 sm:p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
                   {/* Eligibility Card */}
                   <div className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50/60 to-white overflow-hidden shadow-sm">
@@ -122,14 +120,20 @@ export default function BankDetailView({ bank, isOpen, onClose }: BankDetailView
                 </div>
 
                 {/* ── Apply CTA ── */}
-                <div className="px-6 pb-12 pt-4 flex flex-col items-center">
-                  <button className="px-24 py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all active:scale-[1.02] flex items-center justify-center gap-3 group">
+                <div className="px-4 sm:px-6 pb-8 sm:pb-12 pt-2 flex flex-col items-center">
+                  <button
+                    onClick={onApplyNow}
+                    className="w-full sm:w-auto px-8 sm:px-16 md:px-24 py-3.5 sm:py-4 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
+                  >
                     Apply Now
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight
+                      size={18}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
                   </button>
-                  <p className="text-center text-[10px] font-bold text-slate-400 mt-5 flex items-center justify-center gap-2">
+                  <p className="text-center text-[10px] font-bold text-slate-400 mt-4 sm:mt-5 flex items-center justify-center gap-2">
                     <ShieldCheck size={14} className="text-emerald-500" />
-                    Fast Approval · Secure & Transparent Process
+                    Fast Approval · Secure &amp; Transparent Process
                   </p>
                 </div>
               </div>

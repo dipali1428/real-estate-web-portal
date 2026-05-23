@@ -33,7 +33,17 @@ type QueuedFile = {
   status: "pending" | "uploading" | "success" | "error";
 };
 
-export default function HealthInsuranceForm({ onClose }: { onClose: () => void }) {
+interface HealthInsuranceFormProps {
+  onClose: () => void;
+  initialPlanName?: string;
+  initialSumAssured?: string;
+}
+
+export default function HealthInsuranceForm({
+  onClose,
+  initialPlanName,
+  initialSumAssured,
+}: HealthInsuranceFormProps) {
   const [step, setStep] = useState(1);
   const [leadId, setLeadId] = useState<string | null>(null);
   const [form, setForm] = useState<Record<string, string>>({

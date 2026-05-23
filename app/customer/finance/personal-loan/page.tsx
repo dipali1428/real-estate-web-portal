@@ -19,12 +19,9 @@ import {
 } from "lucide-react";
 
 import BankGrid from "./components/BankGrid";
-import PersonalLoanForm from "../../../products/personal-loan/components/personaloanform";
 import PlanDetailDrawer, { getPlansForBank, PlanInfo } from "./components/PlanDetailDrawer";
 
 export default function PersonalLoanDashboard() {
-  const [showForm, setShowForm] = useState(false);
-  const [formBank, setFormBank] = useState<string | undefined>(undefined);
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo | null>(null);
   const [drawerBank, setDrawerBank] = useState<string>("");
@@ -49,13 +46,7 @@ export default function PersonalLoanDashboard() {
 
   const handleApply = (bankName: string, _planKey: string) => {
     setSelectedPlan(null);
-    setFormBank(bankName);
-    setShowForm(true);
-  };
-
-  const openFormDirect = (bankName?: string) => {
-    setFormBank(bankName ?? undefined);
-    setShowForm(true);
+    router.push("/dashboard/leadmanagement");
   };
 
   const activePlans = selectedBank ? getPlansForBank(selectedBank) : null;
@@ -341,13 +332,6 @@ export default function PersonalLoanDashboard() {
         )}
       </AnimatePresence>
 
-      {/* ─── Application Form Modal ─── */}
-      {showForm && (
-        <PersonalLoanForm
-          onClose={() => setShowForm(false)}
-          selectedBank={formBank}
-        />
-      )}
     </div>
   );
 }

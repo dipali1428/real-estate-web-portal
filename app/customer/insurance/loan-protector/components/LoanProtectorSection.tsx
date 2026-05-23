@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     IconHome,
@@ -8,6 +8,7 @@ import {
     IconBuildingStore,
     IconCheck,
 } from '@tabler/icons-react';
+import LoanProtectorForm from '@/app/dashboard/leadmanagement/forms/loanprotectorform';
 
 const PROTECTOR_PLANS = [
     {
@@ -55,7 +56,7 @@ const PROTECTOR_PLANS = [
 ];
 
 export default function LoanProtectorSection({ activeTab }: { activeTab: 'plans' }) {
-    // Note: We currently only have one tab 'plans' for the grid view
+    const [showForm, setShowForm] = useState(false);
     const products = PROTECTOR_PLANS;
 
     return (
@@ -108,9 +109,23 @@ export default function LoanProtectorSection({ activeTab }: { activeTab: 'plans'
                                 </li>
                             ))}
                         </ul>
+
+                        {/* Action Button */}
+                        <div className="mt-auto pt-4 border-t border-slate-100">
+                            <button 
+                                onClick={() => setShowForm(true)}
+                                className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90 text-white text-xs font-bold rounded-xl tracking-wider uppercase transition-all shadow-md active:scale-95 cursor-pointer text-center"
+                            >
+                                Apply Now
+                            </button>
+                        </div>
                     </motion.div>
                 );
             })}
+
+            {showForm && (
+                <LoanProtectorForm onClose={() => setShowForm(false)} />
+            )}
         </div>
     );
 }
