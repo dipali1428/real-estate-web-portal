@@ -38,7 +38,7 @@ export default function BranchPage() {
     // --- PAGINATION STATE ---
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    
+
     const [selectedBranchForUser, setSelectedBranchForUser] = useState<{ [key: number]: number }>({});
 
     const [form, setForm] = useState({
@@ -63,19 +63,24 @@ export default function BranchPage() {
         try {
             setUsersLoading(true);
             const res = await AdminService.getBranchUsers(page);
-            
-            // Handle different API structures for data
+
+            // 1. Set the users for the current page
             setBranchUsers(res.data || []);
 
-            // Update pagination state based on standard API response (Laravel/Node)
-            // Checks for res.meta.last_page or res.last_page
-            const lastPage = res.meta?.last_page || res.last_page || 1;
-            const current = res.meta?.current_page || res.current_page || 1;
-            
-            setTotalPages(lastPage);
-            setCurrentPage(current);
+            // 2. Map pagination based on your specific JSON structure: res.pagination
+            if (res.pagination) {
+                setTotalPages(res.pagination.total_pages || 1);
+                setCurrentPage(res.pagination.current_page || 1);
+            } else {
+                // Fallback for older logic if necessary
+                const lastPage = res.meta?.last_page || res.last_page || 1;
+                const current = res.meta?.current_page || res.current_page || 1;
+                setTotalPages(lastPage);
+                setCurrentPage(current);
+            }
         } catch (err) {
             toast.error("Failed to fetch branch users");
+            console.error(err);
         } finally {
             setUsersLoading(false);
         }
@@ -210,75 +215,186 @@ export default function BranchPage() {
                         <div className="p-10 text-center text-gray-400 border border-dashed rounded-xl">No branch users found</div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {branchUsers.map((user) => (
-                                    <div key={user.id} className="border border-gray-200 rounded-xl p-5 hover:shadow-md transition bg-white flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-                                                    <User size={20} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {branchUsers.map((user) => {
+                                    const isAssigned = !!user.branch_id;
+                                    return (
+                                        <div
+                                            key={user.id}
+                                            className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white/90 backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-gray-200">
+                                            {/* Top Glow */}
+                                            <div className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-slate-900 via-slate-600 to-slate-300 opacity-80" />
+
+                                            {/* Header */}
+                                            <div className="flex items-start justify-between mb-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-12 w-12 rounded-2xl bg-linear-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-700 shadow-inner">
+                                                        <User size={22} />
+                                                    </div>
+
+                                                    <div>
+                                                        <h3 className="font-semibold text-gray-900 text-base leading-tight">
+                                                            {user.name}
+                                                        </h3>
+
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-full">
+                                                                {user.role}
+                                                            </span>
+
+                                                            {isAssigned ? (
+                                                                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border-emerald-200 px-2 py-1 rounded-full">
+                                                                    Assigned
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 border-amber-200 px-2 py-1 rounded-full">
+                                                                    Unassigned
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <h3 className="font-semibold text-gray-900 leading-none">{user.name}</h3>
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded mt-1 inline-block">
-                                                        {user.role}
+                                            </div>
+
+                                            {/* User Info */}
+                                            <div className="space-y-3">
+                                                <div className="flex items-center gap-3 text-sm text-gray-600">
+                                                    <div className="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                        <Mail size={14} className="text-gray-500" />
+                                                    </div>
+                                                    <span className="truncate">{user.email}</span>
+                                                </div>
+
+                                                <div className="flex items-center gap-3 text-sm text-gray-600">
+                                                    <div className="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                        <Phone size={14} className="text-gray-500" />
+                                                    </div>
+
+                                                    <span>
+                                                        {user.mobile !== "null" ? user.mobile : "No mobile number"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="flex items-center gap-3 text-sm text-gray-600">
+                                                    <div className="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                        <MapPin size={14} className="text-gray-500" />
+                                                    </div>
+
+                                                    <span>
+                                                        {user.city}, {user.state}
                                                     </span>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-3">
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Mail size={14} className="text-gray-400" />
-                                                    <span className="truncate">{user.email}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Phone size={14} className="text-gray-400" />
-                                                    <span>{user.mobile !== "null" ? user.mobile : "No mobile"}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <MapPin size={14} className="text-gray-400" />
-                                                    <span>{user.city}, {user.state}</span>
-                                                </div>
+                                            {/* Branch Status Card */}
+                                            <div
+                                                className={`mt-5 rounded-2xl shadow-sm border p-4 ${isAssigned
+                                                    ? "border-green-200 bg-linear-to-br from-emerald-50/80 to-white"
+                                                    : "border-orange-200 bg-linear-to-br from-amber-50/80 to-white"
+                                                    }`}>
+                                                <div className="flex items-start gap-3">
+                                                    <div
+                                                        className={`h-10 w-10 rounded-xl flex items-center justify-center ${isAssigned
+                                                            ? "bg-green-100 text-green-700"
+                                                            : "bg-orange-100 text-orange-700"
+                                                            }`}>
+                                                        <Building2 size={18} />
+                                                    </div>
 
-                                                <div className="pt-3 mt-3 border-t border-gray-100">
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <Building2 size={14} className="text-gray-400" />
-                                                        <span className="font-medium text-gray-700">
-                                                            {user.branch_name || "Unassigned"}
-                                                        </span>
+                                                    <div className="flex-1">
+                                                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                                                            Branch Status
+                                                        </p>
+
+                                                        {isAssigned ? (
+                                                            <>
+                                                                <h4 className="font-semibold text-gray-900">
+                                                                    {user.branch_name}
+                                                                </h4>
+
+                                                                <p className="text-sm text-gray-600 mt-0.5">
+                                                                    {user.branch_city},{" "}
+                                                                    {user.branch_state}
+                                                                </p>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <h4 className="font-semibold text-orange-700">
+                                                                    No Branch Assigned
+                                                                </h4>
+
+                                                                <p className="text-sm text-gray-500 mt-0.5">
+                                                                    Assign a branch profile below
+                                                                </p>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {/* API Assignment UI */}
-                                        <div className="mt-5 pt-4 border-t border-gray-50">
-                                            <label className="text-[10px] uppercase font-bold text-gray-400 block mb-2">Assign Branch</label>
-                                            <div className="flex gap-2">
-                                                <select 
-                                                    className="flex-1 text-xs border border-gray-200 text-gray-600 rounded px-2 py-1.5 focus:outline-none focus:ring-1 bg-gray-50"
-                                                    value={selectedBranchForUser[user.id] || ""}
-                                                    onChange={(e) => setSelectedBranchForUser({
-                                                        ...selectedBranchForUser,
-                                                        [user.id]: Number(e.target.value)
-                                                    })}
-                                                >
-                                                    <option value="">Select Branch</option>
-                                                    {branches.map(b => (
-                                                        <option key={b.id} value={b.id}>{b.name}</option>
-                                                    ))}
-                                                </select>
-                                                <button 
-                                                    onClick={() => handleAssignBranch(user.id)}
-                                                    className="bg-black text-white p-1.5 rounded hover:bg-gray-800 transition"
-                                                    title="Confirm Assignment"
-                                                >
-                                                    <Check size={16} />
-                                                </button>
+                                            {/* Assign / Update UI */}
+                                            <div className="mt-5 pt-5 border-t border-gray-100">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <label className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                        {isAssigned ? "Update Branch" : "Assign Branch"}
+                                                    </label>
+
+                                                    {isAssigned && (
+                                                        <span className="text-[11px] text-green-700 font-medium">
+                                                            Currently Assigned
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex gap-2">
+                                                    <select
+                                                        className="flex-1 rounded-2xl border border-gray-200 bg-gray-50/80 px-3 py-2.5 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 focus:bg-white"
+                                                        value={
+                                                            selectedBranchForUser[user.id] ||
+                                                            user.branch_id ||
+                                                            ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            setSelectedBranchForUser({
+                                                                ...selectedBranchForUser,
+                                                                [user.id]: Number(e.target.value),
+                                                            })
+                                                        }>
+                                                        <option value="">
+                                                            {isAssigned
+                                                                ? "Change Branch"
+                                                                : "Select Branch"}
+                                                        </option>
+
+                                                        {branches.map((b) => (
+                                                            <option key={b.id} value={b.id}>
+                                                                {b.name} • {b.city}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+
+                                                    <button
+                                                        onClick={() => handleAssignBranch(user.id)}
+                                                        className={`px-4 rounded-xl flex items-center justify-center transition text-white shadow-sm ${isAssigned
+                                                            ? "bg-slate-800 hover:bg-slate-900"
+                                                            : "bg-slate-900 hover:bg-black"
+                                                            }`}
+                                                        title={
+                                                            isAssigned
+                                                                ? "Update Branch"
+                                                                : "Assign Branch"
+                                                        }>
+                                                        {isAssigned ? (
+                                                            <Pencil size={16} />
+                                                        ) : (
+                                                            <Check size={16} />
+                                                        )}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {/* Pagination Controls */}
@@ -290,7 +406,7 @@ export default function BranchPage() {
                                 >
                                     <ChevronLeft size={18} />
                                 </button>
-                                
+
                                 <span className="text-sm font-medium text-gray-700">
                                     Page {currentPage} of {totalPages}
                                 </span>
