@@ -4,12 +4,13 @@ import React, { useState, Suspense } from 'react';
 import CustomerPropertiesSection from './components/PropertiesSection';
 import RealEstatePropertyDetailsModal from '../../../products/RealEstate/components/PropertyDetailsModal';
 import Login from '@/app/auth/login/page';
-import { useModal } from '@/app/context/ModalContext';
+import EnquiryModal from '@/app/customer/orderform/EnquiryModal';
 
 export default function RealEstateDashboard() {
-    const { openApplyNow } = useModal();
     const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [enquiryOpen, setEnquiryOpen] = useState(false);
+    const [enquiryPropertyTitle, setEnquiryPropertyTitle] = useState('');
 
     const handlePropertySelect = (id: string) => {
         setSelectedPropertyId(id);
@@ -31,10 +32,20 @@ export default function RealEstateDashboard() {
                     onClose={() => setSelectedPropertyId(null)}
                     onInvestNow={(propertyTitle) => {
                         setSelectedPropertyId(null);
-                        openApplyNow(propertyTitle, true);
+                        setEnquiryPropertyTitle(propertyTitle);
+                        setEnquiryOpen(true);
                     }}
                 />
             )}
+
+            <EnquiryModal
+                isOpen={enquiryOpen}
+                onClose={() => setEnquiryOpen(false)}
+                productType="Real_Estate"
+                productName={enquiryPropertyTitle}
+                productId={0}
+                sourcePage="/customer/investments/real-estate"
+            />
 
             <Login 
                 isOpen={isLoginOpen} 
@@ -42,4 +53,4 @@ export default function RealEstateDashboard() {
             />
         </div>
     );
-}
+}

@@ -8,7 +8,7 @@ import {
     IconSchool, IconUsers, IconLoader, IconPlane, 
     IconFileText, IconCalculator, IconWorld, IconShieldCheck, IconMapPin,
     IconHistory, IconFileCertificate,
-    IconStethoscope, IconLuggage, IconPlaneArrival
+    IconStethoscope, IconLuggage, IconPlaneArrival, IconBolt
 } from '@tabler/icons-react';
 import { useModal } from '@/app/context/ModalContext';
 import toast from 'react-hot-toast';
@@ -35,6 +35,7 @@ const coverageBenefits = [
 import BenefitsAndEligibility from './BenefitsAndEligibility';
 import CalculatorAndProcess from './CalculatorAndProcess';
 import DashboardView from './DashboardView';
+import QuotationComparison from '../components/QuotationComparison';
 
 const getPlanIcon = (title: string) => {
     switch (title) {
@@ -48,7 +49,7 @@ const getPlanIcon = (title: string) => {
 
 export default function TravelInsuranceSection({ isDashboard = false }: { isDashboard?: boolean }) {
     const { openLogin, openApplyNow } = useModal();
-    const [activeTab, setActiveTab] = useState<'plans' | 'details' | 'calculator'>('plans');
+    const [activeTab, setActiveTab] = useState<'plans' | 'details' | 'calculator' | 'quote'>('plans');
 
     const [hasActivePolicy, setHasActivePolicy] = useState(false); // Reset to false as requested for initial empty state
     const [hasActiveClaim, setHasActiveClaim] = useState(false);
@@ -82,6 +83,8 @@ export default function TravelInsuranceSection({ isDashboard = false }: { isDash
                                         <IconCalculator size={24} />
                                     ) : activeTab === 'details' ? (
                                         <IconHistory size={24} />
+                                    ) : activeTab === 'quote' ? (
+                                        <IconBolt size={24} />
                                     ) : (
                                         <IconPlane size={24} />
                                     )}
@@ -94,6 +97,8 @@ export default function TravelInsuranceSection({ isDashboard = false }: { isDash
                                                 ? 'Travel Protection' 
                                                 : activeTab === 'details' 
                                                 ? 'Insurance Dashboard' 
+                                                : activeTab === 'quote'
+                                                ? 'Travel Quotation'
                                                 : 'Travel Calculator'}
                                         </h2>
                                     </div>
@@ -103,6 +108,8 @@ export default function TravelInsuranceSection({ isDashboard = false }: { isDash
                                                 ? 'Secure your journeys with comprehensive global coverage' 
                                                 : activeTab === 'details' 
                                                 ? 'Manage your active policy and claims' 
+                                                : activeTab === 'quote'
+                                                ? 'Provide your travel details to compare top rates'
                                                 : 'Estimate your premium based on destination and duration'}
                                         </span>
                                     </p>
@@ -115,6 +122,7 @@ export default function TravelInsuranceSection({ isDashboard = false }: { isDash
                                         { id: 'plans', label: 'Plans', icon: IconPlane },
                                         { id: 'details', label: 'Dashboard', icon: IconFileText },
                                         { id: 'calculator', label: 'Calculator', icon: IconCalculator },
+                                        { id: 'quote', label: 'Generate Quote', icon: IconBolt },
                                     ].map((tab) => (
                                         <button
                                             key={tab.id}
@@ -463,6 +471,18 @@ export default function TravelInsuranceSection({ isDashboard = false }: { isDash
                             transition={{ duration: 0.3 }}
                         >
                             <CalculatorAndProcess isDashboard={true} onShowPlans={() => setActiveTab('plans')} />
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'quote' && (
+                        <motion.div
+                            key="quote"
+                            initial={{ opacity: 0, scale: 0.98 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.98 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            <QuotationComparison />
                         </motion.div>
                     )}
                 </AnimatePresence>
