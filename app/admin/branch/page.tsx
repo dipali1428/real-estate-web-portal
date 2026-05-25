@@ -345,13 +345,12 @@ export default function BranchPage() {
                                                     )}
                                                 </div>
 
-                                                <div className="flex gap-2">
+                                                <div className="flex flex-col sm:flex-row gap-2 w-full">
                                                     <select
-                                                        className="flex-1 rounded-2xl border border-gray-200 bg-gray-50/80 px-3 py-2.5 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 focus:bg-white"
+                                                        className="w-full sm:flex-1 min-w-0 rounded-2xl border border-gray-200 bg-gray-50/80 px-3 py-2.5 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 focus:bg-white"
                                                         value={
                                                             selectedBranchForUser[user.id] ||
-                                                            user.branch_id ||
-                                                            ""
+                                                            user.branch_id || ""
                                                         }
                                                         onChange={(e) =>
                                                             setSelectedBranchForUser({
@@ -374,7 +373,7 @@ export default function BranchPage() {
 
                                                     <button
                                                         onClick={() => handleAssignBranch(user.id)}
-                                                        className={`px-4 rounded-xl flex items-center justify-center transition text-white shadow-sm ${isAssigned
+                                                        className={`shrink-0 px-4 py-2.5 rounded-xl flex items-center justify-center transition text-white shadow-sm ${isAssigned
                                                             ? "bg-slate-800 hover:bg-slate-900"
                                                             : "bg-slate-900 hover:bg-black"
                                                             }`}

@@ -56,7 +56,11 @@ export default function KycStatusPage() {
   }, []);
 
   useEffect(() => {
-    fetchData(currentPage, searchTerm, activeTab);
+    const delayDebounceFn = setTimeout(() => {
+      fetchData(currentPage, searchTerm, activeTab);
+    }, 300); // Wait 300ms after last keystroke before calling API
+
+    return () => clearTimeout(delayDebounceFn);
   }, [currentPage, searchTerm, activeTab, fetchData]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -178,7 +182,10 @@ export default function KycStatusPage() {
                 placeholder={activeTab === "kyc" ? "Search By Name or ADV_ID..." : "Search Name, Email or Mobile..."}
                 className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg outline-none text-gray-600 focus:ring-2 focus:ring-gray-100 w-64 text-sm bg-white"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value); // Update search term
+                  setCurrentPage(1);            // RESET PAGE TO 1
+                }}
               />
             </div>
             <button type="submit" className="bg-[#2076C7] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#1a65ad] transition-colors">
@@ -187,8 +194,7 @@ export default function KycStatusPage() {
             <button
               type="button"
               onClick={() => { setSearchTerm(""); setCurrentPage(1); fetchData(1, "", activeTab); }}
-              className="p-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50"
-            >
+              className="p-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50">
               <RefreshCcw size={18} className={loading ? "animate-spin" : ""} />
             </button>
           </form>
@@ -198,14 +204,12 @@ export default function KycStatusPage() {
         <div className="flex border-b border-gray-200 mb-6 gap-6">
           <button
             onClick={() => handleTabChange("kyc")}
-            className={`pb-3 text-sm font-bold transition-all px-2 ${activeTab === "kyc" ? "border-b-2 border-[#2076C7] text-[#2076C7]" : "text-gray-400 hover:text-gray-600"}`}
-          >
+            className={`pb-3 text-sm font-bold transition-all px-2 ${activeTab === "kyc" ? "border-b-2 border-[#2076C7] text-[#2076C7]" : "text-gray-400 hover:text-gray-600"}`}>
             KYC Status
           </button>
           <button
             onClick={() => handleTabChange("agreement")}
-            className={`pb-3 text-sm font-bold transition-all px-2 ${activeTab === "agreement" ? "border-b-2 border-[#2076C7] text-[#2076C7]" : "text-gray-400 hover:text-gray-600"}`}
-          >
+            className={`pb-3 text-sm font-bold transition-all px-2 ${activeTab === "agreement" ? "border-b-2 border-[#2076C7] text-[#2076C7]" : "text-gray-400 hover:text-gray-600"}`}>
             Agreement Status
           </button>
         </div>
@@ -368,15 +372,49 @@ export default function KycStatusPage() {
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1 || loading}
-                className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all"
-              >
+                className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all">
                 <ChevronLeft size={16} /> Previous
               </button>
+              <div className="hidden sm:flex items-center gap-1">
+                {/* Always show Page 1 */}
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md border ${currentPage === 1
+                    ? 'bg-blue-50 border-blue-200 text-[#2076C7]'
+                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}>
+                  1
+                </button>
+
+                {/* Show ellipsis if current page is far from the start */}
+                {currentPage > 3 && <span className="px-1 text-gray-400">...</span>}
+
+                {/* Show current page indicator if it's not the first or last page */}
+                {currentPage !== 1 && currentPage !== totalPages && (
+                  <button className="px-3 py-1.5 text-sm font-medium rounded-md border bg-blue-50 border-blue-200 text-[#2076C7]">
+                    {currentPage}
+                  </button>
+                )}
+
+                {/* Show ellipsis if current page is far from the end */}
+                {currentPage < totalPages - 2 && <span className="px-1 text-gray-400">...</span>}
+
+                {/* Always show Last Page (if more than 1 page exists) */}
+                {totalPages > 1 && (
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md border ${currentPage === totalPages
+                      ? 'bg-blue-50 border-blue-200 text-[#2076C7]'
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                      }`}>
+                    {totalPages}
+                  </button>
+                )}
+              </div>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages || loading}
-                className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all"
-              >
+                className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all">
                 Next <ChevronRight size={16} />
               </button>
             </div>
