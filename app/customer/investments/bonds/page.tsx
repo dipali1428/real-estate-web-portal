@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import customerService from '../../../services/customerService';
 
 import BondDetailModal from '../../../products/bonds/components/BondDetailModal';
+import EnquiryModal from '@/app/customer/orderform/EnquiryModal';
 
 // 🆕 Extracted Components
 import CategoryFilter from './components/CategoryFilter';
@@ -37,6 +38,8 @@ export default function CustomerBondsDashboard() {
     const [selectedBondForModal, setSelectedBondForModal] = useState<Bond | null>(null);
     const [bonds, setBonds] = useState<Bond[]>([]);
     const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
+    const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+    const [enquiryProduct, setEnquiryProduct] = useState<any>(null);
 
    useEffect(() => {
     const fetchBonds = async () => {
@@ -179,7 +182,12 @@ export default function CustomerBondsDashboard() {
     }, [investments, portfolioStats.returns]);
 
     const handleBuyNow = (bond: Bond) => {
-        toast.error("Ordering is temporarily disabled for maintenance.");
+        setEnquiryProduct({
+            product_type: 'BOND',
+            product_name: bond.company,
+            product_id: bond.id
+        });
+        setEnquiryModalOpen(true);
     };
 
     const handleWishlistToggle = async (bond: Bond): Promise<boolean> => {
@@ -349,6 +357,18 @@ export default function CustomerBondsDashboard() {
                     isOpen={!!selectedBondForModal} 
                     bond={selectedBondForModal} 
                     onClose={() => setSelectedBondForModal(null)} 
+                    onInvest={() => handleBuyNow(selectedBondForModal)}
+                />
+            )}
+
+            {enquiryProduct && (
+                <EnquiryModal
+                    isOpen={enquiryModalOpen}
+                    onClose={() => setEnquiryModalOpen(false)}
+                    productType="BOND"
+                    productName={enquiryProduct.product_name}
+                    productId={enquiryProduct.product_id}
+                    sourcePage="/customer/investments/bonds"
                 />
             )}
         </div>

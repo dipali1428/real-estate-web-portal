@@ -89,24 +89,29 @@ export default function PetInsuranceCalculator({
 
     return (
         <>
-            <section id="calculator" className="py-10 md:py-10 bg-slate-50 relative overflow-hidden">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden">
+            <section id="calculator" className={`py-10 md:py-10 bg-slate-50 relative overflow-hidden ${isDashboard ? 'rounded-[2.5rem] mt-4' : ''}`}>
+                <div className={isDashboard ? 'max-w-full' : 'max-w-7xl mx-auto px-4 sm:px-6'}>
+                    <div className={`${isDashboard ? '' : 'bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden'}`}>
+                        {/* Header - Only in Public mode */}
+                        {!isDashboard && (
+                            <div className="bg-white border-b border-slate-50 py-8 sm:py-10 px-4 sm:px-6 text-center">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                >
+                                    <h2 className="text-2xl md:text-4xl font-extrabold mb-4 md:mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
+                                        Pet Premium Calculator
+                                    </h2>
+                                    <div className="w-20 md:w-24 h-1 bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] mx-auto rounded-full mb-6 opacity-30" />
+                                    <p className="text-gray-600 max-w-2xl mx-auto font-medium text-sm md:text-lg leading-relaxed">
+                                        Get personalized quotes for your pet in 3 simple steps.
+                                    </p>
+                                </motion.div>
+                            </div>
+                        )}
 
-                        {/* Header */}
-                        <div className="bg-white border-b border-slate-50 py-8 sm:py-10 px-4 sm:px-6 text-center">
-                            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                                <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm tracking-tight leading-tight">
-                                    Pet Premium Calculator
-                                </h2>
-                                <div className="w-24 h-1 bg-gradient-to-r from-[#2076C7] via-[#1CADA3] to-[#2076C7] mx-auto rounded-full mb-6 opacity-30" />
-                                <p className="text-gray-600 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed">
-                                    Get personalized quotes for your companion in 3 simple steps.
-                                </p>
-                            </motion.div>
-                        </div>
-
-                        <div className="p-5 sm:p-6 lg:p-10">
+                        <div className="p-4 sm:p-6 lg:p-10">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 
                                 {/* Left Column: Controls */}
@@ -322,7 +327,7 @@ export default function PetInsuranceCalculator({
                                         </div>
 
                                         <button
-                                            onClick={openLogin}
+                                            onClick={isDashboard ? undefined : openLogin}
                                             className="w-full mt-auto py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black uppercase tracking-widest text-sm md:text-base shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:shadow-[0_25px_50px_-10px_rgba(32,118,199,0.4)] hover:-translate-y-1.5 transition-all duration-500 group"
                                         >
                                             Apply For Pet Insurance

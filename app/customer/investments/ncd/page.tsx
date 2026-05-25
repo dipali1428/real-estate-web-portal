@@ -14,7 +14,7 @@ import { NCDData } from "../../../products/NCD/data/ncdData";
 import NCDDetailDrawer from "./components/NCDDetailDrawer";
 import CustomerService from "../../../services/customerService";
 import toast from "react-hot-toast";
-// import EnquiryModal from "../../../component/EnquiryModal";
+import EnquiryModal from "@/app/customer/orderform/EnquiryModal";
 
 interface NCDInvestment {
   id: string;
@@ -518,11 +518,16 @@ export default function NCDDashboard() {
         }}
       />
 
-      {/* <EnquiryModal 
-        isOpen={enquiryModalOpen}
-        onClose={() => setEnquiryModalOpen(false)}
-        productDetails={enquiryProduct}
-      /> */}
+      {enquiryProduct && (
+        <EnquiryModal 
+          isOpen={enquiryModalOpen}
+          onClose={() => setEnquiryModalOpen(false)}
+          productType="NCD"
+          productName={enquiryProduct.product_name}
+          productId={enquiryProduct.product_id}
+          sourcePage="/customer/investments/ncd"
+        />
+      )}
 
     </div>
   );

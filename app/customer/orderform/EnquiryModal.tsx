@@ -4,7 +4,7 @@ import { User, Mail, Phone, MapPin, MessageCircle, Send, CheckCircle, X, Loader2
 import customerService from '../../services/customerService';
 import toast from 'react-hot-toast';
 
-export type ProductType = 'SHARE' | 'MUTUAL_FUND' | 'BOND' | 'NCD' | 'PMS' | 'AIF' | 'NPS' | 'Real_Estate';
+export type ProductType = 'SHARE' | 'MUTUAL_FUND' | 'BOND' | 'NCD' | 'PMS' | 'AIF' | 'NPS' | 'Real_Estate' | 'FIXED_DEPOSIT';
 
 interface EnquiryPayload {
     full_name: string;
@@ -33,6 +33,8 @@ interface EnquiryModalProps {
     multipleProducts?: Array<{ id: number; name: string; quantity?: number; price?: string }>;
 }
 
+const DEFAULT_MULTIPLE_PRODUCTS: Array<{ id: number; name: string; quantity?: number; price?: string }> = [];
+
 const EnquiryModal: React.FC<EnquiryModalProps> = ({
     isOpen,
     onClose,
@@ -42,7 +44,7 @@ const EnquiryModal: React.FC<EnquiryModalProps> = ({
     productId = 0,
     sourcePage = typeof window !== 'undefined' ? window.location.pathname : '',
     preFillMessage = '',
-    multipleProducts = []
+    multipleProducts = DEFAULT_MULTIPLE_PRODUCTS
 }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [enquiryError, setEnquiryError] = useState<string | null>(null);
@@ -64,6 +66,7 @@ const EnquiryModal: React.FC<EnquiryModalProps> = ({
             'AIF': 'Alternative Investment Fund',
             'NPS': 'National Pension System',
             'Real_Estate': 'Real Estate',
+            'FIXED_DEPOSIT': 'Fixed Deposit',
         };
         return types[type] || type;
     };
@@ -77,25 +80,14 @@ const EnquiryModal: React.FC<EnquiryModalProps> = ({
         return parseFloat(productName) || 0;
     };
 
+    const multipleProductsSerialized = JSON.stringify(multipleProducts);
+
     // Generate default message based on cart items
     useEffect(() => {
         if (preFillMessage) {
             setFormData(prev => ({ ...prev, message: preFillMessage }));
-        } else if (multipleProducts.length > 0) {
-            const productList = multipleProducts.map(p => 
-                `• ${p.name} - ${p.quantity} share(s) at ₹${parseFloat(p.price || '0').toLocaleString('en-IN')} each`
-            ).join('\n');
-            const totalAmount = getTotalAmount();
-            setFormData(prev => ({
-                ...prev,
-                            }));
-        } else if (productName && productId) {
-            setFormData(prev => ({
-                ...prev,
-                message: `I want more details about this ${getProductTypeLabel(productType)}: ${productName}. Please share the investment details and process.`
-            }));
         }
-    }, [productName, productId, productType, preFillMessage, multipleProducts]);
+    }, [preFillMessage]);
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
