@@ -20,11 +20,13 @@ import {
 
 import BankGrid from "./components/BankGrid";
 import PlanDetailDrawer, { getPlansForBank, PlanInfo } from "./components/PlanDetailDrawer";
+import PersonalLoanForm from "../../../dashboard/leadmanagement/forms/personaloanform";
 
 export default function PersonalLoanDashboard() {
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo | null>(null);
   const [drawerBank, setDrawerBank] = useState<string>("");
+  const [showApplyForm, setShowApplyForm] = useState(false);
   const plansRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -46,7 +48,7 @@ export default function PersonalLoanDashboard() {
 
   const handleApply = (bankName: string, _planKey: string) => {
     setSelectedPlan(null);
-    router.push("/dashboard/leadmanagement");
+    setShowApplyForm(true);
   };
 
   const activePlans = selectedBank ? getPlansForBank(selectedBank) : null;
@@ -98,7 +100,7 @@ export default function PersonalLoanDashboard() {
               <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-2xl sm:rounded-full flex flex-col sm:flex-row sm:items-center gap-1 relative shadow-inner border border-slate-200/50">
 
                 <button
-                  onClick={() => router.push("/customer/finance/personal-loan")}
+                  onClick={() => setShowApplyForm(true)}
                   className="relative w-full sm:w-auto px-4 md:px-5 py-2.5 md:py-2 rounded-xl sm:rounded-full text-[10px] md:text-xs font-black uppercase tracking-wider text-white flex items-center justify-center gap-1.5 overflow-hidden active:scale-95 transition-transform"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-xl sm:rounded-full -z-10 shadow-sm" />
@@ -331,6 +333,11 @@ export default function PersonalLoanDashboard() {
           />
         )}
       </AnimatePresence>
+
+      {/* ─── P0: Personal Loan Form Modal ─── */}
+      {showApplyForm && (
+        <PersonalLoanForm onClose={() => setShowApplyForm(false)} />
+      )}
 
     </div>
   );

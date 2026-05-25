@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { realEstateAPI, RealEstateInvestment } from '../../../services/realestateAPI';
 import { MapPin, CheckCircle, Info, Shield, X, Share2, Download, Loader, Calculator, FileText } from 'lucide-react';
 import Image from 'next/image';
@@ -638,7 +639,7 @@ const RealEstatePropertyDetailsModal = ({ propertyId, onClose, onInvestNow }: Re
                                 {/* Left: Image & Key Stats */}
                                 <div className="space-y-6">
                                     <div className="rounded-2xl overflow-hidden shadow-lg h-[400px] relative group">
-                                        <Image src={property.image} alt={property.title} fill className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" width={400} height={400} />
+                                        <Image src={property.image} alt={property.title} fill className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                         <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-slate-900/80 to-transparent p-6 pt-20 text-white">
                                             <p className="font-bold text-lg mb-1">{property.developer || 'Premium Developer'}</p>
                                             <p className="text-sm opacity-80">Possession: {property.completion_date || 'Ready to Move'}</p>

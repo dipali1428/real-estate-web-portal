@@ -5,7 +5,7 @@ import api from '../../../../services/api';
 import { useRouter } from 'next/navigation';
 import customerService from '@/app/services/customerService';
 import toast from 'react-hot-toast';
-// import EnquiryModal from '@/app/component/EnquiryModal';
+import EnquiryModal from '@/app/customer/orderform/EnquiryModal';
 
 interface FlattenedBank {
   id: number; name: string; logo: string; category: string;
@@ -93,7 +93,7 @@ export default function FDCompaniesPage() {
 
   const handleApplyNow = (company: FlattenedBank) => {
     setEnquiryProduct({
-      product_type: 'FIXED DEPOSIT',
+      product_type: 'FIXED_DEPOSIT',
       product_name: company.name,
       product_id: company.id
     });
@@ -533,13 +533,16 @@ export default function FDCompaniesPage() {
         .animate-fadeIn { animation: fadeIn 0.25s ease; }
       `}</style>
 
-      {/* {enquiryProduct && (
+      {enquiryProduct && (
         <EnquiryModal
           isOpen={enquiryModalOpen}
           onClose={() => setEnquiryModalOpen(false)}
-          productDetails={enquiryProduct}
+          productType="FIXED_DEPOSIT"
+          productName={enquiryProduct.product_name}
+          productId={enquiryProduct.product_id}
+          sourcePage="/customer/investments/FD/companies"
         />
-      )} */}
+      )}
     </div>
   );
 }

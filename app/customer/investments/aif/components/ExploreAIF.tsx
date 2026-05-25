@@ -192,11 +192,11 @@ export default function ExploreAIF() {
   }, [cart]);
   // Filtering
   const filteredProducts = useMemo(() => {
-    const allProducts = [...dynamicAifProducts, ...aifProducts];
-    // Remove duplicates by name (prefer dynamic)
-    const uniqueProducts = allProducts.filter((p, index, self) =>
-      index === self.findIndex((t) => t.name === p.name)
-    );
+    // Only use static aifProducts as a fallback if no dynamic products were fetched
+    const allProducts = dynamicAifProducts.length > 0 ? dynamicAifProducts : aifProducts;
+    
+    // Sort or filter if needed, but here we just use the unique list
+    const uniqueProducts = allProducts;
     return uniqueProducts.filter(p => {
       const matchesSearch =
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

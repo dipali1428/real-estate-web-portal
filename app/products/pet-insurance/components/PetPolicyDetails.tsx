@@ -57,8 +57,8 @@ const providers = [
 export function ProviderComparison({ isDashboard = false }: { isDashboard?: boolean } = {}) {
     const { openLogin } = useModal();
     return (
-        <section className="py-10 px-4 sm:px-6 bg-slate-50">
-            <div className="max-w-7xl mx-auto">
+        <section className={`py-10 bg-slate-50 ${isDashboard ? '' : 'px-4 sm:px-6'}`}>
+            <div className={isDashboard ? 'w-full px-2' : 'max-w-7xl mx-auto px-2 lg:px-4'}>
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -126,7 +126,7 @@ export function ProviderComparison({ isDashboard = false }: { isDashboard?: bool
                                         <div className="text-[10px] md:text-xs text-slate-400">per month</div>
                                     </td>
                                     <td className="p-4 md:p-6 text-center">
-                                        <button onClick={openLogin} className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-[#1CADA3] hover:text-white transition-all">
+                                        <button onClick={isDashboard ? undefined : openLogin} className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-[#1CADA3] hover:text-white transition-all">
                                             <IconExternalLink size={20} />
                                         </button>
                                     </td>
@@ -193,8 +193,8 @@ export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } 
     const { openLogin } = useModal();
 
     return (
-        <section id="plans" className="py-10 px-4 sm:px-6 bg-white">
-            <div className="max-w-7xl mx-auto">
+        <section id="plans" className={`py-10 ${isDashboard ? '' : 'bg-white px-4 sm:px-6'}`}>
+            <div className={isDashboard ? 'w-full px-2' : 'max-w-7xl mx-auto px-2 lg:px-4'}>
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -259,7 +259,7 @@ export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } 
 
                                 {/* Standardized Color for All Buttons */}
                                 <button
-                                    onClick={openLogin}
+                                    onClick={isDashboard ? undefined : openLogin}
                                     className="mt-8 w-full block text-center py-3.5 rounded-xl font-bold transition-all bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg hover:shadow-xl hover:scale-[1.02]"
                                 >
                                     Apply Now
