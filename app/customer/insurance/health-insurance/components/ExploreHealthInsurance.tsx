@@ -4,10 +4,11 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Search, ArrowRight, ShieldPlus, Info, FileText } from 'lucide-react';
 import HealthInsurancePlanCard from './HealthInsurancePlanCard';
 import { healthInsurancePlans } from '../healthInsuranceConstants';
-import { motion } from 'framer-motion';
+import { motion,AnimatePresence } from 'framer-motion';
 import customerService from '../../../../services/customerService';
 import toast from 'react-hot-toast';
 
+import HealthInsuranceForm from '../../../../dashboard/leadmanagement/forms/healthisurancform';
 export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
@@ -15,6 +16,9 @@ export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { ac
     const [wishlistMap, setWishlistMap] = useState<Map<string, number>>(new Map());
     const [wishlistLoading, setWishlistLoading] = useState<Set<string>>(new Set());
     const [userId, setUserId] = useState<number | null>(null);
+    const [showApplyModal, setShowApplyModal] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<any>(null);
+
 
     const categories = useMemo(() => {
         return ['All', ...Array.from(new Set(healthInsurancePlans.map(plan => plan.bestFor))).slice(0, 3)];
@@ -224,13 +228,16 @@ export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { ac
                 )}
             </div>
 
-            {/* Plans Grid */}
+           {/* Plans Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {visiblePlans.map((plan, idx) => (
                     <HealthInsurancePlanCard 
                         key={idx} 
                         {...plan} 
-                         
+                         onApply={() => {
+                            setSelectedPlan(plan);
+                            setShowApplyModal(true);
+                         }}
                         isWishlisted={wishlistMap.has(plan.name)}
                         onWishlistToggle={() => toggleWishlist(plan)}
                         wishlistLoading={wishlistLoading.has(plan.name)}
@@ -261,7 +268,15 @@ export default function ExploreHealthInsurance({ activeTab, setActiveTab }: { ac
                     <p className="text-gray-500 font-medium">No plans found matching your search criteria.</p>
                 </div>
             )}
-
+  <AnimatePresence>
+                {showApplyModal && (
+                    <HealthInsuranceForm 
+                        onClose={() => setShowApplyModal(false)} 
+                        initialPlanName={selectedPlan?.name}
+                        initialSumAssured={selectedPlan?.sumInsured}
+                    />
+                )}
+            </AnimatePresence>
             <style jsx>{`
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(10px); }

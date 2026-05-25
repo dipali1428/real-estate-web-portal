@@ -6,8 +6,10 @@ import CustomerRegistrationForm from "../auth/signup/page"; // Import your new C
 import QuoteRequestForm from "../products/corporate-insurance/components/QuoteRequestForm"; // Import Quote Form
 import { X } from "lucide-react";
 import ApplyNowModal from "../component/ApplyNowModal";
+
 import ContactSection from "../component/ContactSection";
 import ContactFormModal from "../component/ContactFormModal";
+import TravelInsuranceForm from "../dashboard/leadmanagement/forms/TravelInsuranceForm";
 
 const ModalContext = createContext({
     isLoginOpen: false,
@@ -30,6 +32,10 @@ const ModalContext = createContext({
     closeContact: () => { },
     isLoanModalOpen: false, // Added for Loan Header hiding
     setLoanModalOpen: (isOpen: boolean) => { }, // Added
+    // Travel Insurance Form state and handlers
+    isTravelFormOpen: false,
+    openTravelForm: () => { },
+    closeTravelForm: () => { },
     closeAll: () => { },
 });
 
@@ -42,10 +48,11 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     const [isQuoteOpen, setIsQuoteOpen] = useState(false); // Quote State
     const [quoteProduct, setQuoteProduct] = useState<string | undefined>(undefined); // Product for Quote
     const [isApplyNowOpen, setIsApplyNowOpen] = useState(false);
+    const [isTravelFormOpen, setIsTravelFormOpen] = useState(false);
     const [isContactOpen, setIsContactOpen] = useState(false);
     const [appliedProduct, setAppliedProduct] = useState<string | undefined>(undefined);
     const [isDashboardFlow, setIsDashboardFlow] = useState(false);
-const [isLoanModalOpen, setIsLoanModalOpen] = useState(false); // Loan Modal State
+    const [isLoanModalOpen, setIsLoanModalOpen] = useState(false); // Loan Modal State
     const closeAll = () => {
         setIsLoginOpen(false);
         setIsPartnerOpen(false);
@@ -83,9 +90,8 @@ const [isLoanModalOpen, setIsLoanModalOpen] = useState(false); // Loan Modal Sta
                 openApplyNow: (productName?: string, isDashboard: boolean = false) => {
                     closeAll();
                     if (isDashboard) {
-                        setAppliedProduct(productName);
-                        setIsDashboardFlow(true);
-                        setIsContactOpen(true);
+                        // Open Travel Insurance Form modal directly in dashboard flow
+                        setIsTravelFormOpen(true);
                     } else {
                         setIsLoginOpen(true);
                     }
@@ -98,8 +104,14 @@ const [isLoanModalOpen, setIsLoanModalOpen] = useState(false); // Loan Modal Sta
                     if (productName) setAppliedProduct(productName);
                     setIsContactOpen(true);
                 },
+                isTravelFormOpen,
+                openTravelForm: () => {
+                    closeAll();
+                    setIsTravelFormOpen(true);
+                },
+                closeTravelForm: () => setIsTravelFormOpen(false),
                 closeContact: () => setIsContactOpen(false),
-// closeQuote: () => setIsQuoteOpen(false),
+                // closeQuote: () => setIsQuoteOpen(false),
                 isLoanModalOpen,
                 setLoanModalOpen: (isOpen: boolean) => setIsLoanModalOpen(isOpen),
                 closeAll,
@@ -158,6 +170,7 @@ const [isLoanModalOpen, setIsLoanModalOpen] = useState(false); // Loan Modal Sta
                     setIsContactOpen(true);
                 }}
             />
+            {isTravelFormOpen && <TravelInsuranceForm onClose={() => setIsTravelFormOpen(false)} />}
 
             {/* Contact Form Modal */}
             {isContactOpen && isDashboardFlow && (
@@ -170,7 +183,7 @@ const [isLoanModalOpen, setIsLoanModalOpen] = useState(false); // Loan Modal Sta
                             <X size={24} />
                         </button>
                         <div className="max-h-[85vh] overflow-y-auto rounded-3xl p-2 md:p-6 lg:p-8">
-                           <ContactFormModal productName={appliedProduct} />
+                            <ContactFormModal productName={appliedProduct} />
                         </div>
                     </div>
                 </div>
@@ -187,7 +200,7 @@ const [isLoanModalOpen, setIsLoanModalOpen] = useState(false); // Loan Modal Sta
                             <X size={24} />
                         </button>
                         <div className="max-h-[85vh] overflow-y-auto rounded-[3rem]">
-                           <ContactSection productName={appliedProduct} />
+                            <ContactSection productName={appliedProduct} />
                         </div>
                     </div>
                 </div>

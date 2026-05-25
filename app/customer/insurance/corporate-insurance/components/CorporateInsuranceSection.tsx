@@ -4,8 +4,13 @@ import React from "react";
 import { motion } from "framer-motion";
 import { IconCheck } from "@tabler/icons-react";
 import { PRODUCTS } from "@/app/products/corporate-insurance/components/data";
+// eslint-disable-next-line no-duplicate-imports
+import { useState } from "react"; 
+// import { useModal } from "@/app/context/ModalContext";
+import CorporateInsuranceForm from "@/app/dashboard/leadmanagement/forms/corporateinsuranceform";
 
 export default function CorporateInsuranceSection({ activeTab }: { activeTab: "medical" | "accident-wc" }) {
+  const [showForm, setShowForm] = useState(false);
   const products = PRODUCTS.filter(p => {
     if (activeTab === "medical") return ["Health", "Life"].includes(p.category);
     return ["Accident", "Liability", "Property", "Cyber"].includes(p.category);
@@ -62,7 +67,7 @@ export default function CorporateInsuranceSection({ activeTab }: { activeTab: "m
             </div>
 
             {/* Features (Wait Period & Claim Ratio) */}
-            <ul className="space-y-2 pt-4 border-t border-slate-100">
+            <ul className="space-y-2 pt-4 border-t border-slate-100 mb-6">
                 <li className="flex items-start gap-2 text-sm font-bold text-slate-600">
                   <IconCheck size={14} className="text-teal-500 shrink-0 mt-0.5" strokeWidth={3} />
                   <span>Waiting Period: {plan.waiting}</span>
@@ -72,9 +77,23 @@ export default function CorporateInsuranceSection({ activeTab }: { activeTab: "m
                   <span>Claim Rating: {plan.claimRatio}</span>
                 </li>
             </ul>
+
+            {/* Action Button */}
+            <div className="mt-auto pt-4 border-t border-slate-100">
+              <button
+                onClick={() => setShowForm(true)}
+                className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90 text-white text-xs font-bold rounded-xl tracking-wider uppercase transition-all shadow-md active:scale-95 cursor-pointer text-center"
+              >
+                Enquire Quote
+              </button>
+            </div>
           </motion.div>
         );
       })}
+
+      {showForm && (
+        <CorporateInsuranceForm onClose={() => setShowForm(false)} />
+      )}
     </div>
   );
 }

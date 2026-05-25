@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     IconCheck,
@@ -12,6 +13,7 @@ import {
     IconTarget,
     IconAward,
 } from '@tabler/icons-react';
+import SMELoanForm from '@/app/dashboard/leadmanagement/forms/smeloanform';
 
 const COMMERCIAL_PRODUCTS = [
     {
@@ -24,8 +26,9 @@ const COMMERCIAL_PRODUCTS = [
         rate: "10.5% – 15% p.a.",
         tenure: "12-36 Months",
         color: "from-[#2076C7] to-[#1CADA3]",
-        bg: "bg-blue-50/30",
-        border: "border-blue-200",
+        bg: "bg-gradient-to-br from-[#2076C7]/5 to-white",
+        border: "border-[#2076C7]/20",
+        featured: false,
         features: ["Cash Credit (CC)", "Overdraft (OD)", "Daily operations"],
     },
     {
@@ -37,9 +40,9 @@ const COMMERCIAL_PRODUCTS = [
         amount: "Up to ₹5 Crore",
         rate: "9.5% – 13.5% p.a.",
         tenure: "Up to 60 Months",
-        color: "from-[#2076C7] to-[#1CADA3]",
-        bg: "bg-gradient-to-br from-blue-50/30 to-teal-50/30",
-        border: "border-blue-100",
+        color: "from-[#1CADA3] to-[#2076C7]",
+        bg: "bg-gradient-to-br from-[#1CADA3]/5 to-white",
+        border: "border-[#1CADA3]/20",
         featured: true,
         features: ["Business expansion", "High value", "Structured EMI"],
     },
@@ -53,8 +56,9 @@ const COMMERCIAL_PRODUCTS = [
         rate: "9.0% – 12% p.a.",
         tenure: "Up to 84 Months",
         color: "from-[#2076C7] to-[#1CADA3]",
-        bg: "bg-teal-50/30",
-        border: "border-teal-200",
+        bg: "bg-gradient-to-br from-[#2076C7]/5 to-white",
+        border: "border-[#2076C7]/20",
+        featured: false,
         features: ["Machine as collateral", "Tax benefits", "Up to 80% funding"],
     },
     {
@@ -66,9 +70,10 @@ const COMMERCIAL_PRODUCTS = [
         amount: "Up to ₹5 Crore",
         rate: "Starting 1% p.m.",
         tenure: "30-90 Days",
-        color: "from-[#2076C7] to-[#1CADA3]",
-        bg: "bg-indigo-50/30",
-        border: "border-indigo-100",
+        color: "from-[#1CADA3] to-[#2076C7]",
+        bg: "bg-gradient-to-br from-[#1CADA3]/5 to-white",
+        border: "border-[#1CADA3]/20",
+        featured: false,
         features: ["Immediate cash", "Unpaid invoices", "Short-term"],
     },
 ];
@@ -84,8 +89,9 @@ const GOVT_SCHEMES = [
         rate: "Starting 8.5% p.a.",
         tenure: "Up to 5 Years",
         color: "from-[#2076C7] to-[#1CADA3]",
-        bg: "bg-blue-50/30",
-        border: "border-blue-200",
+        bg: "bg-gradient-to-br from-[#2076C7]/5 to-white",
+        border: "border-[#2076C7]/20",
+        featured: false,
         features: ["No collateral", "Micro-units", "Refinance support"],
     },
     {
@@ -97,9 +103,9 @@ const GOVT_SCHEMES = [
         amount: "Up to ₹5 Crore",
         rate: "Based on Lender",
         tenure: "Based on Lender",
-        color: "from-[#2076C7] to-[#1CADA3]",
-        bg: "bg-gradient-to-br from-blue-50/30 to-teal-50/30",
-        border: "border-blue-100",
+        color: "from-[#1CADA3] to-[#2076C7]",
+        bg: "bg-gradient-to-br from-[#1CADA3]/5 to-white",
+        border: "border-[#1CADA3]/20",
         featured: true,
         features: ["Govt guarantee", "No security", "Nationwide"],
     },
@@ -113,8 +119,9 @@ const GOVT_SCHEMES = [
         rate: "15–35% Subsidy",
         tenure: "3-7 Years",
         color: "from-[#2076C7] to-[#1CADA3]",
-        bg: "bg-teal-50/30",
-        border: "border-teal-200",
+        bg: "bg-gradient-to-br from-[#2076C7]/5 to-white",
+        border: "border-[#2076C7]/20",
+        featured: false,
         features: ["15-35% Subsidy", "Up to ₹50 Lakh", "New units"],
     },
     {
@@ -126,9 +133,10 @@ const GOVT_SCHEMES = [
         amount: "Up to ₹1 Crore",
         rate: "Starting 10.5% p.a.",
         tenure: "Up to 7 Years",
-        color: "from-[#2076C7] to-[#1CADA3]",
-        bg: "bg-blue-50/30",
-        border: "border-blue-200",
+        color: "from-[#1CADA3] to-[#2076C7]",
+        bg: "bg-gradient-to-br from-[#1CADA3]/5 to-white",
+        border: "border-[#1CADA3]/20",
+        featured: false,
         features: ["SC/ST & Women", "Greenfield", "Up to ₹1 Crore"],
     },
 ];
@@ -136,6 +144,8 @@ const GOVT_SCHEMES = [
 export default function SMELoanTypesSection({ activeTab, showOnlyLive, }: {
     activeTab?: 'commercial' | 'govt'; showOnlyLive?: boolean
 }) {
+    const [showForm, setShowForm] = useState(false);
+
     // decide tab dynamically
     const tabToUse: 'commercial' | 'govt' =
         activeTab ?? (showOnlyLive ? 'commercial' : 'govt');
@@ -144,57 +154,74 @@ export default function SMELoanTypesSection({ activeTab, showOnlyLive, }: {
         tabToUse === 'commercial' ? COMMERCIAL_PRODUCTS : GOVT_SCHEMES;
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {products.map((loan, i) => {
-                const Icon = loan.icon;
-                return (
-                    <motion.div
-                        key={loan.id}
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: i * 0.1 }}
-                        className={`group relative rounded-[2rem] border ${loan.border} ${loan.bg} p-6 md:p-8 flex flex-col h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 ${loan.featured ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''
+        <>
+            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+                {products.map((loan, i) => {
+                    const Icon = loan.icon;
+                    return (
+                        <motion.div
+                            key={loan.id}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: i * 0.1 }}
+                            className={`group relative rounded-2xl border ${loan.border} ${loan.bg} p-5 md:p-6 flex flex-col h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+                                loan.featured ? 'ring-2 ring-[#2076C7]/30 shadow-lg' : ''
                             }`}
-                    >
+                        >
+                            {/* ICON */}
+                            <div className="flex flex-col items-center text-center">
+                                <div className={`w-12 h-12 bg-gradient-to-br ${loan.color} rounded-xl flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                                    <Icon size={22} className="text-white" strokeWidth={1.8} />
+                                </div>
+                                <div className="text-[9px] font-bold text-[#2076C7]/70 uppercase tracking-wider mb-1">{loan.category}</div>
+                                <h3 className="text-base font-extrabold text-gray-800 mb-2 tracking-tight text-center">{loan.title}</h3>
+                                <p className="text-[10px] text-gray-500 mb-3 text-center">{loan.subtitle}</p>
+                            </div>
 
-                        {/* Icon & Category */}
-                        <div className="flex flex-col items-center text-center">
-                            <div className={`w-14 h-14 bg-gradient-to-br ${loan.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
-                                <Icon size={28} className="text-white" strokeWidth={1.8} />
+                            {/* STATS */}
+                            <div className="space-y-2 mb-4">
+                                <div className="flex justify-between items-center py-1.5 border-b border-gray-100">
+                                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Max Amount</span>
+                                    <span className="text-xs font-bold text-[#2076C7]">{loan.amount}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-1.5 border-b border-gray-100">
+                                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Tenure</span>
+                                    <span className="text-xs font-semibold text-gray-700">{loan.tenure}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-1.5">
+                                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Interest</span>
+                                    <span className="text-xs font-bold text-gray-800">{loan.rate}</span>
+                                </div>
                             </div>
-                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{loan.category}</div>
-                            <h3 className="text-xl font-extrabold text-gray-700 mb-4 tracking-tight">{loan.title}</h3>
-                        </div>
 
-                        {/* Stats */}
-                        <div className="space-y-2 mb-6">
-                            <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Max Amount</span>
-                                <span className="text-base font-extrabold text-[#2076C7]">{loan.amount}</span>
-                            </div>
-                            <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Tenure</span>
-                                <span className="text-base font-extrabold text-slate-700">{loan.tenure}</span>
-                            </div>
-                            <div className="flex justify-between items-center py-2">
-                                <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Interest</span>
-                                <span className="text-base font-extrabold text-slate-700">{loan.rate}</span>
-                            </div>
-                        </div>
+                            {/* FEATURES */}
+                            <ul className="space-y-1.5 mb-4 flex-1">
+                                {loan.features.map((feat) => (
+                                    <li key={feat} className="flex items-start gap-1.5 text-[10px] font-medium text-gray-600 leading-relaxed">
+                                        <IconCheck size={12} className="text-[#1CADA3] shrink-0 mt-0.5" strokeWidth={2.5} />
+                                        <span className="break-words leading-tight">{feat}</span>
+                                    </li>
+                                ))}
+                            </ul>
 
-                        {/* Features */}
-                        <ul className="space-y-2 mb-8 flex-1">
-                            {loan.features.map((feat) => (
-                                <li key={feat} className="flex items-start gap-2 text-sm font-bold text-slate-600">
-                                    <IconCheck size={14} className="text-teal-500 shrink-0 mt-0.5" strokeWidth={3} />
-                                    <span className="break-words">{feat}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </motion.div>
-                );
-            })}
-        </div>
+                            {/* Apply Now Button */}
+                            <button
+                                onClick={() => setShowForm(true)}
+                                className="w-full mt-2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90 hover:shadow-lg text-white text-[10px] font-bold uppercase tracking-wider py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                            >
+                                Apply Now
+                            </button>
+                        </motion.div>
+                    );
+                })}
+            </div>
+
+            {showForm && (
+                <SMELoanForm
+                    onClose={() => setShowForm(false)}
+                />
+            )}
+        </>
     );
 }

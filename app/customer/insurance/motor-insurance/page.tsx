@@ -21,7 +21,7 @@ const tabs = [
 ];
 
 export default function MotorInsurancePage() {
-    const [activeTab, setActiveTab] = useState("DASHBOARD");
+    const [activeTab, setActiveTab] = useState("QUOTES");
 
     return (
         <div className="flex-1 p-4 sm:p-6">

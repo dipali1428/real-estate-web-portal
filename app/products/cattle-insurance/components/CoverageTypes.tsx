@@ -1,9 +1,11 @@
+
 'use client';
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { IconCheck, IconX, IconArrowRight, IconShieldCheck, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { useModal } from '../../../context/ModalContext';
+import CattleInsuranceForm from '@/app/dashboard/leadmanagement/forms/cattleinsuranceform';
 
 const coverageTypes = [
     // ... items 1-9
@@ -108,12 +110,14 @@ export default function CoverageTypes({
 }: CoverageTypesProps) {
     const { openLogin } = useModal();
     const [showAll, setShowAll] = useState(false);
+    const [showForm, setShowForm] = useState(false);
 
-    const visiblePlans = showAll ? coverageTypes : coverageTypes.slice(0, 3);
+    const defaultCount = isDashboard ? 4 : 3;
+    const visiblePlans = showAll ? coverageTypes : coverageTypes.slice(0, defaultCount);
 
     return (
-        <section id="coverage" className="py-8 bg-white relative">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 md:px-12">
+        <section id="coverage" className={`py-8 bg-white relative ${isDashboard ? 'px-4 lg:px-8' : ''}`}>
+            <div className={isDashboard ? "w-full" : "max-w-6xl mx-auto px-4 sm:px-6 py-4 md:px-12"}>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -129,7 +133,7 @@ export default function CoverageTypes({
                     </p>
                 </motion.div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
+                <div className={`grid grid-cols-1 sm:grid-cols-2 ${isDashboard ? 'xl:grid-cols-4 lg:grid-cols-3' : 'lg:grid-cols-3'} gap-5 md:gap-8`}>
                     {visiblePlans.map((plan, i) => (
                         <motion.div
                             key={plan.animal}
@@ -190,7 +194,7 @@ export default function CoverageTypes({
                                     <button
                                         onClick={() => {
                                             if (isDashboard) {
-                                                openLogin(); // or custom dashboard flow
+                                                setShowForm(true);
                                             } else {
                                                 openLogin();
                                             }
@@ -221,6 +225,15 @@ export default function CoverageTypes({
                     </button>
                 </div>
             </div>
+
+            {/* Form Modal */}
+            {showForm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative my-8">
+                        <CattleInsuranceForm onClose={() => setShowForm(false)} />
+                    </div>
+                </div>
+            )}
         </section >
     );
 }

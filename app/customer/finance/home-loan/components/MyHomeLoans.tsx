@@ -1,13 +1,10 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { 
   Building2, Download, CheckCircle, XCircle, Clock, Filter, IndianRupee,
   FileText, Home, X, Search, SlidersHorizontal, Calendar
 } from 'lucide-react';
-
 // ==================== MOCK DATA ====================
-
 interface LoanApplication {
   id: number;
   bank_name: string;
@@ -18,22 +15,18 @@ interface LoanApplication {
   status: 'APPROVED' | 'PENDING' | 'REJECTED' | 'FAILED' | 'CANCELLED';
   createdat: string;
 }
-
 // ==================== MAIN COMPONENT ====================
-
 export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (tab: "explore" | "applications") => void }) {
   const [applications, setApplications] = useState<LoanApplication[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<LoanApplication[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [] = useState(false);
+  const [] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
-  
   // Filter States
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [bankSearch, setBankSearch] = useState<string>('');
-
   useEffect(() => {
     setLastUpdated(new Date().toLocaleTimeString('en-IN', {
       hour: '2-digit',
@@ -41,49 +34,39 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
       second: '2-digit'
     }));
   }, []);
-
   useEffect(() => {
     applyClientSideFilters();
   }, [statusFilter, bankSearch, applications]);
-
   // ========== CLIENT-SIDE FILTER FALLBACK ==========
   const applyClientSideFilters = () => {
     let filtered = [...applications];
-    
     if (statusFilter !== 'ALL') {
       filtered = filtered.filter(app => app.status === statusFilter);
     }
-    
     if (bankSearch) {
       filtered = filtered.filter(app => 
         app.bank_name.toLowerCase().includes(bankSearch.toLowerCase())
       );
     }
-    
     // Sort by date (newest first)
     filtered.sort((a, b) => new Date(b.createdat).getTime() - new Date(a.createdat).getTime());
-    
     setFilteredApplications(filtered);
   };
-
   // ========== CLEAR ALL FILTERS ==========
   const clearFilters = () => {
     setStatusFilter('ALL');
     setBankSearch('');
     setShowFilters(false);
   };
-
   // ========== TOGGLE ROW EXPAND ==========
   const toggleRow = (id: number) => {
     setExpandedRow(expandedRow === id ? null : id);
   };
-
   // ========== FORMATTERS ==========
   const formatCurrency = (amount: string | number) => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
     return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-IN', {
@@ -92,7 +75,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
       year: 'numeric'
     });
   };
-
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-IN', {
@@ -101,7 +83,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
       hour12: true
     });
   };
-
   // ========== STATUS BADGE ==========
   const StatusBadge = ({ status }: { status: string }) => {
     const config: Record<string, { bg: string; text: string; icon: any; label: string }> = {
@@ -119,22 +100,17 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
       </span>
     );
   };
-
   // ========== CALCULATE STATS ==========
   const pendingAmount = applications
     .filter(app => app.status === 'PENDING')
     .reduce((sum, app) => sum + parseFloat(app.total_amount), 0);
-    
   const approvedAmount = applications
     .filter(app => app.status === 'APPROVED')
     .reduce((sum, app) => sum + parseFloat(app.total_amount), 0);
-    
   const pendingCount = applications.filter(app => app.status === 'PENDING').length;
   const approvedCount = applications.filter(app => app.status === 'APPROVED').length;
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
-      
+    <div className="space-y-6 animate-fadeIn pb-12">
       {/* --- NEW MODERN HEADER --- */}
       <div className="relative bg-white rounded-2xl p-6 mb-6 shadow-sm border border-slate-100/60 mt-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -157,7 +133,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
                       </p>
                   </div>
               </div>
-              
               <div className="flex pb-2 md:pb-0 w-full sm:w-auto mt-2 sm:mt-0 overflow-x-auto hide-scrollbar sm:overflow-visible">
                   <div className="p-1 bg-slate-100/80 backdrop-blur-sm rounded-full flex items-center gap-1 relative shadow-inner border border-slate-200/50 shrink-0">
                       <button
@@ -184,7 +159,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
               </div>
           </div>
       </div>
-
       <div className="flex flex-col md:flex-row md:items-center justify-end gap-3 mb-6">
           <button 
             onClick={() => setShowFilters(!showFilters)}
@@ -202,13 +176,11 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
               </span>
             )}
           </button>
-          
           <button className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl text-sm font-medium flex items-center gap-2 transition-all">
             <Download className="w-4 h-4" />
             Export CSV
           </button>
       </div>
-
       {/* Filter Panel */}
       {showFilters && (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8 animate-fadeIn">
@@ -225,7 +197,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
               Clear all
             </button>
           </div>
-          
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Status Filter */}
               <div>
@@ -243,7 +214,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
                   <option value="REJECTED">Rejected</option>
                 </select>
               </div>
-              
               {/* Bank Search */}
               <div className="md:col-span-2">
                 <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
@@ -263,12 +233,10 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
             </div>
         </div>
       )}
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        
+     {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {/* Total Applications */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
           <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3">
             <FileText className="w-6 h-6 text-blue-600" />
           </div>
@@ -278,7 +246,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
             {approvedCount} approved • {pendingCount} pending
           </p>
         </div>
-        
         {/* Approved Amount */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
@@ -288,7 +255,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
           <p className="text-2xl font-bold text-emerald-600">{formatCurrency(approvedAmount)}</p>
           <p className="text-xs text-gray-400 mt-2">Sanctioned loans</p>
         </div>
-        
         {/* Pending Amount */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-3">
@@ -298,7 +264,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
           <p className="text-2xl font-bold text-amber-600">{formatCurrency(pendingAmount)}</p>
           <p className="text-xs text-gray-400 mt-2">Awaiting decision</p>
         </div>
-        
         {/* Average Tenure */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-3">
@@ -311,14 +276,12 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
           <p className="text-xs text-gray-400 mt-2">Across all applications</p>
         </div>
       </div>
-
       {/* Results Summary */}
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-gray-600">
           Showing <span className="font-bold text-[#2076C7]">{filteredApplications.length}</span> applications
         </p>
       </div>
-
       {/* Applications Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -373,7 +336,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
                         <StatusBadge status={app.status} />
                       </td>
                     </tr>
-                    
                     {/* Expanded Row */}
                     {expandedRow === app.id && (
                       <tr className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
@@ -386,7 +348,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
                               </div>
                               <div className="font-mono font-medium text-gray-900">#{app.id}</div>
                             </div>
-                            
                             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-blue-100">
                               <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                                 <Building2 size={14} className="text-[#2076C7]" />
@@ -395,7 +356,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
                               <div className="font-medium text-gray-900">{app.interest}% for {app.tenure} Years</div>
                               <div className="text-[10px] text-gray-400 mt-1">Expected EMI calculations applying</div>
                             </div>
-                            
                             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-blue-100">
                               <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                                 <IndianRupee size={14} className="text-[#2076C7]" />
@@ -403,7 +363,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
                               </div>
                               <div className="font-bold text-[#2076C7]">{formatCurrency(app.total_amount)}</div>
                             </div>
-                            
                             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-blue-100">
                               <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                                 <Clock size={14} className="text-[#2076C7]" />
@@ -442,7 +401,6 @@ export default function MyHomeLoans({ activeTab, setActiveTab }: { activeTab: st
           </table>
         </div>
       </div>
-
       <style jsx>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }

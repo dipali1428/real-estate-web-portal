@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     X, CheckCircle2, ArrowRight,
-    Shield, Target, Award, Sparkles, ArrowUpRight
+    Shield, Target, Award, Sparkles
 } from "lucide-react";
 
 export type Plan = {
@@ -20,6 +20,7 @@ export type Plan = {
     accentColor: string;
     badge: string;
     ctas?: string[];
+    claimSettlementRatio?: string;
 };
 
 type PlanDetailsModalProps = {
@@ -165,11 +166,11 @@ export default function PlanDetailsModal({ plan, onClose, onGetQuote, isCustomer
                                 <div className="relative z-10">
                                     <h4 className="text-slate-800 font-black text-lg mb-2">Why choose {plan.insurer}?</h4>
                                     <p className="text-slate-500 text-xs font-medium leading-relaxed max-w-sm">
-                                        {plan.insurer} is among India's top life insurers with high Claim Settlement Ratio and digital-first support architecture.
+                                        {plan.insurer} is among India&apos;s top life insurers with high Claim Settlement Ratio and digital-first support architecture.
                                     </p>
                                     <div className="mt-6 flex items-center gap-6">
                                         <div className="flex flex-col">
-                                            <span className="text-[#2076C7] text-2xl font-black leading-none">98.5%+</span>
+                                            <span className="text-[#2076C7] text-2xl font-black leading-none">{plan.claimSettlementRatio || "98%+"}</span>
                                             <span className="text-slate-400 text-[9px] font-bold uppercase tracking-widest mt-1.5">Claim Settlement</span>
                                         </div>
                                         <div className="w-[1px] h-10 bg-slate-200" />
@@ -204,8 +205,8 @@ export default function PlanDetailsModal({ plan, onClose, onGetQuote, isCustomer
                             >
                                 {isCustomer ? (
                                     <>
-                                        Proceed to Digital Onboarding
-                                        <ArrowUpRight className="w-4 h-4" />
+                                        Apply Now
+                                        <ArrowRight className="w-4 h-4" />
                                     </>
                                 ) : (
                                     <>

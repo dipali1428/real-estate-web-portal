@@ -3,7 +3,6 @@
 import React from "react";
 import {
   Search,
-  Bookmark,
   Percent,
   TrendingDown,
   Landmark,
@@ -93,9 +92,7 @@ function BankCard({ bank }: { bank: BusinessLoanBank }) {
               </p>
             </div>
           </div>
-          <button className="text-gray-300 hover:text-blue-500 transition-colors">
-            <Bookmark size={20} />
-          </button>
+
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -110,7 +107,7 @@ function BankCard({ bank }: { bank: BusinessLoanBank }) {
         </div>
 
         <Link 
-          href={`/customer/Finance/business-loan/${bank.slug}`}
+          href={`/customer/finance/business-loan/${bank.slug}`}
           className="w-full mt-auto py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 group/btn shadow-md hover:shadow-lg hover:shadow-teal-500/20"
         >
           View Details

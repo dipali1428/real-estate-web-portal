@@ -5,6 +5,7 @@ import api from '../../../../services/api';
 import { useRouter } from 'next/navigation';
 import customerService from '@/app/services/customerService';
 import toast from 'react-hot-toast';
+// import EnquiryModal from '@/app/component/EnquiryModal';
 
 interface FlattenedBank {
   id: number; name: string; logo: string; category: string;
@@ -22,10 +23,10 @@ const parseRate = (v: string) => parseFloat(String(v).replace('%', '')) || 0;
 const fmt = (v: string) => { const n = parseRate(v); return n > 0 ? `${n.toFixed(2)}%` : '—'; };
 
 const CATS: Record<string, { bg: string; text: string; dot: string; short: string }> = {
-  'Public Sector Banks': { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-400', short: 'PSB' },
-  'Private Sector Banks': { bg: 'bg-indigo-50', text: 'text-indigo-700', dot: 'bg-indigo-400', short: 'Pvt' },
+  'Public Sector Banks': { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400', short: 'PSB' },
+  'Private Sector Banks': { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400', short: 'Pvt' },
   'Small Finance Banks': { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400', short: 'SFB' },
-  'NBFCs': { bg: 'bg-violet-50', text: 'text-violet-700', dot: 'bg-violet-400', short: 'NBFC' },
+  'NBFCs': { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400', short: 'NBFC' },
 };
 
 const normCat = (cat: string) => {
@@ -85,7 +86,19 @@ export default function FDCompaniesPage() {
   const [wishlistedIds, setWishlistedIds] = useState<Record<number, number>>({});
   const [wishlistLoading, setWishlistLoading] = useState<Set<number>>(new Set());
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 12;
+
+  const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+  const [enquiryProduct, setEnquiryProduct] = useState<any>(null);
+
+  const handleApplyNow = (company: FlattenedBank) => {
+    setEnquiryProduct({
+      product_type: 'FIXED DEPOSIT',
+      product_name: company.name,
+      product_id: company.id
+    });
+    setEnquiryModalOpen(true);
+  };
 
   useEffect(() => {
     const token = getTokenFromCookie();
@@ -263,43 +276,98 @@ export default function FDCompaniesPage() {
 
 
       {/* ── Stats ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           { icon: Landmark, label: 'Total Plans', value: `${companies.length}`, color: 'text-[#2076C7]', bg: 'bg-blue-50' },
           { icon: Percent, label: 'Avg. Best Rate', value: avgRate > 0 ? `${avgRate.toFixed(2)}%` : '—', color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { icon: TrendingUp, label: 'Highest Rate', value: maxRate > 0 ? `${maxRate.toFixed(2)}%` : '—', color: 'text-amber-600', bg: 'bg-amber-50' },
           { icon: Star, label: 'Best Sr. Rate', value: maxSenior > 0 ? `${maxSenior.toFixed(2)}%` : '—', color: 'text-violet-600', bg: 'bg-violet-50' },
         ].map((s, i) => (
-          <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 flex items-center gap-3 sm:gap-4 shadow-sm hover:shadow-md transition-shadow">
-            <div className={`w-9 h-9 sm:w-10 sm:h-10 ${s.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-              <s.icon size={16} className={s.color} />
+          <div key={i} className="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-5 flex items-center gap-2.5 sm:gap-4 shadow-sm hover:shadow-md transition-shadow">
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 ${s.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+              <s.icon size={15} className={s.color} />
             </div>
             <div>
-              <p className="text-lg sm:text-xl font-black text-gray-900 leading-tight">{s.value}</p>
-              <p className="text-[10px] sm:text-[11px] text-gray-400 font-medium mt-0.5">{s.label}</p>
+              <p className="text-base sm:text-xl font-black text-gray-900 leading-tight">{s.value}</p>
+              <p className="text-[9px] sm:text-[11px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* ── Toolbar ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-6 w-full">
+        {/* Left: Title and Badge */}
+        <div className="w-full lg:w-auto shrink-0">
           <h3 className="text-xl font-black text-gray-900">
             Explore FD Plans
             <span className="ml-2 px-2.5 py-0.5 bg-[#2076C7]/10 text-[#2076C7] text-[11px] font-bold rounded-lg">{filtered.length} plans</span>
           </h3>
           <p className="text-xs text-gray-400 mt-0.5 font-medium">Compare daily-updated rates from {companies.length}+ institutions</p>
         </div>
-        <div className="flex items-center gap-2.5 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
+
+        {/* Center: Category Tabs */}
+       {/* Center: Category Tabs */}
+<div className="w-full lg:flex-1 overflow-hidden">
+  <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide whitespace-nowrap pb-2 px-1 lg:justify-center">
+    {CAT_OPTS.map((opt) => {
+      const meta = CATS[opt.value as keyof typeof CATS];
+
+      const count =
+        opt.value === "ALL"
+          ? companies.length
+          : companies.filter((c) => c.category === opt.value).length;
+
+      const active = category === opt.value;
+
+      return (
+        <button
+          key={opt.value}
+          onClick={() => setCategory(opt.value as CatOpt)}
+          className={
+            `flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-[11px] sm:text-xs md:text-[13px] font-bold whitespace-nowrap border transition-all shrink-0 ` +
+            (active
+              ? "bg-[#2076C7] text-white border-[#2076C7] shadow-md shadow-blue-100"
+              : "bg-white border-gray-200 text-gray-600 hover:border-[#2076C7]/40 hover:text-[#2076C7]")
+          }
+        >
+          {meta && !active && (
+            <span
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ${meta.dot}`}
+            />
+          )}
+
+          <span>
+            {opt.value === "ALL"
+              ? "All"
+              : meta?.short ?? opt.label}
+          </span>
+
+          <span
+            className={
+              `px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[11px] font-black shrink-0 ` +
+              (active
+                ? "bg-white/20 text-white"
+                : "bg-gray-100 text-gray-500")
+            }
+          >
+            {count}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+</div>
+        {/* Right: Search and Filter */}
+        <div className="flex items-center gap-2.5 w-full lg:w-auto shrink-0">
+          <div className="relative flex-1 md:w-56 lg:w-64">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <input type="text" placeholder="Search institution..." value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/5 transition-all" />
+              className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#2076C7] focus:ring-4 focus:ring-[#2076C7]/5 transition-all" />
           </div>
           <button onClick={() => setShowFilters(!showFilters)}
-            className={`px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 border transition-all ${showFilters ? 'bg-[#2076C7] text-white border-[#2076C7] shadow-md' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 border transition-all shrink-0 ${showFilters ? 'bg-[#2076C7] text-white border-[#2076C7] shadow-md' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'}`}>
             <Filter size={14} />
             Filter
             {activeCnt > 0 && <span className={`w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center ${showFilters ? 'bg-white text-[#2076C7]' : 'bg-[#2076C7] text-white'}`}>{activeCnt}</span>}
@@ -333,116 +401,111 @@ export default function FDCompaniesPage() {
         </div>
       )}
 
-      {/* ── Category Tabs ── */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {CAT_OPTS.map(opt => {
-          const meta = CATS[opt.value as keyof typeof CATS];
-          const count = opt.value === 'ALL' ? companies.length : companies.filter(c => c.category === opt.value).length;
-          const active = category === opt.value;
-          return (
-            <button key={opt.value} onClick={() => setCategory(opt.value as CatOpt)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border transition-all ${active ? 'bg-[#2076C7] text-white border-[#2076C7] shadow-md shadow-blue-100'
-                : 'bg-white border-gray-200 text-gray-600 hover:border-[#2076C7]/40 hover:text-[#2076C7]'}`}>
-              {meta && !active && <span className={`w-2 h-2 rounded-full ${meta.dot}`} />}
-              {opt.value === 'ALL' ? 'All' : meta?.short ?? opt.label}
-              <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${active ? 'bg-white/20' : 'bg-gray-100 text-gray-500'}`}>{count}</span>
-            </button>
-          );
-        })}
-      </div>
 
-      {/* ── Desktop Table / Mobile Cards ── */}
-      <div className="space-y-4">
-        {/* Mobile Cards (Hidden on md+) */}
-        <div className="grid grid-cols-1 gap-4 md:hidden">
+
+      {/* ── Cards Grid ── */}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {paginated.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center shadow-sm">
-              <Database className="w-8 h-8 text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-400 font-bold text-sm">No plans found</p>
+            <div className="col-span-full bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-sm">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Database className="w-8 h-8 text-gray-300" />
+              </div>
+              <p className="text-gray-500 font-bold text-base mb-2">No plans found</p>
+              <button onClick={clearFilters} className="text-[#2076C7] text-sm font-bold hover:underline transition-all">Clear active filters</button>
             </div>
           ) : (
             paginated.map((company) => {
               const meta = CATS[company.category] ?? { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-300', short: company.category.substring(0, 4) };
-              // const bookmarked = isInWishlist(company.id);
               const best = parseRate(company.bestRate);
+              const bestSenior = parseRate(company.bestSeniorRate);
+
               return (
-                <div key={company.id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4 relative overflow-hidden">
-                  <div className="flex items-start justify-between">
+                <div key={company.id} className="group flex flex-col bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-[#2076C7]/5 hover:border-blue-100 transition-all duration-300 relative overflow-hidden">
+
+                  {/* Card Header */}
+                  <div className="flex items-start justify-between mb-5 gap-3">
                     <div className="flex items-center gap-3">
                       {company.logo && !imgErr.has(company.id) ? (
-                        <img src={company.logo} alt={company.name} className="w-10 h-10 rounded-xl object-contain border border-gray-50 p-1" onError={() => setImgErr(p => new Set(p).add(company.id))} />
+                        <img src={company.logo} alt={company.name} className="w-10 h-10 rounded-2xl object-contain border border-gray-100 p-1 shadow-sm bg-white shrink-0" onError={() => setImgErr(p => new Set(p).add(company.id))} />
                       ) : (
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#2076C7] font-black text-xs">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-center justify-center text-[#2076C7] font-black text-xs shrink-0">
                           {getInitials(company.name)}
                         </div>
                       )}
                       <div>
-                        <h4 className="font-bold text-gray-900 text-sm leading-tight">{company.name}</h4>
-                        <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter ${meta.bg} ${meta.text}`}>
-                          {meta.short}
-                        </span>
+                        <h4 className="font-bold text-gray-900 text-[16px] leading-tight line-clamp-2 group-hover:text-[#2076C7] transition-colors">{company.name}</h4>
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-black uppercase tracking-widest ${meta.bg} ${meta.text}`}>
+                            <span className={`w-1 h-1 rounded-full ${meta.dot}`} />
+                            {meta.short}
+                          </span>
+                          {company.specialRate && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-amber-50 text-amber-700 text-[9.5px] font-black border border-amber-200 uppercase tracking-widest shadow-sm shadow-amber-100 shrink-0">
+                              <Star size={8} className="fill-amber-500 text-amber-500 shrink-0" />
+                              <span className="whitespace-nowrap">{company.specialRate}</span>
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    {/* <button onClick={() => handleBookmark(company)} className={`p-2 rounded-xl transition-all ${bookmarked ? 'bg-blue-50 text-[#2076C7]' : 'text-gray-300'}`}>
-                      <Bookmark size={18} className={bookmarked ? 'fill-current' : ''} />
-                    </button> */}
+
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleWishlistToggle(company); }}
+                      disabled={wishlistLoading.has(company.id)}
+                      className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center transition-all active:scale-95 ${wishlistedIds[company.id] !== undefined
+                        ? 'bg-blue-50/80 text-[#2076C7] shadow-inner'
+                        : 'bg-gray-50/50 text-gray-400 hover:bg-gray-100 hover:text-[#2076C7]'
+                        } disabled:opacity-50 disabled:cursor-wait`}
+                      title={wishlistedIds[company.id] !== undefined ? 'Remove from wishlist' : 'Add to wishlist'}
+                    >
+                      {wishlistLoading.has(company.id) ? (
+                        <div className="w-3 h-3 border-[2px] border-current border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Bookmark
+                          size={14}
+                          strokeWidth={wishlistedIds[company.id] !== undefined ? 2.5 : 2}
+                          className={wishlistedIds[company.id] !== undefined ? 'fill-current scale-110 transition-transform' : 'transition-transform'}
+                        />
+                      )}
+                    </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 pt-2">
-                    <div className="bg-gray-50/50 rounded-xl p-3 border border-gray-100">
-                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Best Rate</p>
-                      <p className="text-lg font-black text-[#2076C7]">{best > 0 ? `${best.toFixed(2)}%` : '—'}</p>
-                    </div>
-                    <div className="bg-emerald-50/30 rounded-xl p-3 border border-emerald-50">
-                      <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Sr. Citizen</p>
-                      <p className="text-lg font-black text-emerald-700">{parseRate(company.bestSeniorRate) > 0 ? `${parseRate(company.bestSeniorRate).toFixed(2)}%` : '—'}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4 py-2 border-y border-gray-50">
+                  {/* Tenures summary */}
+                  <div className="flex items-center justify-between gap-1 pb-4 mb-4 border-b border-gray-50">
                     {['1Y', '2Y', '3Y', '5Y'].map((label, i) => {
                       const rates = [company.shortRate, company.mediumRate, company.longRate, company.megaRate];
                       const val = parseRate(rates[i]);
                       return (
-                        <div key={label} className="text-center">
-                          <p className="text-[8px] font-black text-gray-300 uppercase mb-0.5">{label}</p>
-                          <p className={`text-[11px] font-bold ${val > 0 ? 'text-gray-700' : 'text-gray-300'}`}>{val > 0 ? `${val}%` : '—'}</p>
+                        <div key={label} className="text-center flex-1">
+                          <p className="text-[13px] font-black text-gray-400 uppercase mb-0.5">{label}</p>
+                          <p className={`text-[13px] font-bold ${val > 0 ? 'text-gray-700' : 'text-gray-300'}`}>{val > 0 ? `${val}%` : '—'}</p>
                         </div>
                       );
                     })}
                   </div>
 
-                  {company.specialRate && (
-                    <div className="bg-amber-50 rounded-xl p-2.5 border border-amber-100 flex items-center gap-2">
-                      <Star size={12} className="text-amber-400 fill-amber-400" />
-                      <p className="text-[10px] font-bold text-amber-800 line-clamp-1">{company.specialRate}</p>
+                  {/* Rates */}
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="bg-gray-50/80 rounded-2xl p-3 border border-gray-100 flex flex-col justify-center">
+                      <p className="text-[10.5px] font-bold text-gray-400 uppercase tracking-widest mb-1">Best Rate</p>
+                      <p className="text-2xl font-black text-[#2076C7]">{best > 0 ? `${best.toFixed(2)}%` : '—'}</p>
                     </div>
-                  )}
+                    <div className="bg-emerald-50/40 rounded-2xl p-3 border border-emerald-50 flex flex-col justify-center">
+                      <p className="text-[10.5px] font-bold text-emerald-500/80 uppercase tracking-widest mb-1">Sr. Citizen</p>
+                      <p className="text-2xl font-black text-emerald-600">{bestSenior > 0 ? `${bestSenior.toFixed(2)}%` : '—'}</p>
+                    </div>
+                  </div>
 
-                  <div className="flex items-center gap-2">
+                  {/* Actions */}
+                  <div className="mt-auto">
                     <button
-                      className="flex-1 py-3.5 rounded-xl text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all cursor-default bg-linear-to-r from-[#2076C7] to-[#1CADA3] whitespace-nowrap"
+                      onClick={() => handleApplyNow(company)}
+                      className="w-full group/btn relative py-3.5 rounded-xl text-white font-bold text-[13px] uppercase tracking-widest shadow-md hover:shadow-xl hover:shadow-[#2076C7]/20 active:scale-95 transition-all overflow-hidden"
+                      style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                     >
-                      Apply Now
-                    </button>
-                    <button
-                      onClick={() => handleWishlistToggle(company)}
-                      disabled={wishlistLoading.has(company.id)}
-                      className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center border transition-all ${wishlistedIds[company.id] !== undefined
-                        ? 'bg-[#2076C7]/10 border-[#2076C7]/30 text-[#2076C7]'
-                        : 'border-gray-200 text-gray-400 hover:border-[#2076C7]/40 hover:text-[#2076C7]'
-                        } disabled:opacity-50 disabled:cursor-wait`}
-                      title={wishlistedIds[company.id] !== undefined ? 'Remove from wishlist' : 'Add to wishlist'}
-                    >
-                      {wishlistLoading.has(company.id) ? (
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Bookmark
-                          size={17}
-                          strokeWidth={wishlistedIds[company.id] !== undefined ? 2.5 : 2}
-                          className={wishlistedIds[company.id] !== undefined ? 'fill-current' : ''}
-                        />
-                      )}
+                      <span className="relative z-10 transition-transform group-hover/btn:scale-105 inline-block">Apply Now</span>
+                      <div className="absolute inset-0 bg-white/20 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                     </button>
                   </div>
                 </div>
@@ -451,134 +514,15 @@ export default function FDCompaniesPage() {
           )}
         </div>
 
-        <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto scrollbar-hide">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest w-48 whitespace-nowrap">Company</th>
-                  <th className="px-4 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest w-24 whitespace-nowrap">Category</th>
-                  {['1Y Rate', '2Y Rate', '3Y Rate', '5Y Rate'].map(h => (
-                    <th key={h} className="px-4 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest w-20 whitespace-nowrap">{h}</th>
-                  ))}
-                  <th className="px-4 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest w-24 whitespace-nowrap">Best Rate</th>
-                  <th className="px-4 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest w-24 whitespace-nowrap">Sr. Citizen</th>
-                  <th className="px-4 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest w-32 whitespace-nowrap">Special Offer</th>
-                  <th className="px-4 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest w-28 whitespace-nowrap">Action</th>
-                  <th className="px-4 py-4 w-10" />
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={10} className="py-20 text-center">
-                      <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <Database className="w-6 h-6 text-gray-300" />
-                      </div>
-                      <p className="text-gray-400 font-semibold text-sm">No plans match your filters</p>
-                      <button onClick={clearFilters} className="text-[#2076C7] text-xs font-bold mt-2 hover:underline">Clear filters</button>
-                    </td>
-                  </tr>
-                ) : paginated.map((company, idx) => {
-                  const meta = CATS[company.category] ?? { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-300', short: company.category.substring(0, 4) };
-                  // const bookmarked = isInWishlist(company.id);
-                  const best = parseRate(company.bestRate);
-                  return (
-                    <tr key={company.id}
-                      className={`group transition-colors border-b border-gray-50 last:border-0 hover:bg-blue-50/40 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}>
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-3">
-                          {company.logo && !imgErr.has(company.id) ? (
-                            <img src={company.logo} alt={company.name} className="w-9 h-9 rounded-xl object-contain border border-gray-100 bg-white flex-shrink-0 shadow-sm" onError={() => setImgErr(p => new Set(p).add(company.id))} loading="lazy" />
-                          ) : (
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10 flex items-center justify-center text-[#2076C7] font-black text-xs flex-shrink-0">
-                              {getInitials(company.name)}
-                            </div>
-                          )}
-                          <span className="font-semibold text-gray-900 text-sm truncate whitespace-nowrap max-w-[150px] block">{company.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-5">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold ${meta.bg} ${meta.text}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
-                          {meta.short}
-                        </span>
-                      </td>
-                      {[company.shortRate, company.mediumRate, company.longRate, company.megaRate].map((r, i) => (
-                        <td key={i} className="px-4 py-5 text-right">
-                          <span className={`text-sm font-semibold ${parseRate(r) > 0 ? 'text-gray-800' : 'text-gray-300'}`}>
-                            {fmt(r)}
-                          </span>
-                        </td>
-                      ))}
-                      <td className="px-4 py-5 text-right">
-                        {best > 0 ? (
-                          <span className="inline-flex items-center justify-center px-2.5 py-1 bg-[#2076C7]/10 text-[#2076C7] text-sm font-black rounded-lg">
-                            {best.toFixed(2)}%
-                          </span>
-                        ) : <span className="text-gray-300 text-sm">—</span>}
-                      </td>
-                      <td className="px-4 py-5 text-right">
-                        {parseRate(company.bestSeniorRate) > 0 ? (
-                          <span className="inline-flex items-center gap-1 text-emerald-700 text-sm font-semibold">
-                            <TrendingUp size={12} className="text-emerald-500" />
-                            {parseRate(company.bestSeniorRate).toFixed(2)}%
-                          </span>
-                        ) : <span className="text-gray-300 text-sm">—</span>}
-                      </td>
-                      <td className="px-4 py-5">
-                        {company.specialRate ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-[11px] font-semibold border border-amber-100 max-w-[120px] truncate">
-                            <Star size={10} className="fill-amber-400 text-amber-400 flex-shrink-0" />
-                            <span className="truncate">{company.specialRate}</span>
-                          </span>
-                        ) : <span className="text-gray-300 text-xs">—</span>}
-                      </td>
-                      <td className="px-4 py-5 text-center">
-                        <button
-                          className="px-5 py-2.5 rounded-xl text-white font-black text-[10px] uppercase tracking-widest shadow-md shadow-blue-500/10 hover:shadow-lg active:scale-95 transition-all cursor-default bg-linear-to-r from-[#2076C7] to-[#1CADA3] whitespace-nowrap"
-                        >
-                          Apply Now
-                        </button>
-                      </td>
-                      <td className="px-4 py-5">
-                        <button
-                          onClick={e => { e.preventDefault(); e.stopPropagation(); handleWishlistToggle(company); }}
-                          disabled={wishlistLoading.has(company.id)}
-                          className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${wishlistedIds[company.id] !== undefined
-                            ? 'bg-[#2076C7]/10 text-[#2076C7]'
-                            : 'text-gray-400 hover:bg-gray-100 hover:text-[#2076C7]'
-                            } disabled:opacity-50 disabled:cursor-wait`}
-                          title={wishlistedIds[company.id] !== undefined ? 'Remove from wishlist' : 'Add to wishlist'}
-                        >
-                          {wishlistLoading.has(company.id) ? (
-                            <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Bookmark
-                              size={17}
-                              strokeWidth={wishlistedIds[company.id] !== undefined ? 2.5 : 2}
-                              className={wishlistedIds[company.id] !== undefined ? 'fill-current' : ''}
-                            />
-                          )}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        {/* Pagination Footer */}
+        {filtered.length > 0 && (
+          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex items-center justify-between">
+            <p className="text-xs text-gray-500 font-medium px-3">
+              Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} plans
+            </p>
+            <PaginationBar />
           </div>
-          
-          {/* Footer with pagination — matches admin FD dashboard style */}
-          {filtered.length > 0 && (
-            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-              <p className="text-xs text-slate-400 font-medium">
-                Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
-              </p>
-              <PaginationBar />
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
 
@@ -588,6 +532,14 @@ export default function FDCompaniesPage() {
         @keyframes fadeIn { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
         .animate-fadeIn { animation: fadeIn 0.25s ease; }
       `}</style>
+
+      {/* {enquiryProduct && (
+        <EnquiryModal
+          isOpen={enquiryModalOpen}
+          onClose={() => setEnquiryModalOpen(false)}
+          productDetails={enquiryProduct}
+        />
+      )} */}
     </div>
   );
 }
