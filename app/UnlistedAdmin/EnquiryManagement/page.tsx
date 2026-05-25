@@ -10,11 +10,8 @@ import {
   TrendingUp,
   BarChart3,
   Building2,
-  Trash2,
-  Eye,
   MapPin,
   Mail,
-  Phone,
   User,
   Package,
   MessageSquare,
@@ -26,7 +23,7 @@ import toast from "react-hot-toast";
 const EnquiryDetailModal = ({ item, onClose }: { item: Enquiry; onClose: () => void }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -91,15 +88,15 @@ const EnquiryDetailModal = ({ item, onClose }: { item: Enquiry; onClose: () => v
 
           {/* Message Content */}
           <div className="space-y-2">
-             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Message</p>
-             <div className="p-4 bg-slate-50 rounded-2xl border-l-4 border-[#2076C7] text-sm text-gray-600 italic leading-relaxed">
-                "{item.message || "No message provided."}"
-             </div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Message</p>
+            <div className="p-4 bg-slate-50 rounded-2xl border-l-4 border-[#2076C7] text-sm text-gray-600 italic leading-relaxed">
+              "{item.message || "No message provided."}"
+            </div>
           </div>
 
           <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-400 font-bold uppercase">
-             <span>Received On: {new Date(item.created_at).toLocaleDateString()}</span>
-             <button onClick={onClose} className="text-[#2076C7] hover:underline">Close View</button>
+            <span>Received On: {new Date(item.created_at).toLocaleDateString()}</span>
+            <button onClick={onClose} className="text-[#2076C7] hover:underline">Close View</button>
           </div>
         </div>
       </motion.div>
@@ -116,6 +113,8 @@ const productTypeToCategoryId: Record<string, string> = {
   BOND: "bonds",
   REAL_ESTATE: "real-estate",
   NCD: "ncd",
+  AIF: "aif",
+  NPS: "nps"
 };
 
 const initialCategories = [
@@ -124,8 +123,10 @@ const initialCategories = [
   { id: "pms", name: "PMS", icon: BarChart3 },
   { id: "ncd", name: "NCD", icon: TrendingUp },
   { id: "bonds", name: "Bonds", icon: Layers },
-  { id: "real-estate", name: "Real Estate", icon: Building2 },
   { id: "mutual-funds", name: "Mutual Funds", icon: TrendingUp },
+  { id: "Real-Estate", name: "Real Estate", icon: Building2 },
+  { id: "aif", name: "AIF", icon: BarChart3 },
+  { id: "nps", name: "NPS", icon: Layers }
 ];
 
 export default function EnquiryManagement() {
@@ -134,7 +135,7 @@ export default function EnquiryManagement() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null); // Added state for Modal
-  
+
   const [categories, setCategories] = useState(
     initialCategories.map((c) => ({ ...c, count: 0 }))
   );
@@ -167,7 +168,7 @@ export default function EnquiryManagement() {
   const filteredItems = useMemo(() => {
     return enquiries.filter((item) => {
       const matchesCategory = selectedCategory === "all" || productTypeToCategoryId[item.product_type || ""] === selectedCategory;
-      const matchesSearch = 
+      const matchesSearch =
         item.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.product_name?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
@@ -178,7 +179,7 @@ export default function EnquiryManagement() {
 
   return (
     <div className="flex-1 p-4 sm:p-6 bg-[#f8fafc] min-h-screen font-sans">
-      
+
       {/* HEADER BANNER */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-linear-to-r from-[#2076C7] to-[#1CADA3] rounded-2xl p-6 mb-6 text-white shadow-lg">
         <div className="flex items-center gap-3">
@@ -197,9 +198,8 @@ export default function EnquiryManagement() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`relative px-5 py-2 rounded-full text-xs font-bold uppercase transition-all duration-300 z-10 flex items-center gap-2 ${
-                selectedCategory === cat.id ? "text-white" : "text-slate-500 hover:text-slate-700"
-              }`}
+              className={`relative px-5 py-2 rounded-full text-xs font-bold uppercase transition-all duration-300 z-10 flex items-center gap-2 ${selectedCategory === cat.id ? "text-white" : "text-slate-500 hover:text-slate-700"
+                }`}
             >
               {selectedCategory === cat.id && (
                 <motion.div layoutId="activeTab" className="absolute inset-0 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full -z-10 shadow-sm" />
@@ -216,13 +216,13 @@ export default function EnquiryManagement() {
       {/* SEARCH */}
       <div className="mb-8 flex justify-center">
         <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700" />
           <input
             type="text"
             placeholder="Search by product or customer name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#2076C7]/10 outline-none"
+            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-gray-700 shadow-sm focus:ring-2 focus:ring-[#2076C7]/10 outline-none"
           />
         </div>
       </div>
@@ -271,9 +271,9 @@ export default function EnquiryManagement() {
                   <div className="text-[10px] text-gray-400">{item.email}</div>
                 </td>
                 <td className="px-6 py-5 text-center">
-                   <span className="inline-flex items-center gap-1 text-xs font-bold text-gray-600">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-gray-600">
                     <MapPin size={12} className="text-gray-400" /> {item.city || "N/A"}
-                   </span>
+                  </span>
                 </td>
                 <td className="px-6 py-5 text-center text-xs font-bold text-gray-500">
                   {new Date(item.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
@@ -281,14 +281,11 @@ export default function EnquiryManagement() {
                 <td className="px-6 py-5 text-center">
                   <div className="flex justify-center gap-2">
                     {/* Updated Click Handler */}
-                    <button 
+                    <button
                       onClick={() => setSelectedEnquiry(item)}
-                      className="p-2 bg-[#2076C7]/10 text-[#2076C7] rounded-lg hover:bg-[#2076C7] hover:text-white transition-all"
+                      className="px-3 py-1 text-sm rounded-md bg-[#2076C7]/10 text-[#2076C7] hover:bg-[#2076C7] hover:text-white transition-all"
                     >
-                      <Eye size={16}/>
-                    </button>
-                    <button className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
-                      <Trash2 size={16}/>
+                      View Enquiry
                     </button>
                   </div>
                 </td>
@@ -340,15 +337,12 @@ export default function EnquiryManagement() {
               </div>
               <div className="flex gap-2">
                 {/* Updated Mobile Click Handler */}
-                <button 
+                <button
                   onClick={() => setSelectedEnquiry(item)}
                   className="p-2 bg-blue-50 text-[#2076C7] rounded-lg"
                 >
-                  <Eye size={18}/>
-                </button>
-                <button className="p-2 bg-red-50 text-red-500 rounded-lg">
-                  <Trash2 size={18}/>
-                </button>
+                  View Enquiry
+                </button >
               </div>
             </div>
           </motion.div>
@@ -358,9 +352,9 @@ export default function EnquiryManagement() {
       {/* DETAIL MODAL OVERLAY */}
       <AnimatePresence>
         {selectedEnquiry && (
-          <EnquiryDetailModal 
-            item={selectedEnquiry} 
-            onClose={() => setSelectedEnquiry(null)} 
+          <EnquiryDetailModal
+            item={selectedEnquiry}
+            onClose={() => setSelectedEnquiry(null)}
           />
         )}
       </AnimatePresence>
