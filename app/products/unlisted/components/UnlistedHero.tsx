@@ -260,7 +260,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                 </span>
                                 <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
                             </button>
-
+{/* 
                             <button
                                 onClick={() => setShowEnquiryModal(true)}
                                 className="group relative bg-white px-10 py-5 rounded-2xl font-black text-base border-2 hover:bg-blue-50 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer overflow-hidden"
@@ -270,7 +270,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                     <Send size={20} strokeWidth={2.5} />
                                     Enquire Now
                                 </span>
-                            </button>
+                            </button> */}
                         </div>
                     </motion.div>
 
@@ -326,7 +326,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
             </div>
 
             {/* Enquiry Modal - Updated for API with all required fields */}
-            {showEnquiryModal && (
+            {/* {showEnquiryModal && (
                 <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
                     <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
                         <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-5 text-white flex justify-between items-center sticky top-0">
@@ -350,7 +350,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                 </div>
                             )}
                             
-                            {/* Product/Company Details Section */}
+          
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
                                     <Briefcase className="w-4 h-4 text-[#2076C7]" />
@@ -410,7 +410,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                 </div>
                             </div>
                             
-                            {/* Personal Details Section */}
+                   
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
                                     <User className="w-4 h-4 text-[#2076C7]" />
@@ -428,7 +428,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                                 onChange={(e) => handleInputChange('full_name', e.target.value)}
                                                 required 
                                                 className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                                                placeholder="Rutuja Shitole" 
+                                                placeholder="Enter your full name" 
                                             />
                                         </div>
                                     </div>
@@ -446,7 +446,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                                     onChange={(e) => handleInputChange('email', e.target.value)}
                                                     required 
                                                     className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                                                    placeholder="rutujas@gmail.com" 
+                                                    placeholder="Enter your email" 
                                                 />
                                             </div>
                                         </div>
@@ -462,7 +462,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                                     onChange={(e) => handleInputChange('phone', e.target.value)}
                                                     required 
                                                     className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                                                    placeholder="8421736838" 
+                                                    placeholder="Enter your phone number" 
                                                 />
                                             </div>
                                         </div>
@@ -480,14 +480,14 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                                 onChange={(e) => handleInputChange('city', e.target.value)}
                                                 required 
                                                 className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                                                placeholder="Pune" 
+                                                placeholder="Enter your city" 
                                             />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            {/* Message Section */}
+          
                             <div>
                                 <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
                                     Your Message <span className="text-rose-500">*</span>
@@ -500,12 +500,12 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                         required 
                                         rows={4}
                                         className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black resize-none" 
-                                        placeholder="I want more details about this share. Please share the investment memorandum and historical performance data."
+                                        placeholder="Enter your message"
                                     />
                                 </div>
                             </div>
                             
-                            {/* Submit Button */}
+        
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting} 
@@ -517,8 +517,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                                     <><Send className="w-5 h-5" />Submit Enquiry</>
                                 )}
                             </button>
-                            
-                            {/* Trust message */}
+             
                             <p className="text-xs text-gray-400 text-center pt-2 flex items-center justify-center gap-2">
                                 <CheckCircle className="w-3 h-3" />
                                 Your information is secure and will not be shared
@@ -528,7 +527,7 @@ export default function UnlistedHero({ onActionClick, onApplyClick }: UnlistedHe
                         </form>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* Success Modal */}
             {showSuccess && (

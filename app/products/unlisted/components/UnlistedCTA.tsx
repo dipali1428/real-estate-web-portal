@@ -211,19 +211,19 @@ export default function UnlistedCTA() {
                             </button>
                             
                             {/* Enquire Now Button - Opens Enquiry Modal */}
-                            <button
+                            {/* <button
                                 onClick={() => setShowEnquiryModal(true)}
                                 className="flex items-center justify-center gap-1 px-10 py-4 border-2 border-white/40 text-white rounded-xl font-extrabold text-base hover:bg-white/10 transition-all duration-300 w-full sm:w-auto"
                             >
                                 Enquire Now
-                            </button>
+                            </button> */}
                         </div>
                     </motion.div>
                 </div>
             </section>
 
             {/* ENQUIRY MODAL - Updated to match API requirements */}
-            {showEnquiryModal && (
+            {/* {showEnquiryModal && (
                 <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
                     <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
                         <div className="bg-gradient-to-r from-teal-600 to-teal-500 p-5 text-white flex justify-between items-center sticky top-0">
@@ -247,7 +247,7 @@ export default function UnlistedCTA() {
                                 </div>
                             )}
                             
-                            {/* Product/Company Details Section */}
+                 
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
                                     <Briefcase className="w-4 h-4 text-teal-600" />
@@ -307,7 +307,7 @@ export default function UnlistedCTA() {
                                 </div>
                             </div>
                             
-                            {/* Personal Details Section */}
+                       
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
                                     <User className="w-4 h-4 text-teal-600" />
@@ -325,7 +325,7 @@ export default function UnlistedCTA() {
                                                 onChange={(e) => handleInputChange('full_name', e.target.value)}
                                                 required 
                                                 className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                                placeholder="Rutuja Shitole" 
+                                                placeholder="Enter your full name" 
                                             />
                                         </div>
                                     </div>
@@ -343,7 +343,7 @@ export default function UnlistedCTA() {
                                                     onChange={(e) => handleInputChange('email', e.target.value)}
                                                     required 
                                                     className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                                    placeholder="rutujas@gmail.com" 
+                                                    placeholder="Enter your email" 
                                                 />
                                             </div>
                                         </div>
@@ -359,7 +359,7 @@ export default function UnlistedCTA() {
                                                     onChange={(e) => handleInputChange('phone', e.target.value)}
                                                     required 
                                                     className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                                    placeholder="9876543210" 
+                                                    placeholder="Enter your phone number" 
                                                 />
                                             </div>
                                         </div>
@@ -377,14 +377,14 @@ export default function UnlistedCTA() {
                                                 onChange={(e) => handleInputChange('city', e.target.value)}
                                                 required 
                                                 className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black" 
-                                                placeholder="Pune" 
+                                                placeholder="Enter your city" 
                                             />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            {/* Message Section */}
+        
                             <div>
                                 <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
                                     Your Message <span className="text-rose-500">*</span>
@@ -397,12 +397,12 @@ export default function UnlistedCTA() {
                                         required 
                                         rows={4}
                                         className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-teal-500 text-sm text-black resize-none" 
-                                        placeholder="I want more details about this share. Please share the investment memorandum and historical performance data."
+                                        placeholder="Enter your message"
                                     />
                                 </div>
                             </div>
                             
-                            {/* Submit Button */}
+                          
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting} 
@@ -421,7 +421,7 @@ export default function UnlistedCTA() {
                                 )}
                             </button>
                             
-                            {/* Trust message */}
+                  
                             <p className="text-xs text-gray-400 text-center pt-2 flex items-center justify-center gap-2">
                                 <CheckCircle className="w-3 h-3" />
                                 Your information is secure and will not be shared
@@ -431,7 +431,7 @@ export default function UnlistedCTA() {
                         </form>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* SUCCESS MODAL */}
             {showSuccess && (

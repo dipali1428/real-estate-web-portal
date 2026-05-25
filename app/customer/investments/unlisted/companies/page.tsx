@@ -1,3 +1,4 @@
+// app/companies/page.tsx (Updated to use imported EnquiryModal)
 'use client';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Search, Filter, Building, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2, Plus, Minus, CreditCard, Send, User, Briefcase, Mail, Phone, MessageCircle } from 'lucide-react';
@@ -8,6 +9,7 @@ import customerService, { WishlistItem } from '../../../../services/customerServ
 import { motion, AnimatePresence } from 'framer-motion';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
 import Image from "next/image";
+import EnquiryModal from '../../../orderform/EnquiryModal';
 
 // ==================== TYPES ====================
 interface Company {
@@ -49,18 +51,6 @@ interface CompanyCardProps {
   onAddToCart: (company: Company, quantity: number) => void;
   wishlistLoading: boolean;
   onViewDetails: (company: Company) => void;
-}
-
-// Enquiry payload type
-interface EnquiryPayload {
-    full_name: string;
-    email: string;
-    phone: string;
-    city: string;
-    message: string;
-    product_type: string;
-    product_name: string;
-    product_id: number;
 }
 
 // ==================== CONSTANTS ====================
@@ -107,13 +97,13 @@ const enrichCompanyForModal = (company: Company): Company => {
   const lotSize = company.min_lot_size || 100;
   let category = 'Unlisted Shares';
   const name = company.shares_name.toLowerCase();
-  
+
   if (name.includes('tech') || name.includes('software')) category = 'Technology';
   else if (name.includes('fin') || name.includes('bank') || name.includes('microfinance')) category = 'Fintech';
   else if (name.includes('health') || name.includes('pharma') || name.includes('clinical')) category = 'Healthcare';
   else if (name.includes('auto') || name.includes('motor')) category = 'Automotive';
   else if (name.includes('energy') || name.includes('power') || name.includes('renewable')) category = 'Energy';
-  
+
   return {
     ...company,
     category,
@@ -155,11 +145,11 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
       <div className="w-full h-24 sm:h-32 bg-gray-50 rounded-t-xl sm:rounded-t-2xl flex items-center justify-center border-b border-gray-100 overflow-hidden">
         {company.logo_url ? (
           <Image
-            src={company.logo_url} 
+            src={company.logo_url}
             width={200}
             height={150}
-            className="w-full h-full object-contain p-2 sm:p-3 transition-all duration-700 group-hover:scale-110" 
-            alt={company.shares_name} 
+            className="w-full h-full object-contain p-2 sm:p-3 transition-all duration-700 group-hover:scale-110"
+            alt={company.shares_name}
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
               const parent = (e.target as HTMLImageElement).parentElement;
@@ -180,13 +170,13 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
         <h4 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 group-hover:text-[#2076C7] transition-colors duration-300 text-center min-h-[40px] sm:min-h-[48px] px-1">
           {company.shares_name}
         </h4>
-        
+
         <div className="mb-2 sm:mb-4 text-center w-full overflow-hidden">
           <span className="inline-block text-lg sm:text-xl md:text-2xl font-bold text-[#2076C7] whitespace-nowrap sm:whitespace-normal break-words max-w-full px-2">
             {formatCurrency(company.price)}
           </span>
         </div>
-        
+
         <div className="text-[10px] sm:text-xs text-gray-500 text-center mb-2 sm:mb-4">Unlisted Shares</div>
 
         <div className="grid grid-cols-2 gap-x-2 sm:gap-x-6 gap-y-2 sm:gap-y-3 w-full mb-4 sm:mb-6">
@@ -223,7 +213,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
           >
             <ShoppingCart size={14} className="sm:w-[18px] sm:h-[18px]" /> Add to Cart
           </button>
-          <button 
+          <button
             onClick={() => onViewDetails(company)}
             className="w-full py-1.5 sm:py-2.5 border-2 border-[#2076C7]/20 text-[#2076C7] text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center gap-1.5 sm:gap-2"
           >
@@ -255,10 +245,10 @@ const CompanyDetailModal: React.FC<{
     const loadGraphData = async () => {
       setIsModalGraphLoading(true);
       setModalGraphData([]);
-      
+
       try {
         const response = await fetchIdGraphData(company.id);
-        
+
         if (response && response.success && response.graph && Array.isArray(response.graph)) {
           const formattedData: GraphPoint[] = response.graph
             .filter(item => item && item.price_date && item.market_price !== null && item.market_price !== undefined)
@@ -266,7 +256,7 @@ const CompanyDetailModal: React.FC<{
               price_date: item.price_date,
               market_price: item.market_price?.toString() || '0'
             }));
-          
+
           if (formattedData.length > 0) {
             setModalGraphData(formattedData);
           }
@@ -285,7 +275,7 @@ const CompanyDetailModal: React.FC<{
   useEffect(() => {
     if (!chartRef.current) return;
     if (modalGraphData.length === 0) return;
-    
+
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
@@ -351,7 +341,7 @@ const CompanyDetailModal: React.FC<{
         scales: {
           y: {
             grid: { color: 'rgba(0, 0, 0, 0.05)' },
-            ticks: { 
+            ticks: {
               callback: (val) => `₹${val}`,
               font: { size: 11 }
             }
@@ -387,7 +377,7 @@ const CompanyDetailModal: React.FC<{
 
   const getFilteredGraphData = useCallback(() => {
     if (!modalGraphData.length) return [];
-    
+
     switch (graphTimeRange) {
       case '1W': {
         const cutoffDate = new Date();
@@ -414,8 +404,6 @@ const CompanyDetailModal: React.FC<{
   const prices = filteredGraphData.map(d => parseFloat(d.market_price));
   const high52W = prices.length ? Math.max(...prices) : parseFloat(company.price);
   const low52W = prices.length ? Math.min(...prices) : parseFloat(company.price);
-  const highDate = filteredGraphData.find(d => parseFloat(d.market_price) === high52W)?.price_date;
-  const lowDate = filteredGraphData.find(d => parseFloat(d.market_price) === low52W)?.price_date;
 
   const handleModalQuantityChange = (newQuantity: number) => {
     if (newQuantity >= 1 && newQuantity <= modalMaxLot) {
@@ -462,8 +450,8 @@ const CompanyDetailModal: React.FC<{
               <p className="text-[10px] md:text-xs text-gray-500 font-medium">Current Price</p>
               <div className="text-lg md:text-2xl lg:text-3xl font-bold text-[#10b981]">{formatCurrency(enriched.price)}</div>
             </div>
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600"
             >
               <X size={20} className="md:w-6 md:h-6" />
@@ -473,7 +461,7 @@ const CompanyDetailModal: React.FC<{
 
         {/* Scrollable Content */}
         <div className="p-4 md:p-6 lg:p-8 bg-gray-50/30 overflow-y-auto">
-          
+
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
             {[
@@ -494,10 +482,10 @@ const CompanyDetailModal: React.FC<{
 
           {/* Main Content */}
           <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
-            
+
             {/* Left Column */}
             <div className="lg:w-2/3 space-y-4 md:space-y-6">
-              
+
               {/* Chart Section */}
               <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
@@ -513,11 +501,10 @@ const CompanyDetailModal: React.FC<{
                       <button
                         key={r}
                         onClick={() => setGraphTimeRange(r)}
-                        className={`px-2.5 md:px-3.5 py-1 md:py-1.5 text-xs font-medium rounded-md transition-all ${
-                          graphTimeRange === r 
-                            ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200' 
+                        className={`px-2.5 md:px-3.5 py-1 md:py-1.5 text-xs font-medium rounded-md transition-all ${graphTimeRange === r
+                            ? 'bg-white text-[#2076C7] shadow-sm border border-gray-200'
                             : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                          }`}
                       >
                         {r}
                       </button>
@@ -545,7 +532,7 @@ const CompanyDetailModal: React.FC<{
                 <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">
                   {enriched.description || `${enriched.shares_name} is a leading player in the ${enriched.category || 'unlisted shares'} sector with strong growth potential and a proven track record of innovation. The company has shown consistent performance and is poised for significant expansion in the coming years.`}
                 </p>
-                
+
                 <div className="grid grid-cols-2 gap-3 md:gap-4 mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100">
                   <div>
                     <p className="text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">ISIN</p>
@@ -566,10 +553,10 @@ const CompanyDetailModal: React.FC<{
                 </div>
               </div>
             </div>
-            
+
             {/* Right Column */}
             <div className="lg:w-1/3 space-y-4 md:space-y-6">
-              
+
               {/* Key Statistics */}
               <div className="bg-white rounded-xl p-4 md:p-5 lg:p-6 border border-gray-100 shadow-sm">
                 <h4 className="text-sm md:text-base font-bold text-gray-900 mb-3 md:mb-4 flex items-center gap-2">
@@ -622,8 +609,8 @@ const CompanyDetailModal: React.FC<{
                 <p className="text-[9px] md:text-xs text-center text-gray-400 mb-3 md:mb-4">
                   Max lot: {modalMaxLot === Infinity ? 'Unlimited' : modalMaxLot.toLocaleString()} shares
                 </p>
-                <button 
-                  onClick={() => { onAddToCart(enriched, modalQuantity); onClose(); }} 
+                <button
+                  onClick={() => { onAddToCart(enriched, modalQuantity); onClose(); }}
                   className="w-full py-2.5 md:py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-sm md:text-base font-bold rounded-lg hover:opacity-90 transition-all"
                 >
                   Add to Cart
@@ -648,8 +635,8 @@ const CompanyDetailModal: React.FC<{
                         <span className="text-xs md:text-sm font-bold text-gray-900">{metric.value}</span>
                       </div>
                       <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full" 
+                        <div
+                          className="h-full bg-gradient-to-r from-[#2076C7] to-[#1CADA3] rounded-full"
                           style={{ width: `${metric.percent}%` }}
                         />
                       </div>
@@ -660,321 +647,6 @@ const CompanyDetailModal: React.FC<{
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
-// ==================== ENQUIRY MODAL COMPONENT ====================
-const EnquiryModal: React.FC<{
-  onClose: () => void;
-  onSuccess: () => void;
-}> = ({ onClose, onSuccess }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [enquiryError, setEnquiryError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    product_id: '',
-    product_name: '',
-    product_type: 'SHARE',
-    full_name: '',
-    email: '',
-    phone: '',
-    city: '',
-    message: ''
-  });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (enquiryError) setEnquiryError(null);
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate all required fields
-    if (!formData.product_id.trim()) {
-      setEnquiryError('Product/Company ID is required');
-      return;
-    }
-    if (!formData.product_name.trim()) {
-      setEnquiryError('Product/Company name is required');
-      return;
-    }
-    if (!formData.full_name.trim()) {
-      setEnquiryError('Full name is required');
-      return;
-    }
-    if (!formData.email.trim()) {
-      setEnquiryError('Email is required');
-      return;
-    }
-    if (!formData.phone.trim()) {
-      setEnquiryError('Phone number is required');
-      return;
-    }
-    if (!formData.city.trim()) {
-      setEnquiryError('City is required');
-      return;
-    }
-    if (!formData.message.trim()) {
-      setEnquiryError('Message is required');
-      return;
-    }
-    
-    // Validate product ID
-    const productIdNum = parseInt(formData.product_id);
-    if (isNaN(productIdNum) || productIdNum <= 0) {
-      setEnquiryError('Please enter a valid product/company ID');
-      return;
-    }
-    
-    // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email.trim())) {
-      setEnquiryError('Please enter a valid email address');
-      return;
-    }
-    
-    // Validate phone (10 digits)
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(formData.phone.trim())) {
-      setEnquiryError('Please enter a valid 10-digit phone number');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setEnquiryError(null);
-    
-    try {
-      const payload: EnquiryPayload = {
-        full_name: formData.full_name.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim(),
-        city: formData.city.trim(),
-        message: formData.message.trim(),
-        product_type: formData.product_type,
-        product_name: formData.product_name.trim(),
-        product_id: productIdNum
-      };
-
-      await customerService.submitEnquiry(payload);
-      onSuccess();
-      onClose();
-      
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to submit enquiry. Please try again.';
-      setEnquiryError(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-8">
-        <div className="bg-gradient-to-r from-[#2076C7] to-[#1CADA3] p-5 text-white flex justify-between items-center sticky top-0">
-          <div>
-            <h3 className="text-xl font-black uppercase tracking-tight">Investor Enquiry</h3>
-            <p className="text-sm text-white/80">Fill details to complete your investment request</p>
-          </div>
-          <button 
-            onClick={onClose} 
-            className="hover:bg-white/20 p-2 rounded-full transition-all"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        
-        <form className="p-6 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto" onSubmit={handleFormSubmit}>
-          {enquiryError && (
-            <div className="bg-rose-50 text-rose-600 text-sm p-3 rounded-lg border border-rose-200 flex items-start gap-2">
-              <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <span>{enquiryError}</span>
-            </div>
-          )}
-          
-          {/* Product/Company Details Section */}
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-            <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
-              <Briefcase className="w-4 h-4 text-[#2076C7]" />
-              Product/Company Details
-            </h4>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                  Product/Company ID <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                  <input 
-                    type="number"
-                    value={formData.product_id}
-                    onChange={(e) => handleInputChange('product_id', e.target.value)}
-                    required 
-                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                    placeholder="Enter company ID" 
-                    min="1"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                  Product Name <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                  <input 
-                    type="text"
-                    value={formData.product_name}
-                    onChange={(e) => handleInputChange('product_name', e.target.value)}
-                    required 
-                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                    placeholder="e.g., Tata Technologies" 
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="mt-3">
-              <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                Product Type
-              </label>
-              <select
-                value={formData.product_type}
-                onChange={(e) => handleInputChange('product_type', e.target.value)}
-                className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black"
-              >
-                <option value="SHARE">SHARE</option>
-                <option value="MUTUAL_FUND">MUTUAL FUND</option>
-                <option value="BOND">BOND</option>
-                <option value="NCD">NCD</option>
-                <option value="PMS">PMS</option>
-                <option value="AIF">AIF</option>
-              </select>
-            </div>
-          </div>
-          
-          {/* Personal Details Section */}
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-            <h4 className="text-sm font-black text-gray-700 mb-3 flex items-center gap-2">
-              <User className="w-4 h-4 text-[#2076C7]" />
-              Personal Information
-            </h4>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                  Full Name <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                  <input 
-                    value={formData.full_name}
-                    onChange={(e) => handleInputChange('full_name', e.target.value)}
-                    required 
-                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                    placeholder="Your full name" 
-                  />
-                </div>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                    Email <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                    <input 
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      required 
-                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                      placeholder="your@email.com" 
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                    Phone <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                    <input 
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      required 
-                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                      placeholder="9876543210" 
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-                  City <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                  <input 
-                    type="text"
-                    value={formData.city}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    required 
-                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black" 
-                    placeholder="Your city" 
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Message Section */}
-          <div>
-            <label className="block text-xs font-black text-gray-400 uppercase mb-1 tracking-widest">
-              Your Message <span className="text-rose-500">*</span>
-            </label>
-            <div className="relative">
-              <MessageCircle className="absolute left-3 top-3 w-4 h-4 text-gray-300" />
-              <textarea 
-                value={formData.message}
-                onChange={(e) => handleInputChange('message', e.target.value)}
-                required 
-                rows={4}
-                className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#2076C7] text-sm text-black resize-none" 
-                placeholder="I want to invest in this company. Please share the investment details and process."
-              />
-            </div>
-          </div>
-          
-          {/* Submit Button */}
-          <button 
-            type="submit" 
-            disabled={isSubmitting} 
-            className="w-full py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-base hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Submitting Enquiry...
-              </>
-            ) : (
-              <>
-                <Send className="w-5 h-5" />
-                Submit Investment Request
-              </>
-            )}
-          </button>
-          
-          {/* Trust message */}
-          <p className="text-xs text-gray-400 text-center pt-2 flex items-center justify-center gap-2">
-            <CheckCircle className="w-3 h-3" />
-            Your information is secure and will not be shared
-            <CheckCircle className="w-3 h-3" />
-            Our RM will contact you within 24 hours
-          </p>
-        </form>
       </div>
     </div>
   );
@@ -995,8 +667,8 @@ const SuccessModal: React.FC<{
         <p className="text-gray-500 text-sm mb-4 leading-relaxed">
           Thank you for your interest! Our relationship manager will contact you within 24 hours with more information about <span className="font-semibold text-[#2076C7]">{productName}</span>.
         </p>
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="w-full py-3 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-lg font-bold hover:opacity-90 transition-all"
         >
           Continue Shopping
@@ -1027,7 +699,7 @@ export default function CompaniesPage() {
   const [showCartDrawer, setShowCartDrawer] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'cart' | 'payment'>('cart');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  
+
   // Enquiry modal states
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -1074,14 +746,14 @@ export default function CompaniesPage() {
 
     try {
       const response = await customerService.getMyWishlist();
-      
+
       if (!response || !response.success) {
         setWishlistMap(new Map());
         return;
       }
 
       let dataArray: any[] = [];
-      
+
       if (response.data && Array.isArray(response.data)) {
         dataArray = response.data;
       } else if (response.data && !Array.isArray(response.data)) {
@@ -1096,7 +768,7 @@ export default function CompaniesPage() {
           newMap.set(item.product_id, item.id);
         }
       });
-      
+
       setWishlistMap(newMap);
     } catch (error) {
       toast.error('Error loading wishlist');
@@ -1115,7 +787,7 @@ export default function CompaniesPage() {
 
       const response = await customerService.getAllCompanies();
       const rawData = response?.data || response || [];
-      
+
       const companiesData = rawData.map((item: any) => ({
         ...item,
         volume: item.volume || `${(Math.random() * 100 + 20).toFixed(1)}K`
@@ -1123,12 +795,12 @@ export default function CompaniesPage() {
 
       setCompanies(companiesData);
       setFilteredCompanies(companiesData);
-      
+
       await loadWishlist();
     } catch (err) {
       toast.error('Failed to load companies');
-    } finally { 
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1180,10 +852,10 @@ export default function CompaniesPage() {
             return newMap;
           });
           toast.success('Removed from wishlist');
-          
+
           if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('wishlistUpdated', { 
-              detail: { action: 'remove', productId: company.id } 
+            window.dispatchEvent(new CustomEvent('wishlistUpdated', {
+              detail: { action: 'remove', productId: company.id }
             }));
           }
         } else {
@@ -1191,19 +863,19 @@ export default function CompaniesPage() {
         }
       } else {
         const res = await customerService.addToWishlist({
-          product_type: 'unlisted_share', 
-          product_id: company.id, 
+          product_type: 'unlisted_share',
+          product_id: company.id,
           product_name: company.shares_name
         });
-        
+
         if (res.success && res.data) {
           const newId = Array.isArray(res.data) ? res.data[0].id : res.data.id;
           setWishlistMap(prev => new Map(prev).set(company.id, newId));
           toast.success('Saved to wishlist');
-          
+
           if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('wishlistUpdated', { 
-              detail: { action: 'add', productId: company.id } 
+            window.dispatchEvent(new CustomEvent('wishlistUpdated', {
+              detail: { action: 'add', productId: company.id }
             }));
           }
         } else {
@@ -1219,12 +891,12 @@ export default function CompaniesPage() {
 
   const addToCart = useCallback((company: Company, quantity: number) => {
     const maxLot = company.min_lot_size || Infinity;
-    
+
     if (quantity > maxLot) {
       showToast(`You can only buy up to ${maxLot} shares (lot size limit).`, 'warning');
       return;
     }
-    
+
     setCartItems(prev => {
       const existing = prev.find(item => item.id === company.id);
       if (existing) {
@@ -1233,32 +905,32 @@ export default function CompaniesPage() {
           showToast(`Cannot exceed lot size limit of ${maxLot} shares.`, 'warning');
           return prev;
         }
-        return prev.map(item => 
+        return prev.map(item =>
           item.id === company.id ? { ...item, quantity: newQuantity } : item
         );
       }
       return [...prev, { id: company.id, company, quantity }];
     });
-    
+
     showToast(`Added ${quantity} share(s) of ${company.shares_name} to cart`, 'success');
   }, [showToast]);
 
   const updateCartQuantity = useCallback((companyId: number, newQuantity: number) => {
     const item = cartItems.find(item => item.id === companyId);
     if (!item) return;
-    
+
     const maxLot = item.company.min_lot_size || Infinity;
-    
+
     if (newQuantity > maxLot) {
       showToast(`Cannot exceed lot size limit of ${maxLot} shares.`, 'warning');
       return;
     }
-    
+
     if (newQuantity <= 0) {
       removeFromCart(companyId);
       return;
     }
-    
+
     setCartItems(prev => prev.map(item =>
       item.id === companyId ? { ...item, quantity: newQuantity } : item
     ));
@@ -1285,11 +957,11 @@ export default function CompaniesPage() {
   // Updated handlePaymentConfirm to open enquiry modal instead of showing success directly
   const handlePaymentConfirm = useCallback(() => {
     if (cartItems.length === 0) return;
-    
+
     // Close the cart drawer first
     setShowCartDrawer(false);
     setCheckoutStep('cart');
-    
+
     // Open the enquiry modal
     setShowEnquiryModal(true);
   }, [cartItems]);
@@ -1307,11 +979,11 @@ export default function CompaniesPage() {
 
   useEffect(() => {
     let filtered = [...companies];
-    
+
     if (searchTerm.trim()) {
       filtered = filtered.filter(c => c.shares_name.toLowerCase().includes(searchTerm.toLowerCase()));
     }
-    
+
     if (priceRange !== 'ALL') {
       const [min, max] = priceRange.split('-').map(Number);
       filtered = filtered.filter(c => {
@@ -1319,7 +991,7 @@ export default function CompaniesPage() {
         return max ? (p >= min && p <= max) : p >= min;
       });
     }
-    
+
     filtered.sort((a, b) => {
       if (sortBy === 'name-asc') return a.shares_name.localeCompare(b.shares_name);
       if (sortBy === 'name-desc') return b.shares_name.localeCompare(a.shares_name);
@@ -1329,7 +1001,7 @@ export default function CompaniesPage() {
       if (sortBy === 'price-desc') return pB - pA;
       return 0;
     });
-    
+
     setFilteredCompanies(filtered);
     setVisibleCount(10);
   }, [companies, searchTerm, priceRange, sortBy]);
@@ -1368,8 +1040,8 @@ export default function CompaniesPage() {
       <div className="fixed top-16 sm:top-20 right-2 sm:right-5 z-[5000] flex flex-col gap-2 sm:gap-3">
         <AnimatePresence>
           {toasts.map(toastMsg => (
-            <motion.div 
-              key={toastMsg.id} 
+            <motion.div
+              key={toastMsg.id}
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 100 }}
@@ -1436,16 +1108,16 @@ export default function CompaniesPage() {
 
       <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-between mb-6 sm:mb-8">
         <div className="flex flex-wrap gap-2 sm:gap-3 flex-1">
-          <select 
+          <select
             className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 min-w-[120px] sm:min-w-[140px] text-xs sm:text-sm"
-            value={priceRange} 
+            value={priceRange}
             onChange={(e) => setPriceRange(e.target.value as PriceRangeOption)}
           >
             {PRICE_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
           </select>
-          <select 
+          <select
             className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-lg focus:border-[#2076C7] transition-all text-gray-900 min-w-[140px] sm:min-w-[160px] text-xs sm:text-sm"
-            value={sortBy} 
+            value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
           >
             {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -1455,15 +1127,14 @@ export default function CompaniesPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <button 
+          <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 ${
-              showFilters ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 shadow-sm'
-            }`}
+            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 ${showFilters ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 shadow-sm'
+              }`}
           >
             <Filter size={14} className="sm:w-4 sm:h-4" /> Filters
           </button>
-          <button 
+          <button
             onClick={() => setShowCartDrawer(true)}
             className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 bg-white text-gray-600 border border-gray-200 shadow-sm hover:border-[#2076C7] hover:text-[#2076C7] relative"
           >
@@ -1488,11 +1159,10 @@ export default function CompaniesPage() {
                   <button
                     key={r.value}
                     onClick={() => setPriceRange(r.value)}
-                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-all ${
-                      priceRange === r.value
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-all ${priceRange === r.value
                         ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md'
                         : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#2076C7]'
-                    }`}
+                      }`}
                   >
                     {r.label}
                   </button>
@@ -1506,11 +1176,10 @@ export default function CompaniesPage() {
                   <button
                     key={o.value}
                     onClick={() => setSortBy(o.value)}
-                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-all ${
-                      sortBy === o.value
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-all ${sortBy === o.value
                         ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-md'
                         : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#2076C7]'
-                    }`}
+                      }`}
                   >
                     {o.label}
                   </button>
@@ -1524,7 +1193,7 @@ export default function CompaniesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
         {filteredCompanies.slice(0, visibleCount).map((company) => {
           const isSaved = wishlistMap.has(company.id);
-          
+
           return (
             <CompanyCard
               key={company.id}
@@ -1541,7 +1210,7 @@ export default function CompaniesPage() {
 
       {visibleCount < filteredCompanies.length && (
         <div className="flex justify-center pb-8 sm:pb-12">
-          <button 
+          <button
             onClick={() => setVisibleCount(prev => prev + 5)}
             className="flex items-center gap-1.5 sm:gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:border-[#2076C7] hover:text-[#2076C7] transition-all shadow-sm hover:shadow-md text-xs sm:text-sm"
           >
@@ -1725,12 +1394,21 @@ export default function CompaniesPage() {
         )}
       </AnimatePresence>
 
-      {/* Enquiry Modal */}
+      {/* Enquiry Modal - Using imported component with productType SHARE */}
       <AnimatePresence>
         {showEnquiryModal && (
           <EnquiryModal
+            isOpen={showEnquiryModal}
             onClose={() => setShowEnquiryModal(false)}
             onSuccess={handleEnquirySuccess}
+            productType="SHARE"  // ✅ This correctly passes SHARE as product type
+            multipleProducts={cartItems.map(item => ({
+              id: item.company.id,
+              name: item.company.shares_name,
+              quantity: item.quantity,
+              price: item.company.price
+            }))}
+            sourcePage="/companies"
           />
         )}
       </AnimatePresence>

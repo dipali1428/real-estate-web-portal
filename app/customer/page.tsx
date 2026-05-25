@@ -3,11 +3,11 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { fetchAllShares } from "../services/unlistedservices"; 
+import { fetchAllShares } from "../services/unlistedservices";
 import customerService from "../services/customerService";
-import { 
-  TrendingUp, Layers, Home, BarChart3, CheckCircle, 
-  ShieldCheck, Banknote, Landmark 
+import {
+    TrendingUp, Layers, Home, BarChart3, CheckCircle,
+    ShieldCheck, Banknote, Landmark
 } from 'lucide-react';
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -28,15 +28,15 @@ interface CustomerProfile {
 export default function CustomerDashboard() {
     const [customer, setCustomer] = useState<CustomerProfile | null>(null);
     const [shares, setShares] = useState<any[]>([]);
-    
+
     // New state for counts (initialized to 0)
     const [counts, setCounts] = useState({
         unlisted: 0,
         mutualFunds: 0,
-        investments: 0, // PMS, AIF, FD, Bonds, NCD, NPS
+        investments: 0, 
         realEstate: 0,
-        loans: 0,       // Home, Personal, Business, etc.
-        insurance: 0    // Life, Health, Motor, etc.
+        loans: 0,      
+        bonds: 0    
     });
 
     const [loading, setLoading] = useState(true);
@@ -66,9 +66,9 @@ export default function CustomerDashboard() {
                     router.push("/");
                     return;
                 }
-                
+
                 setLoading(true);
-                
+
                 // 1. Fetch Profile
                 try {
                     const profileResponse = await customerService.getProfile();
@@ -103,9 +103,9 @@ export default function CustomerDashboard() {
                     investments: 0, // Replace with API call (PMS, AIF, Bonds, etc.)
                     realEstate: 0,  // Replace with API call
                     loans: 0,       // Replace with API call
-                    insurance: 0    // Replace with API call
+                    bonds: 0    // Replace with API call
                 });
-                
+
             } catch (error) {
                 toast.error("Failed to load dashboard data");
             } finally {
@@ -120,11 +120,11 @@ export default function CustomerDashboard() {
     const chartData = useMemo(() => {
         return [
             { name: 'Unlisted Shares', value: counts.unlisted, color: '#4f46e5' },
-            { name: 'Mutual Funds', value: counts.mutualFunds, color: '#0ea5e9' },
+            { name: 'Mutual Funds', value: "4100+", color: '#0ea5e9' },
             { name: 'Investments', value: counts.investments, color: '#f97316' },
             { name: 'Real Estate', value: counts.realEstate, color: '#10b981' },
             { name: 'Loans', value: counts.loans, color: '#ef4444' },
-            { name: 'Insurance', value: counts.insurance, color: '#8b5cf6' },
+            { name: 'Bonds', value: counts.bonds, color: '#8b5cf6' },
         ];
     }, [counts]);
 
@@ -168,7 +168,7 @@ export default function CustomerDashboard() {
 
                 {/* --- KPI CARDS GRID (Updated to 3 columns to handle more items) --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                    <KpiCard 
+                    <KpiCard
                         icon={<Layers className="w-5 h-5" />}
                         color="from-indigo-600 to-violet-600"
                         value={counts.unlisted.toString()}
@@ -176,23 +176,23 @@ export default function CustomerDashboard() {
                         badge="Equity"
                         badgeColor="bg-indigo-100 text-indigo-700"
                     />
-                    <KpiCard 
+                    <KpiCard
                         icon={<TrendingUp className="w-5 h-5" />}
                         color="from-blue-500 to-cyan-500"
-                        value={counts.mutualFunds.toString()}
+                        value= "4100+"
                         label="Mutual Funds"
                         badge="Portfolio"
                         badgeColor="bg-blue-100 text-blue-700"
                     />
-                    <KpiCard 
+                    <KpiCard
                         icon={<BarChart3 className="w-5 h-5" />}
                         color="from-orange-500 to-red-500"
                         value={counts.investments.toString()}
-                        label="PMS, AIF, Bonds, FD, NPS"
+                        label="PMS, AIF, FD, NPS"
                         badge="Investments"
                         badgeColor="bg-orange-100 text-orange-700"
                     />
-                    <KpiCard 
+                    <KpiCard
                         icon={<Banknote className="w-5 h-5" />}
                         color="from-rose-500 to-pink-600"
                         value={counts.loans.toString()}
@@ -200,15 +200,15 @@ export default function CustomerDashboard() {
                         badge="Liabilities"
                         badgeColor="bg-rose-100 text-rose-700"
                     />
-                    <KpiCard 
+                    <KpiCard
                         icon={<ShieldCheck className="w-5 h-5" />}
                         color="from-purple-500 to-indigo-600"
-                        value={counts.insurance.toString()}
-                        label="Insurance Policies"
+                        value={counts.bonds.toString()}
+                        label="Bonds"
                         badge="Protection"
                         badgeColor="bg-purple-100 text-purple-700"
                     />
-                    <KpiCard 
+                    <KpiCard
                         icon={<Home className="w-5 h-5" />}
                         color="from-emerald-500 to-teal-600"
                         value={counts.realEstate.toString()}
@@ -219,7 +219,7 @@ export default function CustomerDashboard() {
                 </div>
 
                 {/* --- PIE CHART SECTION --- */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100"
@@ -232,70 +232,70 @@ export default function CustomerDashboard() {
                         Consolidated view of all your financial holdings and liabilities.
                     </p>
 
-<div className="flex flex-col xl:flex-row items-stretch gap-6 xl:gap-8">
-    {/* Chart Area */}
-    <div className="w-full xl:w-1/2">
-        <div className="w-full aspect-square max-h-[400px] mx-auto rounded-2xl overflow-hidden bg-gray-50/30 p-3 sm:p-4">
-            {chartReady ? (
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={chartData.filter(d => d.value > 0)} 
-                            cx="50%"
-                            cy="50%"
-                            innerRadius="35%"
-                            outerRadius="65%"
-                            paddingAngle={2}
-                            dataKey="value"
-                            isAnimationActive={true}
-                        >
-                            {chartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(255,255,255,0.5)" strokeWidth={2} />
-                            ))}
-                        </Pie>
-                        <Tooltip 
-                            contentStyle={{ 
-                                borderRadius: '8px', 
-                                border: 'none', 
-                                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                                fontSize: '11px',
-                                padding: '6px 10px'
-                            }}
-                        />
-                    </PieChart>
-                </ResponsiveContainer>
-            ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                        <p className="text-gray-400 text-xs">Loading...</p>
-                    </div>
-                </div>
-            )}
-        </div>
-    </div>
+                    <div className="flex flex-col xl:flex-row items-stretch gap-6 xl:gap-8">
+                        {/* Chart Area */}
+                        <div className="w-full xl:w-1/2">
+                            <div className="w-full aspect-square max-h-[400px] mx-auto rounded-2xl overflow-hidden bg-gray-50/30 p-3 sm:p-4">
+                                {chartReady ? (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={chartData.filter(d => typeof d.value === 'number' && d.value > 0)}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius="35%"
+                                                outerRadius="65%"
+                                                paddingAngle={2}
+                                                dataKey="value"
+                                                isAnimationActive={true}
+                                            >
+                                                {chartData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(255,255,255,0.5)" strokeWidth={2} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                contentStyle={{
+                                                    borderRadius: '8px',
+                                                    border: 'none',
+                                                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                                                    fontSize: '11px',
+                                                    padding: '6px 10px'
+                                                }}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <div className="text-center">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                                            <p className="text-gray-400 text-xs">Loading...</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
-    {/* Legend Area */}
-    <div className="w-full xl:w-1/2">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {chartData.map((item, idx) => (
-                <div 
-                    key={idx} 
-                    className="group flex items-center justify-between p-2.5 rounded-lg bg-gray-50/50 hover:bg-white transition-all duration-200 border border-transparent hover:border-gray-200 cursor-pointer"
-                >
-                    <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }}></div>
-                        <span className="text-xs font-medium text-gray-700 truncate">{item.name}</span>
+                        {/* Legend Area */}
+                        <div className="w-full xl:w-1/2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {chartData.map((item, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="group flex items-center justify-between p-2.5 rounded-lg bg-gray-50/50 hover:bg-white transition-all duration-200 border border-transparent hover:border-gray-200 cursor-pointer"
+                                    >
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }}></div>
+                                            <span className="text-xs font-medium text-gray-700 truncate">{item.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-xs font-bold text-gray-900">{item.value}%</span>
+                                            <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0 opacity-60 group-hover:opacity-100" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-gray-900">{item.value}%</span>
-                        <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0 opacity-60 group-hover:opacity-100" />
-                    </div>
-                </div>
-            ))}
-        </div>
-    </div>
-</div>
                 </motion.div>
             </section>
         </div>
