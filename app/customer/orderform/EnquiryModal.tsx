@@ -4,7 +4,7 @@ import { User, Mail, Phone, MapPin, MessageCircle, Send, CheckCircle, X, Loader2
 import customerService from '../../services/customerService';
 import toast from 'react-hot-toast';
 
-export type ProductType = 'SHARE' | 'MUTUAL_FUND' | 'BOND' | 'NCD' | 'PMS' | 'AIF' | 'NPS' | 'Real_Estate' | 'FIXED_DEPOSIT';
+export type ProductType = 'SHARE' | 'MUTUAL_FUND' | 'BOND' | 'NCD' | 'PMS' | 'AIF' | 'NPS' | 'Real_Estate' | 'FIXED_DEPOSIT' | 'CREDIT_CARD';
 
 interface EnquiryPayload {
     full_name: string;
@@ -67,6 +67,7 @@ const EnquiryModal: React.FC<EnquiryModalProps> = ({
             'NPS': 'National Pension System',
             'Real_Estate': 'Real Estate',
             'FIXED_DEPOSIT': 'Fixed Deposit',
+            'CREDIT_CARD': 'Credit Card',
         };
         return types[type] || type;
     };
@@ -154,7 +155,7 @@ const EnquiryModal: React.FC<EnquiryModalProps> = ({
                     await customerService.submitEnquiry(payload);
                 }
                 toast.success(`Enquiry submitted for ${multipleProducts.length} product(s)!`);
-            } else if (productName && productId) {
+            } else if (productName) {
                 const payload: EnquiryPayload = {
                     full_name: formData.full_name.trim(),
                     email: formData.email.trim(),
@@ -163,7 +164,7 @@ const EnquiryModal: React.FC<EnquiryModalProps> = ({
                     message: formData.message.trim(),
                     product_type: productType,
                     product_name: productName,
-                    product_id: productId,
+                    product_id: productId || 1,
                     quantity: 1,
                     source_page: sourcePage,
                     platform: 'WEB'
@@ -314,7 +315,7 @@ const EnquiryModal: React.FC<EnquiryModalProps> = ({
                     
                     <button 
                         type="submit" 
-                        disabled={isSubmitting || (multipleProducts.length === 0 && !productName)} 
+                        disabled={isSubmitting} 
                         className="w-full py-3.5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl font-bold text-base hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {isSubmitting ? (

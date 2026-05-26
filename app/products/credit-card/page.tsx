@@ -1,6 +1,6 @@
 'use client';
 
-// import React from 'react';
+import { useState } from 'react';
 import HeroSection from './components/HeroSection';
 import CardTypesSection from './components/CardTypesSection';
 import FAQSection from './components/FAQSection';
@@ -9,11 +9,21 @@ import BenefitsSection from './components/BenefitsSection';
 import CTASection from '../../component/CTASection';
 import ScrollToTop from '@/app/component/ScrollToTop';
 import ContactModal from '../../component/ContactModal';
-import { useState } from 'react';
+import EnquiryModal from '@/app/customer/orderform/EnquiryModal';
 
 export default function CreditCardPage() {
+    // Enquiry modal (Apply Now on cards)
+    const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+    const [selectedCardTitle, setSelectedCardTitle] = useState('');
+
+    // Contact/callback modal (hero, sidebar, CTA)
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-    const [modalSource, setModalSource] = useState("Credit Card Page (Callback Request)");
+    const [modalSource, setModalSource] = useState('Credit Card Page (Callback Request)');
+
+    const handleApplyClick = (title: string) => {
+        setSelectedCardTitle(title);
+        setIsEnquiryOpen(true);
+    };
 
     const openContactModal = (source: string) => {
         setModalSource(source);
@@ -22,22 +32,22 @@ export default function CreditCardPage() {
 
     return (
         <main className="min-h-screen bg-white">
-            <HeroSection onApplyClick={() => openContactModal("Credit Card Page (Hero Apply)")} />
-            
+            <HeroSection onApplyClick={() => openContactModal('Credit Card Page (Hero Apply)')} />
+
             <div id="types">
-                <CardTypesSection 
-                    onApplyClick={(title) => openContactModal(`Credit Card Page (Apply Now: ${title})`)} 
-                    onContactClick={() => openContactModal("Credit Card Page (Sidebar Callback)")} 
+                <CardTypesSection
+                    onApplyClick={(title) => handleApplyClick(title)}
+                    onContactClick={() => openContactModal('Credit Card Page (Sidebar Callback)')}
                 />
             </div>
+
             <div className="max-w-[1440px] mx-auto px-6 py-12 lg:py-16">
                 <div className="bg-[#1CADA3] rounded-[2rem] p-6 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_20px_40px_-15px_rgba(28,173,163,0.3)] relative overflow-hidden group">
                     {/* Decorative elements */}
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/[0.03] rounded-full translate-x-1/3 -translate-y-1/2 group-hover:scale-110 transition-transform duration-700"></div>
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#2076C7]/20 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
-                    
+
                     <div className="flex flex-col md:flex-row items-center gap-6 relative z-10 text-center md:text-left">
-                        {/* Abstract Cibil meter icon replacement */}
                         <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
                             <svg className="w-8 h-8 text-[#2076C7]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M12 20v-4" />
@@ -59,8 +69,8 @@ export default function CreditCardPage() {
                             </p>
                         </div>
                     </div>
-                    
-                    <button 
+
+                    <button
                         onClick={() => window.location.href = '/page/cibil'}
                         className="relative z-10 shrink-0 bg-white text-[#2076C7] px-8 py-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-3 cursor-pointer"
                     >
@@ -90,18 +100,31 @@ export default function CreditCardPage() {
                 <FAQSection />
             </div>
 
-             <div id="cta">
-                <CTASection onClick={() => openContactModal("Credit Card Page (Footer CTA)")} />
+            <div id="cta">
+                <CTASection onClick={() => openContactModal('Credit Card Page (Footer CTA)')} />
             </div>
+
             <div id="Srolltotop">
                 <ScrollToTop />
             </div>
 
-          <ContactModal 
-                isOpen={isContactModalOpen} 
-                onClose={() => setIsContactModalOpen(false)} 
+            {/* Enquiry Modal — opens when Apply Now is clicked on a card */}
+            <EnquiryModal
+                isOpen={isEnquiryOpen}
+                onClose={() => setIsEnquiryOpen(false)}
+                productType="CREDIT_CARD"
+                productName={selectedCardTitle}
+                productId={0}
+                sourcePage="/products/credit-card"
+                preFillMessage={`I am interested in the ${selectedCardTitle} credit card. Please share more details and help me apply.`}
+            />
+
+            {/* Contact / Callback Modal */}
+            <ContactModal
+                isOpen={isContactModalOpen}
+                onClose={() => setIsContactModalOpen(false)}
                 source={modalSource}
-            /> 
+            />
         </main>
     );
 }

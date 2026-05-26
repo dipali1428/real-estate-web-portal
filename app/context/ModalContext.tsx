@@ -61,6 +61,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
         setIsQuoteOpen(false);
         setIsApplyNowOpen(false);
         setIsContactOpen(false);
+        setIsDashboardFlow(false);
     };
 
     return (
@@ -90,8 +91,24 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                 openApplyNow: (productName?: string, isDashboard: boolean = false) => {
                     closeAll();
                     if (isDashboard) {
-                        // Open Travel Insurance Form modal directly in dashboard flow
-                        setIsTravelFormOpen(true);
+                        const nameLower = productName?.toLowerCase() || '';
+                        if (nameLower.includes('travel')) {
+                            setIsTravelFormOpen(true);
+                        } else if (
+                            nameLower.includes('card') ||
+                            nameLower.includes('credit') ||
+                            nameLower.includes('pet') ||
+                            nameLower.includes('paws') ||
+                            nameLower.includes('care') ||
+                            nameLower.includes('shield') ||
+                            nameLower.includes('senior')
+                        ) {
+                            if (productName) setAppliedProduct(productName);
+                            setIsDashboardFlow(true);
+                            setIsContactOpen(true);
+                        } else {
+                            setIsTravelFormOpen(true);
+                        }
                     } else {
                         setIsLoginOpen(true);
                     }
@@ -110,7 +127,10 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                     setIsTravelFormOpen(true);
                 },
                 closeTravelForm: () => setIsTravelFormOpen(false),
-                closeContact: () => setIsContactOpen(false),
+                closeContact: () => {
+                    setIsContactOpen(false);
+                    setIsDashboardFlow(false);
+                },
                 // closeQuote: () => setIsQuoteOpen(false),
                 isLoanModalOpen,
                 setLoanModalOpen: (isOpen: boolean) => setIsLoanModalOpen(isOpen),

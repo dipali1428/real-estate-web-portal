@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     IconCheck,
@@ -17,6 +18,7 @@ import {
     IconDog
 } from '@tabler/icons-react';
 import { useModal } from '@/app/context/ModalContext';
+import EnquiryModal from '@/app/customer/orderform/EnquiryModal';
 
 // --- Section 1: ProviderComparison ---
 const providers = [
@@ -55,7 +57,9 @@ const providers = [
 ];
 
 export function ProviderComparison({ isDashboard = false }: { isDashboard?: boolean } = {}) {
-    const { openLogin } = useModal();
+    const { openLogin, openApplyNow } = useModal();
+    const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+    const [selectedProvider, setSelectedProvider] = useState('');
     return (
         <section className={`py-10 bg-slate-50 ${isDashboard ? '' : 'px-4 sm:px-6'}`}>
             <div className={isDashboard ? 'w-full px-2' : 'max-w-7xl mx-auto px-2 lg:px-4'}>
@@ -126,7 +130,10 @@ export function ProviderComparison({ isDashboard = false }: { isDashboard?: bool
                                         <div className="text-[10px] md:text-xs text-slate-400">per month</div>
                                     </td>
                                     <td className="p-4 md:p-6 text-center">
-                                        <button onClick={isDashboard ? undefined : openLogin} className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-[#1CADA3] hover:text-white transition-all">
+                                        <button
+                                            onClick={() => { setSelectedProvider(provider.name); setIsEnquiryOpen(true); }}
+                                            className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-[#1CADA3] hover:text-white transition-all"
+                                        >
                                             <IconExternalLink size={20} />
                                         </button>
                                     </td>
@@ -136,6 +143,15 @@ export function ProviderComparison({ isDashboard = false }: { isDashboard?: bool
                     </table>
                 </div>
                 <p className="text-center text-xs text-slate-400 mt-6">Disclaimer: Comparison based on market data for 2024. Payouts and network size vary by plan type and pet profile.</p>
+                <EnquiryModal
+                    isOpen={isEnquiryOpen}
+                    onClose={() => setIsEnquiryOpen(false)}
+                    productType="PET_INSURANCE"
+                    productName={selectedProvider}
+                    productId={0}
+                    sourcePage="/products/pet-insurance"
+                    preFillMessage={`I am interested in the ${selectedProvider} pet insurance. Please provide more details.`}
+                />
             </div>
         </section>
     );
@@ -190,7 +206,9 @@ export const plans = [
 ];
 
 export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } = {}) {
-    const { openLogin } = useModal();
+    const { openLogin, openApplyNow } = useModal();
+    const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState('');
 
     return (
         <section id="plans" className={`py-10 ${isDashboard ? '' : 'bg-white px-4 sm:px-6'}`}>
@@ -259,7 +277,7 @@ export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } 
 
                                 {/* Standardized Color for All Buttons */}
                                 <button
-                                    onClick={isDashboard ? undefined : openLogin}
+                                    onClick={() => { setSelectedPlan(plan.title); setIsEnquiryOpen(true); }}
                                     className="mt-8 w-full block text-center py-3.5 rounded-xl font-bold transition-all bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg hover:shadow-xl hover:scale-[1.02]"
                                 >
                                     Apply Now
@@ -268,6 +286,15 @@ export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } 
                         </motion.div>
                     ))}
                 </div>
+                <EnquiryModal
+                    isOpen={isEnquiryOpen}
+                    onClose={() => setIsEnquiryOpen(false)}
+                    productType="PET_INSURANCE"
+                    productName={selectedPlan}
+                    productId={0}
+                    sourcePage="/products/pet-insurance"
+                    
+                />
             </div>
         </section>
     );
