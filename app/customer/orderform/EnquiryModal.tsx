@@ -4,7 +4,18 @@ import { User, Mail, Phone, MapPin, MessageCircle, Send, CheckCircle, X, Loader2
 import customerService from '../../services/customerService';
 import toast from 'react-hot-toast';
 
-export type ProductType = 'SHARE' | 'MUTUAL_FUND' | 'BOND' | 'NCD' | 'PMS' | 'AIF' | 'NPS' | 'Real_Estate' | 'FIXED_DEPOSIT' | 'CREDIT_CARD';
+export type ProductType = 
+  'SHARE' | 
+  'MUTUAL_FUND' | 
+  'BOND' | 
+  'NCD' | 
+  'PMS' | 
+  'AIF' | 
+  'NPS' | 
+  'Real_Estate' | 
+  'FIXED_DEPOSIT' | 
+  'CREDIT_CARD' |
+  'PET_INSURANCE';
 
 interface EnquiryPayload {
     full_name: string;
@@ -57,18 +68,19 @@ const EnquiryModal: React.FC<EnquiryModalProps> = ({
     });
 
     const getProductTypeLabel = (type: ProductType): string => {
-        const types: Record<ProductType, string> = {
-            'SHARE': 'Unlisted Share',
-            'MUTUAL_FUND': 'Mutual Fund',
-            'BOND': 'Bonds',
-            'NCD': 'Non-Convertible Debenture',
-            'PMS': 'Portfolio Management Services',
-            'AIF': 'Alternative Investment Fund',
-            'NPS': 'National Pension System',
-            'Real_Estate': 'Real Estate',
-            'FIXED_DEPOSIT': 'Fixed Deposit',
-            'CREDIT_CARD': 'Credit Card',
-        };
+      const types: Record<ProductType, string> = {
+    'SHARE': 'Unlisted Share',
+    'MUTUAL_FUND': 'Mutual Fund',
+    'BOND': 'Bonds',
+    'NCD': 'Non-Convertible Debenture',
+    'PMS': 'Portfolio Management Services',
+    'AIF': 'Alternative Investment Fund',
+    'NPS': 'National Pension System',
+    'Real_Estate': 'Real Estate',
+    'FIXED_DEPOSIT': 'Fixed Deposit',
+    'CREDIT_CARD': 'Credit Card',
+    'PET_INSURANCE': 'Pet Insurance',
+};
         return types[type] || type;
     };
 
