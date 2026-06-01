@@ -43,14 +43,10 @@ export default function Dashboard() {
       // 1. Fetch RM Profile & Extract Ref Code
       const rmProfile = await RmService.getRmProfile();
       setUserName(rmProfile?.user?.name || "");
-      // console.log("RM Profile:", rmProfile);
-
       // Assuming your API returns 'referralCode' or 'ref_code'
       // Adjust the key name based on your actual API response
       const code = rmProfile?.user?.referral_code || rmProfile?.user?.ref_code;
       setReferralCode(code);
-      // console.log("Referral Code:", code);
-
       // 2. Fetch Total Referral Leads
       const referralLeadsRes = await RmService.getReferralLeads();
       setTotalReferralLeads(referralLeadsRes?.count || 0);
@@ -68,7 +64,6 @@ export default function Dashboard() {
       setCustomerDetailLeadTotal(customerDetailLeadsResponse?.count || 0);
 
     } catch (error: any) {
-      // console.error("Dashboard data error:", error);
       toast.error("Failed to load dashboard data. Please try again.");
       if (error?.response?.status === 401) {
         toast.error("Session expired! Please login again.");

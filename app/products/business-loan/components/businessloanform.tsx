@@ -103,9 +103,7 @@ export default function BusinessLoanForm({ onClose, prefilledData }: BusinessLoa
       await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
-      // console.error("Submission error:", err);
       toast.error("Something went wrong. Please try again.");
-      // alert("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

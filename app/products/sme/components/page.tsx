@@ -39,7 +39,6 @@ export default function SMEApplyPage() {
       nextStep();
     } else {
       toast.success("Application submitted successfully! Our team will contact you soon.");
-      // console.log("Form Submitted", formData);
     }
   };
 

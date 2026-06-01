@@ -40,4 +40,9 @@ export const PublicService = {
         });
         return response.data;
     },
+
+    getAllCreditCards: async () => {
+        const response = await api.get("/api/unlisted/public/credit-cards");
+        return response.data;
+    },
 }

@@ -362,6 +362,21 @@ const CustomerService = {
      * POST → /api/customer/add-wishlist
      */
     addToWishlist: async (wishlistData: AddToWishlistParams): Promise<WishlistResponse> => {
+        // Guard: wishlist API requires CUSTOMER role — block non-customer logins before hitting the API
+        if (typeof window !== 'undefined') {
+            const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
+            if (!token) {
+                return { success: false, message: 'Please login to manage your wishlist' };
+            }
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.role !== 'CUSTOMER') {
+                    return { success: false, message: 'Wishlist is only available for customer accounts' };
+                }
+            } catch {
+                // If decode fails, let the request proceed and the backend will handle auth
+            }
+        }
         const response = await api.post("/api/customer/add-wishlist", {
             product_type: wishlistData.product_type,
             product_id: wishlistData.product_id,
@@ -378,10 +393,30 @@ const CustomerService = {
      * GET → /api/customer/my-wishlist
      */
     getMyWishlist: async (): Promise<WishlistResponse> => {
+        if (typeof window !== 'undefined') {
+            const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
+            if (!token) return { success: false, message: 'Please login' };
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.role !== 'CUSTOMER') {
+                    return { success: false, message: 'Wishlist is only available for customer accounts', data: [] };
+                }
+            } catch {}
+        }
         const response = await api.get("/api/customer/my-wishlist");
         return response.data;
     },
     getWishlistItem: async (wishlistId: number): Promise<WishlistResponse> => {
+        if (typeof window !== 'undefined') {
+            const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
+            if (!token) return { success: false, message: 'Please login' };
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.role !== 'CUSTOMER') {
+                    return { success: false, message: 'Wishlist is only available for customer accounts' };
+                }
+            } catch {}
+        }
         const response = await api.get(`/api/customer/wishlist/${wishlistId}`);
         return response.data;
     },
@@ -391,6 +426,16 @@ const CustomerService = {
      * GET → /api/customer/wishlist-count
      */
     getWishlistCount: async (): Promise<{ success: boolean; count: number }> => {
+        if (typeof window !== 'undefined') {
+            const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
+            if (!token) return { success: false, count: 0 };
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.role !== 'CUSTOMER') {
+                    return { success: false, count: 0 };
+                }
+            } catch {}
+        }
         const response = await api.get("/api/customer/wishlist-count");
         return response.data;
     },
@@ -400,6 +445,16 @@ const CustomerService = {
      * DELETE → /api/customer/remove-wishlist/:id
      */
     removeFromWishlist: async (wishlistId: number): Promise<{ success: boolean; message: string }> => {
+        if (typeof window !== 'undefined') {
+            const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
+            if (!token) return { success: false, message: 'Please login' };
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.role !== 'CUSTOMER') {
+                    return { success: false, message: 'Wishlist is only available for customer accounts' };
+                }
+            } catch {}
+        }
         const response = await api.delete(`/api/customer/remove-wishlist/${wishlistId}`);
         return response.data;
     },
@@ -537,12 +592,30 @@ const CustomerService = {
         }
     },
 
-    isAuthenticated: async (): Promise<boolean> => {
+    /**
+     * Synchronously checks if the user has an authToken cookie.
+     * Mirrors the same check done in api.ts's request interceptor.
+     * Returns false on SSR (no window).
+     */
+    isAuthenticated: (): boolean => {
+        if (typeof window === 'undefined') return false;
+        const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
+        return !!token;
+    },
+
+    /**
+     * Decodes the JWT payload from the authToken cookie and returns the user's role.
+     * Returns null on SSR, missing token, or decode failure.
+     */
+    getUserRole: (): string | null => {
+        if (typeof window === 'undefined') return null;
+        const token = document.cookie.match(/authToken=([^;]+)/)?.[1];
+        if (!token) return null;
         try {
-            const res = await api.get("/api/dashboard/profile");
-            return res.data?.success === true;
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.role || null;
         } catch {
-            return false;
+            return null;
         }
     },
     submitEnquiry: async (enquiryData: SubmitEnquiryParams) => {

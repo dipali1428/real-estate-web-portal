@@ -62,7 +62,6 @@ const ConsumerDetailedLeads: FC = () => {
         setData(mappedLeads);
       }
     } catch (error) {
-      // console.error("Failed to fetch consumer leads:", error);
       toast.error("Failed to fetch consumer leads. Please try again.");
     } finally {
       setLoading(false);
@@ -85,7 +84,6 @@ const ConsumerDetailedLeads: FC = () => {
         });
       }
     } catch (error) {
-      // console.error("Error fetching documents:", error);
       toast.error("Error fetching documents. Please try again.");
     } finally {
       setFetchingDocs(false);
@@ -115,7 +113,6 @@ const ConsumerDetailedLeads: FC = () => {
         loadDocuments(activeLeadId);
       }
     } catch (error) {
-      // console.error("Upload failed:", error);
       toast.error("Document upload failed. Please try again.");
     } finally {
       setUploadingKey(null);

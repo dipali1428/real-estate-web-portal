@@ -25,7 +25,7 @@ const TicketAdminCard = ({
     formatPhoneNumber();
   }, [ticket.created_at, ticket.phone]);
 
-  const formatDates = () => {
+  function formatDates() {
     if (!ticket.created_at) return;
     
     const date = new Date(ticket.created_at);
@@ -45,7 +45,7 @@ const TicketAdminCard = ({
     setFormattedTimeAgo(`${displayHours}:${minutes} ${ampm}`);
   };
 
-  const formatPhoneNumber = () => {
+  function formatPhoneNumber() {
     if (!ticket.phone) {
       setFormattedPhone('Not provided');
       return;

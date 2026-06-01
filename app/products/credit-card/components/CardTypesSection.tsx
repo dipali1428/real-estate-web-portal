@@ -36,12 +36,29 @@ import Image from "next/image";
 import CompareModal from './CompareModal';
 
 import {
-    banks, categories, cardTypes,
+    banks, categories,
     KOTAK_ELIGIBILITY, KOTAK_DOCS,
     INDUSIND_ELIGIBILITY, INDUSIND_DOCS,
     UNION_ELIGIBILITY, UNION_DOCS,
     GENERIC_ELIGIBILITY, GENERIC_DOCS
 } from '../data/cards';
+import { PublicService } from '@/app/services/publicService';
+
+export interface CreditCardData {
+    id: number;
+    bank: string;
+    category: string;
+    title: string;
+    subtitle: string;
+    image: string;
+    highlights: string[];
+    detailedFeatures: string[];
+    joiningFee: string;
+    annualFee: string;
+    bestFor: string;
+    tags: string[];
+    featured?: boolean;
+}
 
 // -- TYPES --
 interface Transaction {
@@ -193,6 +210,52 @@ export default function CardTypesSection({
     const [sortBy, setSortBy] = useState<'default' | 'fee-asc' | 'fee-desc' | 'name-asc' | 'name-desc'>('default');
     const scrollerRef = useRef<HTMLDivElement>(null);
     const isFirstRender = useRef(true);
+    const [fetchedCards, setFetchedCards] = useState<CreditCardData[]>([]);
+    const [isLoadingCards, setIsLoadingCards] = useState(true);
+
+    useEffect(() => {
+        const loadCards = async () => {
+            try {
+                const res = await PublicService.getAllCreditCards();
+                if (res?.success && Array.isArray(res.data)) {
+                    const mapped = res.data.map((dbCard: any) => {
+                        let imageUrl = dbCard.image_url || '';
+                        try {
+                            if (imageUrl.includes('_next/image?url=')) {
+                                // Add fake base if it's a relative URL to avoid URL constructor error
+                                const parsed = new URL(imageUrl.startsWith('http') ? imageUrl : `http://localhost${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`);
+                                const realUrl = parsed.searchParams.get('url');
+                                if (realUrl) imageUrl = realUrl;
+                            }
+                        } catch (_e) {
+                            // URL parsing failed, use original imageUrl
+                        }
+
+                        return {
+                            id: dbCard.id,
+                            bank: dbCard.bank_name || '',
+                            category: dbCard.category || '',
+                            title: dbCard.card_name || '',
+                            image: imageUrl,
+                            highlights: dbCard.highlights ? dbCard.highlights.split('|') : [],
+                            detailedFeatures: dbCard.detailed_features ? dbCard.detailed_features.split('|') : [],
+                            joiningFee: dbCard.joining_fee || '',
+                            annualFee: dbCard.annual_fee || '',
+                            bestFor: dbCard.best_for || '',
+                            tags: dbCard.tags ? dbCard.tags.split('|') : [],
+                            featured: dbCard.featured || false,
+                        };
+                    });
+                    setFetchedCards(mapped);
+                }
+            } catch (_error) {
+                // silently handle fetch error
+            } finally {
+                setIsLoadingCards(false);
+            }
+        };
+        loadCards();
+    }, []);
 
     // Dashboard-specific state
     const [activeTab, setActiveTab] = useState<'cards' | 'summary'>('cards');
@@ -233,7 +296,7 @@ export default function CardTypesSection({
     };
 
     const filteredCards = useMemo(() => {
-        const filtered = cardTypes.filter(card => {
+        const filtered = fetchedCards.filter(card => {
             const matchesSearch = card.title.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesBank = selectedBanks.length === 0 || selectedBanks.includes(card.bank);
             const matchesCategory = selectedCategories.length === 0 || selectedCategories.some(catId => {
@@ -252,7 +315,7 @@ export default function CardTypesSection({
                 if (c === 'shopping' && (searchStr.includes('shopping') || searchStr.includes('myntra') || searchStr.includes('amazon') || searchStr.includes('flipkart') || searchStr.includes('apparel') || searchStr.includes('grocery'))) return true;
                 if (c === 'online' && (searchStr.includes('online') || searchStr.includes('amazon') || searchStr.includes('flipkart') || searchStr.includes('swiggy'))) return true;
                 if (c === 'premium' && (searchStr.includes('premium') || searchStr.includes('luxury') || searchStr.includes('elite') || searchStr.includes('golf'))) return true;
-                if (c === 'metal' && (searchStr.includes('metal') || card.title.toLowerCase().includes('metal') || card.tags.some(t => t.toLowerCase() === 'metal'))) return true;
+                if (c === 'metal' && (searchStr.includes('metal') || card.title.toLowerCase().includes('metal') || card.tags.some((t: string) => t.toLowerCase() === 'metal'))) return true;
                 if (c === 'priority_pass' && searchStr.includes('priority pass')) return true;
                 if (c === 'elite_status' && (searchStr.includes('elite') || searchStr.includes('status') || searchStr.includes('tier') || searchStr.includes('privilege'))) return true;
                 if (c === 'health' && (searchStr.includes('health') || searchStr.includes('wellness') || searchStr.includes('apollo') || searchStr.includes('pharmacy') || searchStr.includes('chemist') || searchStr.includes('fitpass'))) return true;
@@ -260,7 +323,7 @@ export default function CardTypesSection({
                 if (c === 'golf' && searchStr.includes('golf')) return true;
                 if (c === 'sports' && (searchStr.includes('sports') || searchStr.includes('manchester') || searchStr.includes('football'))) return true;
 
-                return card.tags.some(tag => tag.toLowerCase().includes(c) || c.includes(tag.toLowerCase()));
+                return card.tags.some((tag: string) => tag.toLowerCase().includes(c) || c.includes(tag.toLowerCase()));
             });
             return matchesSearch && matchesBank && matchesCategory;
         });
@@ -275,7 +338,7 @@ export default function CardTypesSection({
                 default: return 0;
             }
         });
-    }, [searchQuery, selectedBanks, selectedCategories, sortBy]);
+    }, [searchQuery, selectedBanks, selectedCategories, sortBy, fetchedCards]);
 
     // Quick scroll to results on mobile when searching
     useEffect(() => {
@@ -329,8 +392,8 @@ export default function CardTypesSection({
     };
 
     const selectedCardsForCompare = useMemo(() => {
-        return cardTypes.filter(card => selectedCompare.includes(card.id));
-    }, [selectedCompare]);
+        return fetchedCards.filter(card => selectedCompare.includes(card.id));
+    }, [selectedCompare, fetchedCards]);
 
     // Show all cards when showAll is true, otherwise show first 3
     const visibleCards = showAll ? filteredCards : filteredCards.slice(0, 3);
@@ -675,7 +738,7 @@ export default function CardTypesSection({
 
                                                                 {/* Tags row */}
                                                                 <div className="flex flex-wrap gap-2 md:gap-3">
-                                                                    {card.tags.map(tag => (
+                                                                    {card.tags.map((tag: string) => (
                                                                         <div key={tag} className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 border border-slate-200 rounded-full text-[11px] md:text-xs font-bold text-slate-600 bg-white">
                                                                             {tag.toLowerCase().includes('reward') || tag.toLowerCase().includes('bogo') ? <IconGift size={14} /> :
                                                                                 tag.toLowerCase().includes('free') || tag.toLowerCase().includes('cash') ? <IconCash size={14} /> :
@@ -706,7 +769,7 @@ export default function CardTypesSection({
 
                                                                 {/* Highlights */}
                                                                 <ul className="space-y-2.5">
-                                                                    {card.highlights.map((h, i) => (
+                                                                    {card.highlights.map((h: string, i: number) => (
                                                                         <li key={i} className="flex items-start gap-3 text-sm font-bold text-slate-600 leading-snug">
                                                                             <div className="bg-slate-800 text-white rounded-full p-0.5 mt-0.5 shrink-0">
                                                                                 <IconCheck size={10} strokeWidth={4} />
@@ -787,7 +850,7 @@ export default function CardTypesSection({
                                                                                     <IconStar size={16} className="text-amber-400" /> Key Features & Benefits
                                                                                 </h4>
                                                                                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-                                                                                    {card.detailedFeatures.map((feature, idx) => (
+                                                                                    {card.detailedFeatures.map((feature: string, idx: number) => (
                                                                                         <li key={idx} className="flex items-start gap-3 text-sm font-bold text-slate-600 leading-snug">
                                                                                             <IconCheck size={16} className="text-[#1CADA3] shrink-0 mt-0.5" strokeWidth={3} />
                                                                                             {feature}
@@ -815,452 +878,452 @@ export default function CardTypesSection({
                                                                             </div>
                                                                         )}
                                                                         {(activeDetailsTab[card.id] || 'features') === 'docs' && (
-                                                                <div className="space-y-4">
-                                                                    <h4 className="text-sm font-black text-slate-800 flex items-center gap-2">
-                                                                        <IconShieldCheck size={16} className="text-[#2076C7]" /> Required Documents
-                                                                    </h4>
-                                                                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-                                                                        {(card.bank === 'Kotak Bank' ? KOTAK_DOCS :
-                                                                          card.bank === 'IndusInd Bank' ? INDUSIND_DOCS :
-                                                                          card.bank === 'Union Bank of India' ? UNION_DOCS : GENERIC_DOCS).map((item, idx) => (
-                                                                            <li key={idx} className="flex items-start gap-3 text-sm font-bold text-slate-600 leading-snug">
-                                                                                <div className="w-1.5 h-1.5 rounded-full bg-[#2076C7] mt-2 shrink-0" />
-                                                                                {item}
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
+                                                                            <div className="space-y-4">
+                                                                                <h4 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                                                                                    <IconShieldCheck size={16} className="text-[#2076C7]" /> Required Documents
+                                                                                </h4>
+                                                                                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                                                                                    {(card.bank === 'Kotak Bank' ? KOTAK_DOCS :
+                                                                                        card.bank === 'IndusInd Bank' ? INDUSIND_DOCS :
+                                                                                            card.bank === 'Union Bank of India' ? UNION_DOCS : GENERIC_DOCS).map((item, idx) => (
+                                                                                                <li key={idx} className="flex items-start gap-3 text-sm font-bold text-slate-600 leading-snug">
+                                                                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#2076C7] mt-2 shrink-0" />
+                                                                                                    {item}
+                                                                                                </li>
+                                                                                            ))}
+                                                                                </ul>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+
+                                                                    <div className="pt-6 border-t border-slate-100 mt-6">
+                                                                        <p className="text-[10px] sm:text-xs font-medium text-slate-400 italic">
+                                                                            * Credit card details are for informational purposes only. Please verify eligibility and documentation with the bank before applying.
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
-                                                            )}
-                                                        </div>
-
-                                                        <div className="pt-6 border-t border-slate-100 mt-6">
-                                                            <p className="text-[10px] sm:text-xs font-medium text-slate-400 italic">
-                                                                * Credit card details are for informational purposes only. Please verify eligibility and documentation with the bank before applying.
-                                                            </p>
-                                                        </div>
-                                                    </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
                                                 </motion.div>
-                                            )}
+                                            ))}
                                         </AnimatePresence>
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
-                        </div>
+                                    </div>
 
-                        {filteredCards.length > 3 && (
-                            <div className="flex flex-col items-center gap-3 mt-10">
-                                {/* Dynamic Card Count Info */}
-                                <div className="text-sm font-bold text-slate-500 text-center">
-                                    {selectedBanks.length === 1 ? (
-                                        <span>
-                                            <span className="text-[#2076C7] font-extrabold">{selectedBanks[0]}</span>
-                                            {' — '}
-                                            <span className="text-slate-700 font-extrabold">{filteredCards.length} cards</span>
-                                            {' available'}
-                                        </span>
-                                    ) : selectedBanks.length > 1 ? (
-                                        <span>
-                                            <span className="text-slate-700 font-extrabold">{filteredCards.length} cards</span>
-                                            {' matching selected banks'}
-                                        </span>
-                                    ) : (
-                                        <span>
-                                            <span className="text-slate-700 font-extrabold">{filteredCards.length} cards</span>
-                                            {' available in total'}
-                                        </span>
-                                    )}
-                                </div>
-                                <button
-                                    onClick={() => setShowAll(!showAll)}
-                                    className="px-8 py-3 bg-white border-[1.5px] border-slate-200 text-slate-700 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg hover:shadow-xl hover:border-[#2076C7] hover:text-[#2076C7] transition-all duration-300 flex items-center gap-3"
-                                >
-                                    {showAll ? (
-                                        <>View Less <IconChevronUp size={14} /></>
-                                    ) : (
-                                        <>View All Cards <IconChevronDown size={14} /></>
-                                    )}
-                                </button>
-                            </div>
-                        )}
-
-                        {filteredCards.length === 0 && (
-                            <div className="py-20 text-center bg-white rounded-[3rem] border border-slate-100">
-                                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <IconSearch size={32} className="text-slate-300" strokeWidth={1.5} />
-                                </div>
-                                <h3 className="text-xl font-black text-slate-800 mb-2">No cards found</h3>
-                                <p className="text-slate-500 font-medium">Try adjusting your filters or search terms.</p>
-                                <button
-                                    onClick={() => { setSearchQuery(''); setSelectedBanks([]); setSelectedCategories([]); }}
-                                    className="mt-6 px-8 py-3 bg-[#2076C7]/10 text-[#2076C7] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#2076C7] hover:text-white transition-all"
-                                >
-                                    Reset All Filters
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Floating Compare Bar */}
-                <AnimatePresence>
-                    {selectedCompare.length > 0 && (
-                        <motion.div
-                            initial={{ y: 100, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: 100, opacity: 0 }}
-                            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[80] w-[90%] max-w-4xl"
-                        >
-                            <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-3xl p-4 md:p-6 shadow-2xl flex flex-col md:flex-row items-center gap-6">
-                                <div className="flex-grow flex items-center justify-center md:justify-start gap-3 md:gap-5">
-                                    {selectedCompare.map(id => {
-                                        const card = cardTypes.find(c => c.id === id);
-                                        return (
-                                            <div key={id} className="relative group">
-                                                <div className="w-16 h-10 md:w-20 md:h-12 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex items-center justify-center p-1">
-                                                    <Image 
-                                                        src={card?.image || "/placeholder-image.png"} 
-                                                        alt={card?.title || "Card image"} 
-                                                        className="max-h-full object-contain" 
-                                                        width={400} 
-                                                        height={400} 
-                                                    />
-                                                </div>
-                                                <button
-                                                    onClick={() => toggleCompare(id)}
-                                                    className="absolute -top-2 -right-2 w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center hover:bg-slate-900 transition-colors shadow-lg z-10"
-                                                >
-                                                    <IconX size={12} strokeWidth={3} />
-                                                </button>
-                                                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <span className="bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg">{card?.title}</span>
-                                                </div>
+                                    {filteredCards.length > 3 && (
+                                        <div className="flex flex-col items-center gap-3 mt-10">
+                                            {/* Dynamic Card Count Info */}
+                                            <div className="text-sm font-bold text-slate-500 text-center">
+                                                {selectedBanks.length === 1 ? (
+                                                    <span>
+                                                        <span className="text-[#2076C7] font-extrabold">{selectedBanks[0]}</span>
+                                                        {' — '}
+                                                        <span className="text-slate-700 font-extrabold">{filteredCards.length} cards</span>
+                                                        {' available'}
+                                                    </span>
+                                                ) : selectedBanks.length > 1 ? (
+                                                    <span>
+                                                        <span className="text-slate-700 font-extrabold">{filteredCards.length} cards</span>
+                                                        {' matching selected banks'}
+                                                    </span>
+                                                ) : (
+                                                    <span>
+                                                        <span className="text-slate-700 font-extrabold">{filteredCards.length} cards</span>
+                                                        {' available in total'}
+                                                    </span>
+                                                )}
                                             </div>
-                                        );
-                                    })}
-                                    {selectedCompare.length < 3 && (
-                                        <div className="w-16 h-10 md:w-20 md:h-12 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center">
-                                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest text-center px-1">Add Card</span>
+                                            <button
+                                                onClick={() => setShowAll(!showAll)}
+                                                className="px-8 py-3 bg-white border-[1.5px] border-slate-200 text-slate-700 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg hover:shadow-xl hover:border-[#2076C7] hover:text-[#2076C7] transition-all duration-300 flex items-center gap-3"
+                                            >
+                                                {showAll ? (
+                                                    <>View Less <IconChevronUp size={14} /></>
+                                                ) : (
+                                                    <>View All Cards <IconChevronDown size={14} /></>
+                                                )}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {filteredCards.length === 0 && (
+                                        <div className="py-20 text-center bg-white rounded-[3rem] border border-slate-100">
+                                            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                                <IconSearch size={32} className="text-slate-300" strokeWidth={1.5} />
+                                            </div>
+                                            <h3 className="text-xl font-black text-slate-800 mb-2">No cards found</h3>
+                                            <p className="text-slate-500 font-medium">Try adjusting your filters or search terms.</p>
+                                            <button
+                                                onClick={() => { setSearchQuery(''); setSelectedBanks([]); setSelectedCategories([]); }}
+                                                className="mt-6 px-8 py-3 bg-[#2076C7]/10 text-[#2076C7] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#2076C7] hover:text-white transition-all"
+                                            >
+                                                Reset All Filters
+                                            </button>
                                         </div>
                                     )}
                                 </div>
+                            </div>
 
-                                <div className="flex items-center gap-4 w-full md:w-auto">
-                                    <div className="hidden md:block text-right">
-                                        <div className="text-xs font-black text-slate-800 uppercase tracking-widest leading-none">Selected {selectedCompare.length}/3</div>
-                                        <div className="text-[10px] font-bold text-slate-400 mt-0.5">Compare for best offers</div>
+                            {/* Floating Compare Bar */}
+                            <AnimatePresence>
+                                {selectedCompare.length > 0 && (
+                                    <motion.div
+                                        initial={{ y: 100, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        exit={{ y: 100, opacity: 0 }}
+                                        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[80] w-[90%] max-w-4xl"
+                                    >
+                                        <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-3xl p-4 md:p-6 shadow-2xl flex flex-col md:flex-row items-center gap-6">
+                                            <div className="flex-grow flex items-center justify-center md:justify-start gap-3 md:gap-5">
+                                                {selectedCompare.map(id => {
+                                                    const card = fetchedCards.find((c: CreditCardData) => c.id === id);
+                                                    return (
+                                                        <div key={id} className="relative group">
+                                                            <div className="w-16 h-10 md:w-20 md:h-12 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex items-center justify-center p-1">
+                                                                <Image
+                                                                    src={card?.image || "/placeholder-image.png"}
+                                                                    alt={card?.title || "Card image"}
+                                                                    className="max-h-full object-contain"
+                                                                    width={400}
+                                                                    height={400}
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                onClick={() => toggleCompare(id)}
+                                                                className="absolute -top-2 -right-2 w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center hover:bg-slate-900 transition-colors shadow-lg z-10"
+                                                            >
+                                                                <IconX size={12} strokeWidth={3} />
+                                                            </button>
+                                                            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <span className="bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg">{card?.title}</span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                                {selectedCompare.length < 3 && (
+                                                    <div className="w-16 h-10 md:w-20 md:h-12 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center">
+                                                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest text-center px-1">Add Card</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="flex items-center gap-4 w-full md:w-auto">
+                                                <div className="hidden md:block text-right">
+                                                    <div className="text-xs font-black text-slate-800 uppercase tracking-widest leading-none">Selected {selectedCompare.length}/3</div>
+                                                    <div className="text-[10px] font-bold text-slate-400 mt-0.5">Compare for best offers</div>
+                                                </div>
+                                                <button
+                                                    onClick={() => setIsCompareOpen(true)}
+                                                    disabled={selectedCompare.length < 2}
+                                                    className="flex-grow md:flex-none px-8 md:px-12 py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-200/50 hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:grayscale disabled:hover:translate-y-0"
+                                                >
+                                                    Compare Now
+                                                </button>
+                                                <button
+                                                    onClick={() => setSelectedCompare([])}
+                                                    className="p-4 border-2 border-slate-100 text-slate-400 rounded-2xl hover:bg-slate-50 hover:text-slate-600 transition-all"
+                                                >
+                                                    <IconX size={20} strokeWidth={3} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* Compare Modal */}
+                            <CompareModal
+                                isOpen={isCompareOpen}
+                                onClose={() => setIsCompareOpen(false)}
+                                cards={selectedCardsForCompare}
+                                onApply={handleApplyClick}
+                            />
+
+                        </motion.div>
+                    )}
+
+                    {/* ====== SUMMARY TAB (Dashboard Only) ====== */}
+                    {(isDashboard && activeTab === 'summary') && (
+                        <motion.div
+                            key="summary-tab"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {!hasActiveCard && (
+                                <div className="mb-8 p-5 md:p-8 bg-blue-50 border border-blue-100 rounded-[2rem] md:rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+                                    <div className="absolute top-0 right-0 p-4 opacity-10 hidden md:block">
+                                        <CreditCard size={120} />
                                     </div>
-                                    <button
-                                        onClick={() => setIsCompareOpen(true)}
-                                        disabled={selectedCompare.length < 2}
-                                        className="flex-grow md:flex-none px-8 md:px-12 py-4 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-200/50 hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:grayscale disabled:hover:translate-y-0"
+                                    <div className="relative z-10 text-center md:text-left">
+                                        <h4 className="text-lg md:text-xl font-black text-blue-900 mb-2">Ready to start spending?</h4>
+                                        <p className="text-[11px] md:text-sm font-bold text-blue-700 max-w-md">Apply for a credit card today and enjoy premium rewards, cashback, and exclusive lounge access.</p>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto">
+                                        <button
+                                            onClick={() => setActiveTab('cards')}
+                                            className="px-8 py-3.5 md:py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:from-[#1a65ac] hover:to-[#17968e] transition-all active:scale-95"
+                                        >
+                                            Explore Cards
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
+                                {/* LEFT COLUMN — Card + Quick Actions */}
+                                <div className="lg:col-span-1 space-y-6">
+                                    {/* Card Visual */}
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+                                        <div
+                                            className="relative w-full max-w-sm mx-auto rounded-3xl p-5 md:p-6 overflow-hidden shadow-2xl transition-all duration-500"
+                                            style={{
+                                                background: hasActiveCard
+                                                    ? 'linear-gradient(135deg, #1a3a6b 0%, #2076C7 45%, #1CADA3 100%)'
+                                                    : 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)',
+                                                minHeight: '170px',
+                                            }}
+                                        >
+                                            {/* Decorative circles */}
+                                            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10" />
+                                            <div className="absolute -bottom-10 -left-10 w-52 h-52 rounded-full bg-white/10" />
+
+                                            {/* Network & Type */}
+                                            <div className="relative flex justify-between items-start">
+                                                <div>
+                                                    <p className={`text-[9px] font-black uppercase tracking-[0.2em] ${hasActiveCard ? 'text-white/60' : 'text-slate-400'}`}>{currentCard.cardType}</p>
+                                                    <p className={`text-[10px] font-semibold mt-0.5 ${hasActiveCard ? 'text-white/90' : 'text-slate-500'}`}>Infinity Arth</p>
+                                                </div>
+                                                <p className={`font-black text-lg italic ${hasActiveCard ? 'text-white' : 'text-slate-300'}`}>{currentCard.network}</p>
+                                            </div>
+
+                                            {/* Chip */}
+                                            <div className="mt-5 mb-4 opacity-50 grayscale">
+                                                <div className="w-10 h-7 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-500 border border-yellow-200/30 flex items-center justify-center">
+                                                    <div className="grid grid-cols-2 gap-0.5 w-5">
+                                                        <div className="h-1.5 bg-yellow-700/40 rounded-sm" />
+                                                        <div className="h-1.5 bg-yellow-700/40 rounded-sm" />
+                                                        <div className="h-1.5 bg-yellow-700/40 rounded-sm" />
+                                                        <div className="h-1.5 bg-yellow-700/40 rounded-sm" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Card Number */}
+                                            <p className={`font-mono tracking-widest text-sm font-semibold mb-3 ${hasActiveCard ? 'text-white' : 'text-slate-400'}`}>
+                                                {maskedCard ? currentCard.cardNumber : (hasActiveCard ? '4539 2184 7619 7821' : '•••• •••• •••• ••••')}
+                                            </p>
+
+                                            {/* Holder & Expiry */}
+                                            <div className="flex justify-between items-end">
+                                                <div>
+                                                    <p className={`text-[9px] uppercase tracking-widest font-bold ${hasActiveCard ? 'text-white/50' : 'text-slate-400'}`}>Card Holder</p>
+                                                    <p className={`text-xs font-bold uppercase tracking-wide ${hasActiveCard ? 'text-white' : 'text-slate-600'}`}>{currentCard.cardHolder}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className={`text-[9px] uppercase tracking-widest font-bold ${hasActiveCard ? 'text-white/50' : 'text-slate-400'}`}>Expires</p>
+                                                    <p className={`text-xs font-bold ${hasActiveCard ? 'text-white' : 'text-slate-600'}`}>{currentCard.expiryDate}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {hasActiveCard && (
+                                            <button
+                                                onClick={() => setMaskedCard(!maskedCard)}
+                                                className="w-full mt-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                                            >
+                                                {maskedCard ? <Eye size={12} /> : <EyeOff size={12} />}
+                                                {maskedCard ? 'Show Card Number' : 'Hide Card Number'}
+                                            </button>
+                                        )}
+                                    </motion.div>
+
+                                    {/* Credit Utilization */}
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                                        className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
                                     >
-                                        Compare Now
-                                    </button>
-                                    <button
-                                        onClick={() => setSelectedCompare([])}
-                                        className="p-4 border-2 border-slate-100 text-slate-400 rounded-2xl hover:bg-slate-50 hover:text-slate-600 transition-all"
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Credit Utilization</h3>
+                                        <div className="space-y-3 text-sm">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500 font-medium text-xs">Total Limit</span>
+                                                <span className="font-black text-slate-800">{formatCurrency(currentCard.creditLimit)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500 font-medium text-xs">Used</span>
+                                                <span className="font-black text-red-500">{formatCurrency(currentCard.usedLimit)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500 font-medium text-xs">Available</span>
+                                                <span className="font-black text-emerald-600">{formatCurrency(currentCard.availableLimit)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="mt-4">
+                                            <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">
+                                                <span>Utilization</span>
+                                                <span className={usedPercent > 70 ? 'text-red-500' : 'text-emerald-600'}>
+                                                    {hasActiveCard ? `${usedPercent.toFixed(0)}%` : '0%'}
+                                                </span>
+                                            </div>
+                                            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: hasActiveCard ? `${usedPercent}%` : 0 }}
+                                                    transition={{ duration: 0.8, delay: 0.3 }}
+                                                    className={`h-2 rounded-full ${usedPercent > 70 ? 'bg-red-400' : usedPercent > 40 ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                                                />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* Quick Actions */}
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                                        className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
                                     >
-                                        <IconX size={20} strokeWidth={3} />
-                                    </button>
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Quick Actions</h3>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {quickActions.map((action, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={hasActiveCard ? action.action : () => toast.error("Please link your card first")}
+                                                    className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl text-center transition-all hover:scale-105 active:scale-95 cursor-pointer 
+                                                    ${hasActiveCard ? action.color : 'bg-slate-50 text-slate-300 border border-slate-100'}`}
+                                                >
+                                                    {action.icon}
+                                                    <span className="text-[9px] font-black uppercase tracking-widest leading-tight">{action.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                </div>
+
+                                {/* RIGHT COLUMN — Bill + Transactions */}
+                                <div className="lg:col-span-2 space-y-6">
+                                    {/* Bill Summary */}
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                                        className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+                                    >
+                                        <div className="px-5 md:px-6 py-4 md:py-5 bg-gradient-to-r from-[#2076C7]/5 to-[#1CADA3]/5 border-b border-slate-100">
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Current Bill Summary</h3>
+                                        </div>
+                                        <div className="p-5 md:p-6">
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Total Due</p>
+                                                    <p className="text-xl font-black text-slate-800">{formatCurrency(currentBill.totalDue)}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Minimum Due</p>
+                                                    <p className="text-xl font-black text-[#2076C7]">{formatCurrency(currentBill.minimumDue)}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Due Date</p>
+                                                    <p className="text-lg font-black text-slate-800">{hasActiveCard ? formatDate(currentBill.dueDate) : '-'}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Statement Date</p>
+                                                    <p className="text-lg font-black text-slate-800">{hasActiveCard ? formatDate(currentBill.statementDate) : '-'}</p>
+                                                </div>
+                                            </div>
+
+                                            {hasActiveCard ? (
+                                                <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex items-center gap-3">
+                                                    <CheckCircle2 size={18} className="text-emerald-600 flex-shrink-0" />
+                                                    <div>
+                                                        <p className="text-xs font-black text-emerald-800">Last payment of {formatCurrency(currentBill.lastPaymentAmount)} received on {formatDate(currentBill.lastPaymentDate)}</p>
+                                                        <p className="text-[9px] text-emerald-600 font-bold mt-0.5 uppercase tracking-widest">No overdue amount</p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex items-center gap-3">
+                                                    <Info size={18} className="text-slate-400 flex-shrink-0" />
+                                                    <p className="text-xs font-bold text-slate-500 italic">No billing history available.</p>
+                                                </div>
+                                            )}
+
+                                            <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                                                <button
+                                                    disabled={!hasActiveCard}
+                                                    className={`flex-1 py-3 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-opacity shadow-md cursor-pointer 
+                                                    ${hasActiveCard ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90' : 'bg-slate-300 cursor-not-allowed opacity-50'}`}
+                                                >
+                                                    Pay Total Due
+                                                </button>
+                                                <button
+                                                    disabled={!hasActiveCard}
+                                                    className={`flex-1 py-3 border text-xs font-black uppercase tracking-widest rounded-xl transition-colors cursor-pointer 
+                                                    ${hasActiveCard ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' : 'bg-white border-slate-100 text-slate-200 cursor-not-allowed'}`}
+                                                >
+                                                    Pay Minimum
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* Transaction History */}
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                                        className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+                                    >
+                                        <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center">
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recent Transactions</h3>
+                                            {hasActiveCard && (
+                                                <button className="text-[9px] font-black text-[#2076C7] uppercase tracking-widest flex items-center gap-1 hover:opacity-75 transition-opacity cursor-pointer">
+                                                    View All <ChevronRight size={10} />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="divide-y divide-slate-50 min-h-[200px] flex flex-col">
+                                            {currentTransactions.length > 0 ? (
+                                                currentTransactions.map((txn, i) => (
+                                                    <motion.div
+                                                        key={txn.id}
+                                                        initial={{ opacity: 0, x: -10 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ delay: 0.05 * i }}
+                                                        className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 hover:bg-slate-50/50 transition-colors"
+                                                    >
+                                                        {/* Icon */}
+                                                        <div className={`flex-shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center text-white font-bold
+                                                        ${txn.type === 'credit' ? 'bg-emerald-500' : txn.category === 'Travel' ? 'bg-[#2076C7]' : txn.category === 'Food & Dining' ? 'bg-orange-400' : txn.category === 'Fuel' ? 'bg-amber-500' : txn.category === 'Entertainment' ? 'bg-purple-500' : 'bg-slate-400'}`}
+                                                        >
+                                                            {txn.categoryIcon}
+                                                        </div>
+                                                        {/* Details */}
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-black text-slate-800 truncate">{txn.merchant}</p>
+                                                            <div className="flex items-center gap-2 mt-0.5">
+                                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{txn.category}</p>
+                                                                {txn.status === 'pending' && (
+                                                                    <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">Pending</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {/* Amount + Date */}
+                                                        <div className="text-right flex-shrink-0">
+                                                            <p className={`text-sm font-black ${txn.type === 'credit' ? 'text-emerald-600' : 'text-slate-800'}`}>
+                                                                {txn.type === 'credit' ? '+' : '−'} {formatCurrency(txn.amount)}
+                                                            </p>
+                                                            <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                                {new Date(txn.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                                                            </p>
+                                                        </div>
+                                                    </motion.div>
+                                                ))
+                                            ) : (
+                                                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                                                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
+                                                        <ShoppingBag size={24} className="text-slate-300" />
+                                                    </div>
+                                                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">No Transactions</p>
+                                                    <p className="text-[10px] font-bold text-slate-300 max-w-[150px]">Your transactions will appear here once you start using your card.</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
                                 </div>
                             </div>
                         </motion.div>
                     )}
-                </AnimatePresence>
-
-                {/* Compare Modal */}
-                <CompareModal
-                    isOpen={isCompareOpen}
-                    onClose={() => setIsCompareOpen(false)}
-                    cards={selectedCardsForCompare}
-                    onApply={handleApplyClick}
-                />
-
-                </motion.div>
-                )}
-
-                {/* ====== SUMMARY TAB (Dashboard Only) ====== */}
-                {(isDashboard && activeTab === 'summary') && (
-                    <motion.div
-                        key="summary-tab"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        {!hasActiveCard && (
-                            <div className="mb-8 p-5 md:p-8 bg-blue-50 border border-blue-100 rounded-[2rem] md:rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
-                                <div className="absolute top-0 right-0 p-4 opacity-10 hidden md:block">
-                                    <CreditCard size={120} />
-                                </div>
-                                <div className="relative z-10 text-center md:text-left">
-                                    <h4 className="text-lg md:text-xl font-black text-blue-900 mb-2">Ready to start spending?</h4>
-                                    <p className="text-[11px] md:text-sm font-bold text-blue-700 max-w-md">Apply for a credit card today and enjoy premium rewards, cashback, and exclusive lounge access.</p>
-                                </div>
-                                <div className="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto">
-                                    <button 
-                                        onClick={() => setActiveTab('cards')}
-                                        className="px-8 py-3.5 md:py-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:from-[#1a65ac] hover:to-[#17968e] transition-all active:scale-95"
-                                    >
-                                        Explore Cards
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
-                            {/* LEFT COLUMN — Card + Quick Actions */}
-                            <div className="lg:col-span-1 space-y-6">
-                                {/* Card Visual */}
-                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-                                    <div
-                                        className="relative w-full max-w-sm mx-auto rounded-3xl p-5 md:p-6 overflow-hidden shadow-2xl transition-all duration-500"
-                                        style={{
-                                            background: hasActiveCard 
-                                                ? 'linear-gradient(135deg, #1a3a6b 0%, #2076C7 45%, #1CADA3 100%)'
-                                                : 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)',
-                                            minHeight: '170px',
-                                        }}
-                                    >
-                                        {/* Decorative circles */}
-                                        <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10" />
-                                        <div className="absolute -bottom-10 -left-10 w-52 h-52 rounded-full bg-white/10" />
-
-                                        {/* Network & Type */}
-                                        <div className="relative flex justify-between items-start">
-                                            <div>
-                                                <p className={`text-[9px] font-black uppercase tracking-[0.2em] ${hasActiveCard ? 'text-white/60' : 'text-slate-400'}`}>{currentCard.cardType}</p>
-                                                <p className={`text-[10px] font-semibold mt-0.5 ${hasActiveCard ? 'text-white/90' : 'text-slate-500'}`}>Infinity Arth</p>
-                                            </div>
-                                            <p className={`font-black text-lg italic ${hasActiveCard ? 'text-white' : 'text-slate-300'}`}>{currentCard.network}</p>
-                                        </div>
-
-                                        {/* Chip */}
-                                        <div className="mt-5 mb-4 opacity-50 grayscale">
-                                            <div className="w-10 h-7 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-500 border border-yellow-200/30 flex items-center justify-center">
-                                                <div className="grid grid-cols-2 gap-0.5 w-5">
-                                                    <div className="h-1.5 bg-yellow-700/40 rounded-sm" />
-                                                    <div className="h-1.5 bg-yellow-700/40 rounded-sm" />
-                                                    <div className="h-1.5 bg-yellow-700/40 rounded-sm" />
-                                                    <div className="h-1.5 bg-yellow-700/40 rounded-sm" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Card Number */}
-                                        <p className={`font-mono tracking-widest text-sm font-semibold mb-3 ${hasActiveCard ? 'text-white' : 'text-slate-400'}`}>
-                                            {maskedCard ? currentCard.cardNumber : (hasActiveCard ? '4539 2184 7619 7821' : '•••• •••• •••• ••••')}
-                                        </p>
-
-                                        {/* Holder & Expiry */}
-                                        <div className="flex justify-between items-end">
-                                            <div>
-                                                <p className={`text-[9px] uppercase tracking-widest font-bold ${hasActiveCard ? 'text-white/50' : 'text-slate-400'}`}>Card Holder</p>
-                                                <p className={`text-xs font-bold uppercase tracking-wide ${hasActiveCard ? 'text-white' : 'text-slate-600'}`}>{currentCard.cardHolder}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className={`text-[9px] uppercase tracking-widest font-bold ${hasActiveCard ? 'text-white/50' : 'text-slate-400'}`}>Expires</p>
-                                                <p className={`text-xs font-bold ${hasActiveCard ? 'text-white' : 'text-slate-600'}`}>{currentCard.expiryDate}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {hasActiveCard && (
-                                        <button
-                                            onClick={() => setMaskedCard(!maskedCard)}
-                                            className="w-full mt-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-                                        >
-                                            {maskedCard ? <Eye size={12} /> : <EyeOff size={12} />}
-                                            {maskedCard ? 'Show Card Number' : 'Hide Card Number'}
-                                        </button>
-                                    )}
-                                </motion.div>
-
-                                {/* Credit Utilization */}
-                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                                    className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
-                                >
-                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Credit Utilization</h3>
-                                    <div className="space-y-3 text-sm">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-slate-500 font-medium text-xs">Total Limit</span>
-                                            <span className="font-black text-slate-800">{formatCurrency(currentCard.creditLimit)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-slate-500 font-medium text-xs">Used</span>
-                                            <span className="font-black text-red-500">{formatCurrency(currentCard.usedLimit)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-slate-500 font-medium text-xs">Available</span>
-                                            <span className="font-black text-emerald-600">{formatCurrency(currentCard.availableLimit)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="mt-4">
-                                        <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">
-                                            <span>Utilization</span>
-                                            <span className={usedPercent > 70 ? 'text-red-500' : 'text-emerald-600'}>
-                                                {hasActiveCard ? `${usedPercent.toFixed(0)}%` : '0%'}
-                                            </span>
-                                        </div>
-                                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: hasActiveCard ? `${usedPercent}%` : 0 }}
-                                                transition={{ duration: 0.8, delay: 0.3 }}
-                                                className={`h-2 rounded-full ${usedPercent > 70 ? 'bg-red-400' : usedPercent > 40 ? 'bg-amber-400' : 'bg-emerald-400'}`}
-                                            />
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                {/* Quick Actions */}
-                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                                    className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
-                                >
-                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Quick Actions</h3>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {quickActions.map((action, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={hasActiveCard ? action.action : () => toast.error("Please link your card first")}
-                                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl text-center transition-all hover:scale-105 active:scale-95 cursor-pointer 
-                                                    ${hasActiveCard ? action.color : 'bg-slate-50 text-slate-300 border border-slate-100'}`}
-                                            >
-                                                {action.icon}
-                                                <span className="text-[9px] font-black uppercase tracking-widest leading-tight">{action.label}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            </div>
-
-                            {/* RIGHT COLUMN — Bill + Transactions */}
-                            <div className="lg:col-span-2 space-y-6">
-                                {/* Bill Summary */}
-                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                                    className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
-                                >
-                                    <div className="px-5 md:px-6 py-4 md:py-5 bg-gradient-to-r from-[#2076C7]/5 to-[#1CADA3]/5 border-b border-slate-100">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Current Bill Summary</h3>
-                                    </div>
-                                    <div className="p-5 md:p-6">
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                            <div>
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Total Due</p>
-                                                <p className="text-xl font-black text-slate-800">{formatCurrency(currentBill.totalDue)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Minimum Due</p>
-                                                <p className="text-xl font-black text-[#2076C7]">{formatCurrency(currentBill.minimumDue)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Due Date</p>
-                                                <p className="text-lg font-black text-slate-800">{hasActiveCard ? formatDate(currentBill.dueDate) : '-'}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Statement Date</p>
-                                                <p className="text-lg font-black text-slate-800">{hasActiveCard ? formatDate(currentBill.statementDate) : '-'}</p>
-                                            </div>
-                                        </div>
-
-                                        {hasActiveCard ? (
-                                            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex items-center gap-3">
-                                                <CheckCircle2 size={18} className="text-emerald-600 flex-shrink-0" />
-                                                <div>
-                                                    <p className="text-xs font-black text-emerald-800">Last payment of {formatCurrency(currentBill.lastPaymentAmount)} received on {formatDate(currentBill.lastPaymentDate)}</p>
-                                                    <p className="text-[9px] text-emerald-600 font-bold mt-0.5 uppercase tracking-widest">No overdue amount</p>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex items-center gap-3">
-                                                <Info size={18} className="text-slate-400 flex-shrink-0" />
-                                                <p className="text-xs font-bold text-slate-500 italic">No billing history available.</p>
-                                            </div>
-                                        )}
-
-                                        <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                                            <button 
-                                                disabled={!hasActiveCard}
-                                                className={`flex-1 py-3 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-opacity shadow-md cursor-pointer 
-                                                    ${hasActiveCard ? 'bg-gradient-to-r from-[#2076C7] to-[#1CADA3] hover:opacity-90' : 'bg-slate-300 cursor-not-allowed opacity-50'}`}
-                                            >
-                                                Pay Total Due
-                                            </button>
-                                            <button 
-                                                disabled={!hasActiveCard}
-                                                className={`flex-1 py-3 border text-xs font-black uppercase tracking-widest rounded-xl transition-colors cursor-pointer 
-                                                    ${hasActiveCard ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' : 'bg-white border-slate-100 text-slate-200 cursor-not-allowed'}`}
-                                            >
-                                                Pay Minimum
-                                            </button>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                {/* Transaction History */}
-                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                                    className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
-                                >
-                                    <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recent Transactions</h3>
-                                        {hasActiveCard && (
-                                            <button className="text-[9px] font-black text-[#2076C7] uppercase tracking-widest flex items-center gap-1 hover:opacity-75 transition-opacity cursor-pointer">
-                                                View All <ChevronRight size={10} />
-                                            </button>
-                                        )}
-                                    </div>
-                                    <div className="divide-y divide-slate-50 min-h-[200px] flex flex-col">
-                                        {currentTransactions.length > 0 ? (
-                                            currentTransactions.map((txn, i) => (
-                                                <motion.div
-                                                    key={txn.id}
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: 0.05 * i }}
-                                                    className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 hover:bg-slate-50/50 transition-colors"
-                                                >
-                                                    {/* Icon */}
-                                                    <div className={`flex-shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center text-white font-bold
-                                                        ${txn.type === 'credit' ? 'bg-emerald-500' : txn.category === 'Travel' ? 'bg-[#2076C7]' : txn.category === 'Food & Dining' ? 'bg-orange-400' : txn.category === 'Fuel' ? 'bg-amber-500' : txn.category === 'Entertainment' ? 'bg-purple-500' : 'bg-slate-400'}`}
-                                                    >
-                                                        {txn.categoryIcon}
-                                                    </div>
-                                                    {/* Details */}
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-black text-slate-800 truncate">{txn.merchant}</p>
-                                                        <div className="flex items-center gap-2 mt-0.5">
-                                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{txn.category}</p>
-                                                            {txn.status === 'pending' && (
-                                                                <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">Pending</span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    {/* Amount + Date */}
-                                                    <div className="text-right flex-shrink-0">
-                                                        <p className={`text-sm font-black ${txn.type === 'credit' ? 'text-emerald-600' : 'text-slate-800'}`}>
-                                                            {txn.type === 'credit' ? '+' : '−'} {formatCurrency(txn.amount)}
-                                                        </p>
-                                                        <p className="text-[9px] font-bold text-slate-400 mt-0.5">
-                                                            {new Date(txn.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
-                                                        </p>
-                                                    </div>
-                                                </motion.div>
-                                            ))
-                                        ) : (
-                                            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-                                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
-                                                    <ShoppingBag size={24} className="text-slate-300" />
-                                                </div>
-                                                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">No Transactions</p>
-                                                <p className="text-[10px] font-bold text-slate-300 max-w-[150px]">Your transactions will appear here once you start using your card.</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
                 </AnimatePresence>
             </div>
         </section>

@@ -72,7 +72,6 @@ export const useMarketIndices = () => {
 //                 const goals = await mutualFundService.getGoals();
 //                 setData(goals);
 //             } catch (error) {
-//                 console.error("Failed to load goals", error);
 //             } finally {
 //                 setIsLoading(false);
 //             }
@@ -95,7 +94,6 @@ export const useMarketIndices = () => {
 //                 const portfolio = await mutualFundService.getPortfolio();
 //                 setData(portfolio);
 //             } catch (error) {
-//                 console.error("Failed to load portfolio", error);
 //             } finally {
 //                 setIsLoading(false);
 //             }
@@ -116,7 +114,6 @@ export const useMarketIndices = () => {
 //                 const summaryValue = await mutualFundService.getPortfolioSummary();
 //                 setData(summaryValue);
 //             } catch (error) {
-//                 console.error("Failed to load portfolio summary", error);
 //             } finally {
 //                 setIsLoading(false);
 //             }

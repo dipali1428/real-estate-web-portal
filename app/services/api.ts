@@ -3,8 +3,9 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  // withCredentials: true, // ⭐ SEND COOKIES AUTOMATICALLY
-  headers: { "Content-Type": "application/json" },
+  // Enable sending cookies (authToken) with each request
+  withCredentials: true,
+  // No default Content-Type; each request will set its own as needed
 });
 
 api.interceptors.request.use(

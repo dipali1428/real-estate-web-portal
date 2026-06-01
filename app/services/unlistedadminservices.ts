@@ -356,12 +356,7 @@ export const AdminService = {
 
     const response = await api.post(
       "/api/unlisted/admin/real-estate",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      formData
     );
 
     return response.data;
@@ -374,6 +369,36 @@ export const AdminService = {
 
   deleteRealEstate: async (id: number | string) => {
     const response = await api.delete(`/api/unlisted/admin/real-estate/${id}`);
+    return response.data;
+  },
+
+  /**
+   * Upload credit cards (CSV)
+   */
+  uploadCreditCards: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.post(
+      "/api/unlisted/admin/credit-card/upload",
+      formData
+    );
+
+    return response.data;
+  },
+
+  getCreditCards: async () => {
+    const response = await api.get("/api/unlisted/admin/credit-card/all");
+    return response.data;
+  },
+
+  updateCreditCard: async (id: number | string, data: any) => {
+    const response = await api.put(`/api/unlisted/admin/credit-card/${id}`, data);
+    return response.data;
+  },
+
+  deleteCreditCard: async (id: number | string) => {
+    const response = await api.delete(`/api/unlisted/admin/credit-card/${id}`);
     return response.data;
   },
   /**

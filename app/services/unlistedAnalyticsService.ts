@@ -78,7 +78,6 @@ export const UnlistedAnalyticsService = {
   exportSharesCSV: () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      // console.error('No authentication token found');
       return;
     }
     window.open(`${process.env.NEXT_PUBLIC_API_URL}/api/unlisted/admin/analytics/shares/export?token=${token}`, '_blank');
@@ -87,7 +86,6 @@ export const UnlistedAnalyticsService = {
   exportTransactionsCSV: () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      // console.error('No authentication token found');
       return;
     }
     window.open(`${process.env.NEXT_PUBLIC_API_URL}/api/unlisted/admin/analytics/transactions/export?token=${token}`, '_blank');

@@ -97,7 +97,6 @@ export default function FundPerformanceChart({ fund }: { fund: Fund }) {
 
             setChartData(processedData);
         } catch (error) {
-            // console.error('Error generating chart data:', error);
             toast.error("Error generating chart data");
             generateSyntheticData();
         } finally {

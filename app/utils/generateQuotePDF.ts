@@ -106,7 +106,7 @@ export async function generateQuotePDF(quote: QuoteData): Promise<void> {
     doc.text('TOTAL PREMIUM', W - MARGIN - 30, cardY + 8, { align: 'center' });
     
     // jsPDF standard fonts don't render ₹ well. Make sure to replace ALL occurrences globally.
-    let displayPrice = quote.price.replace(/₹/g, 'Rs. ').replace(/\/\*/g, '').trim();
+    const displayPrice = quote.price.replace(/₹/g, 'Rs. ').replace(/\/\*/g, '').trim();
     
     // Dynamically adjust font size for long price ranges (e.g. "Rs. 465 - Rs. 1,050")
     if (displayPrice.length > 16) {

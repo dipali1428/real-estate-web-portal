@@ -89,7 +89,6 @@ export default function LoanAgainstSecuritiesForm({ onClose, prefilledData }: Lo
       await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
-      // console.error("Submission error:", err);
       toast.error("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MortgageLoanService, MortgageLoanPlan } from '../../../../services/mortgageLoanService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileSpreadsheet, X, Zap, Loader2, Database, Download, CheckCircle, AlertCircle, RefreshCw, Landmark, Package, Edit3, Trash2, Search } from "lucide-react";
+import { Upload, FileSpreadsheet, X, Zap, Loader2, Database, Download, Landmark, Package, Edit3, Trash2, Search } from "lucide-react";
 import { toast } from 'react-hot-toast';
 const MortgageLoanImportAdmin: React.FC = () => {
     // States for Import

@@ -237,7 +237,6 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
 
       setStep(2);
     } catch (err) {
-      // console.error(err);
       toast.error("Failed to create application. Please try again.");
       setStatusMsg("Failed to create application.");
     } finally {
@@ -270,7 +269,6 @@ export default function PersonalLoanForm({ onClose }: { onClose: () => void }) {
             await DashboardService.uploadLeadDocument(leadId!, formData);
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "success" } : item));
         } catch (err) {
-            // console.error(err);
             toast.error("Failed to upload document. Please try again.");
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "error" } : item));
             setStatusMsg("Upload failed. Please try again.");

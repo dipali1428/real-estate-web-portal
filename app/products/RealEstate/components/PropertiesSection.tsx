@@ -45,7 +45,6 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
         try {
             setLoading(true);
             setFetchError(null);
-            // ✅ Changed from getAllInvestments to getAllProperties
             const response = await realEstateAPI.getAllProperties();
             setApiProperties(response.data);
         } catch (error) {
@@ -55,7 +54,6 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
         }
     };
 
-    // ✅ New function to fetch single property by ID
     const fetchPropertyById = async (id: string | number) => {
         try {
             const response = await realEstateAPI.getPropertyById(id);
@@ -84,7 +82,6 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
             status: prop.status === 'ACTIVE' ? 'live' : 'closed'
         }));
 
-        // Convert static properties to match TransformedProperty interface
         const staticTransformed = staticProperties.map(p => ({
             id: p.id, 
             title: p.title, 
@@ -102,24 +99,16 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
             description: p.description
         }));
 
-        // Combine both, avoiding duplicates by title/id if necessary
         return [...apiTransformed, ...staticTransformed.filter(sp => !apiTransformed.some(ap => ap.title === sp.title))];
     }, [apiProperties]);
 
-    // Handle property selection with detailed fetch
     const handlePropertySelect = async (propertyId: string) => {
         if (onPropertySelect) {
-            // ✅ Fetch full property details before passing to parent
-            const detailedProperty = await fetchPropertyById(propertyId);
-            if (detailedProperty) {
-                onPropertySelect(propertyId);
-            } else {
-                onPropertySelect(propertyId);
-            }
+            await fetchPropertyById(propertyId);
+            onPropertySelect(propertyId);
         }
     };
 
-    // Auto-scroll logic for benefits
     useEffect(() => {
         if (!benefitsScrollRef.current || isHovered) return;
 
@@ -216,7 +205,6 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                                 </div>
                             </div>
 
-                            {/* Tab Buttons - Refined Grid Switcher for Mobile, Pill for Desktop */}
                             <div className="w-full sm:w-auto mt-4 sm:mt-0">
                                 <div className="grid grid-cols-2 p-1.5 bg-slate-100/80 backdrop-blur-sm rounded-2xl sm:rounded-full gap-1.5 relative shadow-inner border border-slate-200/50">
                                     {[
@@ -285,7 +273,14 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                                 {liveProperties.map((property, idx) => (
                                     <div key={`${property.status}-${property.id}-${idx}`} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-slate-100 group">
                                         <div className="relative">
-                                            <img src={property.image} alt={property.title} className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110" />
+                                            <img 
+                                                src={property.image || '/realestate/real_estate_hero.webp'} 
+                                                alt={property.title} 
+                                                className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = '/realestate/real_estate_hero.webp';
+                                                }}
+                                            />
                                             <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-xs font-bold uppercase tracking-wider text-teal-600 border border-teal-100">
                                                 {property.type.split(' ')[0]}
                                             </div>
@@ -332,7 +327,6 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                     )}
                 </AnimatePresence>
 
-                {/* Rest of the component remains the same - FAQ, Benefits, etc. */}
                 {!isDashboard && (
                     <>
                         <section className="py-12 md:py-16 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 bg-slate-50 rounded-[3rem] mb-12">
@@ -357,7 +351,17 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                                 <div id="closed-scroll" className="flex gap-4 overflow-x-auto scroll-smooth pb-4 px-2 no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                                     {closedProperties.map((property, idx) => (
                                         <div key={`${property.status}-${property.id}-${idx}`} className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col border border-slate-100 opacity-90 grayscale-[0.5] hover:grayscale-0 transition-all duration-500 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-0.75rem)] shrink-0">
-                                            <div className="relative"><img src={property.image} alt={property.title} className="w-full h-40 sm:h-48 object-cover" /><div className="absolute top-3 left-3 px-2 py-1 bg-slate-900/90 backdrop-blur bg-opacity-90 rounded text-[10px] font-bold uppercase tracking-wider text-white border border-white/20">SUCCESSFULLY CLOSED</div></div>
+                                            <div className="relative">
+                                                <img 
+                                                    src={property.image || '/realestate/real_estate_hero.webp'} 
+                                                    alt={property.title} 
+                                                    className="w-full h-40 sm:h-48 object-cover"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = '/realestate/real_estate_hero.webp';
+                                                    }}
+                                                />
+                                                <div className="absolute top-3 left-3 px-2 py-1 bg-slate-900/90 backdrop-blur bg-opacity-90 rounded text-[10px] font-bold uppercase tracking-wider text-white border border-white/20">SUCCESSFULLY CLOSED</div>
+                                            </div>
                                             <div className="p-5 flex-1 flex flex-col"><h3 className="text-lg font-bold mb-1 text-brand-gradient">{property.title}</h3><div className="flex items-center gap-1 text-slate-500 text-xs mb-4"><MapPin size={12} /><span>{property.location}</span></div><div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 rounded-xl mt-auto"><div><p className="text-[10px] text-slate-400 mb-0.5">Returns Delivered</p><p className="text-sm font-bold text-teal-600">{property.yield_percentage}% Yield</p></div><div><p className="text-[10px] text-slate-400 mb-0.5">Exit IRR</p><p className="text-sm font-bold text-blue-600">{property.irr_percentage}%</p></div></div></div>
                                         </div>
                                     ))}
@@ -500,7 +504,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
 
                         <form onSubmit={(e) => {
                             e.preventDefault();
-                            alert("Thank you for your valuable feedback! It will be listed after moderation.");
+                            const successMessage = "Thank you for your valuable feedback! It will be listed after moderation.";
                             setShowFeedbackForm(false);
                             setNewFeedback({ name: '', role: '', text: '', rating: 5 });
                         }} className="space-y-6">

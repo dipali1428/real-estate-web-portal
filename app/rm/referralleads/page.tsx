@@ -163,7 +163,6 @@ export default function ReferralLeadsDashboard() {
         updateLocalLeads(leadId, newStatus);
       }
     } catch (err) {
-      // console.error('Failed to update status:', err);
       toast.error('Failed to update status. Please try again.');
     }
   };
@@ -178,7 +177,6 @@ export default function ReferralLeadsDashboard() {
         setPendingUpdate(null);
       }
     } catch (err) {
-      // console.error('Failed to update rejection status:', err);
       toast.error('Failed to update status. Please try again.');
     }
   };

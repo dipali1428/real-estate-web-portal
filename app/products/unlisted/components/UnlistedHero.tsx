@@ -5,8 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, ShoppingCart, HandCoins, Activity, 
-    Newspaper, CheckCircle, ShieldCheck, ArrowLeft,
-    Send, X, User, Loader2, Building, MapPin, Briefcase, Mail, Phone, MessageCircle
+    Newspaper, CheckCircle, ShieldCheck, ArrowLeft, X
 } from 'lucide-react';
 import CustomerService from '../../../services/customerService';
 import { useModal } from '../../../context/ModalContext';

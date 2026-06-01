@@ -28,18 +28,15 @@ class RealTimeWebSocket {
         });
 
         this.socket.on('connect', () => {
-            // console.log('WebSocket connected:', this.socket?.id);
             this.reconnectAttempts = 0;
             this.subscribeToDefaultChannels();
         });
 
         this.socket.on('disconnect', (reason) => {
-            // console.log('WebSocket disconnected:', reason);
             this.handleDisconnection(reason);
         });
 
         this.socket.on('connect_error', (error) => {
-            // console.error('WebSocket connection error:', error);
             this.handleConnectionError(error);
         });
 
@@ -95,7 +92,6 @@ class RealTimeWebSocket {
                     callback(data);
                 } catch (error) {
                     toast.error(`Error processing ${channel} update: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                    // console.error('Error in subscriber callback:', error);
                 }
             });
         }

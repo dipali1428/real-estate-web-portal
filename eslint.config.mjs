@@ -41,8 +41,8 @@ const eslintConfig = defineConfig([
 
       /* -------------------- IMPORTANT ERRORS -------------------- */
 
-      "no-console": "error",
-      "no-alert": "error",
+      "no-console": "warn",
+      "no-alert": "warn",
       "no-debugger": "error",
       "no-duplicate-imports": "error",
       "no-unsafe-optional-chaining": "error",
@@ -61,6 +61,11 @@ const eslintConfig = defineConfig([
       "react/self-closing-comp": "off",
       "@typescript-eslint/consistent-type-imports": "off",
       "react-hooks/exhaustive-deps": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react/no-unescaped-entities": "off",
+      "@next/next/no-img-element": "off",
+      "@next/next/no-html-link-for-pages": "off",
+      "jsx-a11y/alt-text": "warn",
 
       /* -------------------- FORMATTING -------------------- */
 

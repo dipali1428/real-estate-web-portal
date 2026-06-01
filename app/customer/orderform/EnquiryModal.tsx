@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, MapPin, MessageCircle, Send, CheckCircle, X, Loader2, ShoppingBag, IndianRupee } from 'lucide-react';
+import { User, Mail, Phone, MapPin, MessageCircle, Send, CheckCircle, X, Loader2 } from 'lucide-react';
 import customerService from '../../services/customerService';
 import toast from 'react-hot-toast';
 

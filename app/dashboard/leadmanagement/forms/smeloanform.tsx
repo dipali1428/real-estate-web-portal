@@ -107,7 +107,6 @@ export default function SMELoanForm({ onClose }: { onClose: () => void }) {
       setLeadId(result.detail_lead_id);
       setStep(2);
     } catch (err) {
-      // console.error(err);
       toast.error("Failed to create application. Please try again.");
       setStatusMsg("Failed to create application.");
     } finally {

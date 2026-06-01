@@ -113,7 +113,6 @@ export default function InsurancePlanComparison({
         if (onViewDetails) {
             onViewDetails(company, activeVehicleType, activePlanType, activeCC, activeIDV);
         } else {
-            // console.log("Selected Company:", company);
         }
     };
 

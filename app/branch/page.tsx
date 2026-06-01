@@ -46,6 +46,32 @@ const defaultMonthlyTrend = [
   { name: 'Jun', disbursed: 5500 },
 ];
 
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.08 } }
+};
+
+const itemVariants: Variants = {
+  hidden: { y: 20, opacity: 0 },
+  show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
+};
+
+// Reusable Stat Card Component
+const StatCard = ({ icon, title, value, subValue }: { icon: React.ReactNode, title: string, value: string, subValue?: string }) => (
+  <motion.div variants={itemVariants} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+    <div className="flex items-center gap-4">
+      <div className="w-12 h-12 bg-blue-50 text-[#2076C7] rounded-xl flex items-center justify-center">
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm font-medium text-slate-500">{title}</p>
+        <p className="text-2xl font-extrabold text-slate-700">{value}</p>
+        {subValue && <p className="text-xs text-slate-400 font-medium mt-0.5">{subValue}</p>}
+      </div>
+    </div>
+  </motion.div>
+);
+
 export default function Dashboard({
   user = "Manager",
   branchName = "Main Office",
@@ -91,37 +117,11 @@ export default function Dashboard({
     );
   }
 
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.08 } }
-  };
-
-  const itemVariants: Variants = {
-    hidden: { y: 20, opacity: 0 },
-    show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
-  };
-  
   const achievementRate = monthlyTarget > 0 
     ? Math.round((loanDisbursedAmount / monthlyTarget) * 100) 
     : 0;
 
   const conversionRatio = totalLeads > 0 ? Math.round((approvedCases / totalLeads) * 100) : 0;
-
-  // Reusable Stat Card Component
-  const StatCard = ({ icon, title, value, subValue }: { icon: React.ReactNode, title: string, value: string, subValue?: string }) => (
-    <motion.div variants={itemVariants} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-blue-50 text-[#2076C7] rounded-xl flex items-center justify-center">
-          {icon}
-        </div>
-        <div>
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="text-2xl font-extrabold text-slate-700">{value}</p>
-          {subValue && <p className="text-xs text-slate-400 font-medium mt-0.5">{subValue}</p>}
-        </div>
-      </div>
-    </motion.div>
-  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8 font-sans text-slate-700">

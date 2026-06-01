@@ -137,7 +137,6 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     //         try {
     //             setWishlist(JSON.parse(savedWishlist));
     //         } catch (e) {
-    //             console.error("Failed to parse wishlist", e);
     //         }
     //     }
     // }, []);

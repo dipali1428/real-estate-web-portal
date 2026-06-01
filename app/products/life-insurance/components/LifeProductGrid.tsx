@@ -237,7 +237,7 @@ const LifeProductGrid = () => {
                     <div>
                       <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Strategic Insight</p>
                       <p className="text-sm text-slate-600 font-medium leading-relaxed italic">
-                        "{selectedProduct.insight}"
+                        {`"${selectedProduct.insight}"`}
                       </p>
                     </div>
                   </div>

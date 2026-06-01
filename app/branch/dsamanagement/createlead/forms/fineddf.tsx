@@ -91,7 +91,6 @@ export default function FixedDepositForm({ onClose }: { onClose: () => void }) {
       await DashboardService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
-      // console.error(":", err);
       // alert("Something went wrong. Please try again.");
       toast.error("Submission error. Please try again.");
     } finally {

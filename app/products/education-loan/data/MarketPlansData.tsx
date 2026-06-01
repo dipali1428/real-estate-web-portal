@@ -21,7 +21,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Fast processing, Flexible profile',
         bestFor: 'Average profile + abroad students',
         category: 'NBFC',
-        logo: '/Logos/future.png' // Placeholder for NBFC
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/avanse.webp'
     },
     {
         id: 'auxilo',
@@ -31,7 +31,7 @@ export const marketPlans: MarketPlan[] = [
         usp: '3–5 days approval, High visa success support',
         bestFor: 'Urgent cases',
         category: 'NBFC',
-        logo: '/Logos/future.png' // Updated to a valid existing logo
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/Auxilo.webp'
     },
     {
         id: 'hdfc-credila',
@@ -41,7 +41,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Strong brand trust, Premium universities focus',
         bestFor: 'Premium universities',
         category: 'NBFC',
-        logo: '/Logos/hdfc bank.png',
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/HDFC credila.jpg',
         extra: 'Insurance bundling common'
     },
     {
@@ -52,7 +52,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Fully digital, Flexible underwriting',
         bestFor: 'Digital-first users',
         category: 'NBFC',
-        logo: '/Logos/capital.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/incred finance.jfif'
     },
     {
         id: 'tata-capital',
@@ -62,7 +62,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Strong corporate backing, Structured EMI options',
         bestFor: 'Structured repayment seekers',
         category: 'NBFC',
-        logo: '/Logos/tcs.png' // Using TCS logo as Tata placeholder
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/tata capital.webp'
     },
     // Private Banks
     {
@@ -73,7 +73,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Good for semi-strong profiles, Faster than PSU',
         bestFor: 'Semi-strong profiles',
         category: 'Private',
-        logo: '/Logos/kotak.png' // Placeholder for private major if axis not found
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/axis bank.png'
     },
     {
         id: 'icici-bank',
@@ -83,7 +83,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Top 200 universities focus, Good for abroad',
         bestFor: 'Top 200 universities',
         category: 'Private',
-        logo: '/Logos/trust.png' 
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/icici bank.jfif'
     },
     {
         id: 'idfc-first',
@@ -93,7 +93,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Competitive rates, Growing segment',
         bestFor: 'International students',
         category: 'Private',
-        logo: '/Logos/digit.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/idfc bank logo.png'
     },
     {
         id: 'yes-bank',
@@ -103,7 +103,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Selective lending, Premium cases',
         bestFor: 'Premium cases',
         category: 'Private',
-        logo: '/Logos/lic.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/yes bank.png'
     },
     // PSU Banks
     {
@@ -114,7 +114,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Premier university list benefit',
         bestFor: 'Premier university students',
         category: 'PSU',
-        logo: '/Logos/canararobeco.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/bank of baroda.png'
     },
     {
         id: 'boi',
@@ -124,7 +124,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Discounts for girls & STEM',
         bestFor: 'Girls & STEM students',
         category: 'PSU',
-        logo: '/Logos/sbi.png' // Using SBI as PSU placeholder if BOI not found
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/bank of india.png'
     },
     {
         id: 'bom',
@@ -134,7 +134,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Low interest, Good for domestic',
         bestFor: 'Domestic students',
         category: 'PSU',
-        logo: '/Logos/sbi.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/bank of maharashtra.jpg'
     },
     {
         id: 'cbi',
@@ -144,7 +144,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Cheapest loans',
         bestFor: 'Cost-conscious students',
         category: 'PSU',
-        logo: '/Logos/sbi.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/central bank of india.png'
     },
     {
         id: 'ubi',
@@ -154,7 +154,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Government schemes support',
         bestFor: 'Govt scheme seekers',
         category: 'PSU',
-        logo: '/Logos/sbi.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/union bank.png'
     },
     // Co-operative
     {
@@ -165,7 +165,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Local client focus',
         bestFor: 'Local clients',
         category: 'Co-operative',
-        logo: '/Logos/royal.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/saraswat bank.jfif'
     },
     {
         id: 'svc',
@@ -175,7 +175,7 @@ export const marketPlans: MarketPlan[] = [
         usp: 'Local client focus',
         bestFor: 'Local clients',
         category: 'Co-operative',
-        logo: '/Logos/royal.png'
+        logo: 'https://diva2ast20wqu.cloudfront.net/public/products/educationloan_banks/svc bank.png'
     }
 ];
 

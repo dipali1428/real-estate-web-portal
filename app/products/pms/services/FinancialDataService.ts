@@ -40,7 +40,6 @@ class FinancialDataService {
             const data = this.processNSEIndexData(response.data);
             if (data) return this.cacheAndReturn(cacheKey, data);
         } catch (error) {
-            // console.warn('NSE fetch failed, falling back to Alpha Vantage');
             toast.error(`Error fetching Nifty 50 data from NSE: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
 
@@ -60,7 +59,6 @@ class FinancialDataService {
                 return this.cacheAndReturn(cacheKey, data);
             }
         } catch (error) {
-            // console.warn('Alpha Vantage fetch failed');
             toast.error(`Error fetching Nifty 50 data: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
 

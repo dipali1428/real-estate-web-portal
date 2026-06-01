@@ -101,7 +101,6 @@ export default function MortgageLoanForm({ onClose, prefilledData }: MortgageLoa
             await AuthService.createLead(payload);
             setShowSuccess(true);
         } catch (err) {
-            // console.error("Submission error:", err);
             toast.error("Submission failed. Please try again.");
             // alert("Something went wrong. Please try again.");
         } finally {

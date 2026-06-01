@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import HomeLoanForm from "../../../../dashboard/leadmanagement/forms/homeloanform";
 import { Search, Filter, Landmark, Percent, ArrowDownSquare, X, ShieldCheck, Database, FileText } from "lucide-react";
-import { categorizedPlans, CATEGORIES } from "../loanConstants";
+import { categorizedPlans } from "../loanConstants";
 import { motion, AnimatePresence } from "framer-motion";
 import { HomeLoanService, HomeLoanPlan } from "../../../../services/homeLoanServices";
 import { useEffect } from "react";

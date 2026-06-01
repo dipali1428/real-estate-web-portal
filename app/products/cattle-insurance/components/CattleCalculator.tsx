@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
@@ -72,6 +72,7 @@ export default function CattleCalculator({
     const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
     const [totalPremium, setTotalPremium] = useState(0);
 
+    // Update market value when animal changes
     useEffect(() => {
         const rafId = requestAnimationFrame(() => {
             setMarketValue(animal.baseValue);
@@ -82,9 +83,10 @@ export default function CattleCalculator({
         });
 
         return () => cancelAnimationFrame(rafId);
-    }, [animal]);
+    }, [animal, age]);
 
-    useEffect(() => {
+    // Calculate premium using useMemo to avoid setState in effect
+    const calculatedPremium = useMemo(() => {
         let baseRate = animal.rate;
         if (age > animal.maxAge * 12 * 0.7) baseRate += 0.005;
         if (breedType === 'exotic') baseRate += 0.01;
@@ -98,8 +100,13 @@ export default function CattleCalculator({
             if (addOn) premium += marketValue * addOn.rate;
         });
         premium = premium * (1 - scheme.subsidy);
-        setTotalPremium(Math.round(premium * 1.18));
+        return Math.round(premium * 1.18);
     }, [animal, marketValue, age, breedType, purpose, scheme, selectedAddOns]);
+
+    // Update totalPremium when calculatedPremium changes
+    useEffect(() => {
+        setTotalPremium(calculatedPremium);
+    }, [calculatedPremium]);
 
     const nextStep = () => setStep(s => Math.min(3, s + 1));
     const prevStep = () => setStep(s => Math.max(1, s - 1));

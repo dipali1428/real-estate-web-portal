@@ -101,10 +101,8 @@ export default function HomeLoanForm({ onClose, prefilledData }: HomeLoanFormPro
 
       await AuthService.createLead(payload);
       setShowSuccess(true);
-    } catch (err) {
-      // console.error("Submission error:", err);
+    } catch (_err) {
       toast.error("Something went wrong. Please try again.");
-      // alert("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

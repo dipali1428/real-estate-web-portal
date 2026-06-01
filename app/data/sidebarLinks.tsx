@@ -47,6 +47,7 @@ import {
     CalendarDays,
     BriefcaseBusiness,
     SquareChartGantt,
+    GraduationCap,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -303,8 +304,17 @@ export const sidebarLinks = {
                     label: "Mortgage Loan",
                     href: "/UnlistedAdmin/products/finance/mortgage-loan",
                     icon: <Building2 className="h-5 w-5 text-neutral-600" />
+                },
+                {
+                    label: "Credit Card",
+                    href: "/UnlistedAdmin/products/finance/credit-card",
+                    icon: <CreditCard className="h-5 w-5 text-neutral-600" />
+                },
+                 {
+                    label: "Education Loan",
+                    href: "/UnlistedAdmin/products/finance/Education-Loan",
+                    icon: <GraduationCap className="h-5 w-5 text-neutral-600" />
                 }
-
             ],
         },
     ],

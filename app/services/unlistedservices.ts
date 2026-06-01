@@ -103,8 +103,6 @@ export const fetchAllShares = async () => {
 //     const response = await api.get("/api/unlisted/public/graph");
 //     return response.data;
 //   } catch (error: any) {
-//     console.error("DEBUG - Graph URL called:", error.config?.url);
-//     console.error("DEBUG - Graph Error:", error.response?.data);
 //     throw error;
 //   }
 // };

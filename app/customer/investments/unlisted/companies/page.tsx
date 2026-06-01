@@ -1,7 +1,7 @@
 // app/companies/page.tsx (Updated to use imported EnquiryModal)
 'use client';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Search, Filter, Building, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2, Plus, Minus, CreditCard, Send, User, Briefcase, Mail, Phone, MessageCircle } from 'lucide-react';
+import { Search, Filter, Building, TrendingUp, X, Bookmark, BookmarkCheck, ShoppingCart, CheckCircle, ChevronDown, IndianRupee, Info, Activity, MapPin, Package, FileText, AlertTriangle, Loader2, Plus, Minus, CreditCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { fetchDashboardData, fetchIdGraphData, GraphPoint } from '../../../../services/unlistedservices';
 import toast from 'react-hot-toast';

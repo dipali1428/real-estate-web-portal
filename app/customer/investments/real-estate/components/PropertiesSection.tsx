@@ -47,7 +47,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
     const [showRealEstateForm, setShowRealEstateForm] = useState(false);
 
     const fetchWishlist = async () => {
-        if (typeof window !== 'undefined' && !customerService.isAuthenticated()) return;
+        if (typeof window !== 'undefined' && (!customerService.isAuthenticated() || customerService.getUserRole() !== 'CUSTOMER')) return;
         try {
             const response = await customerService.getMyWishlist();
             if (response.success && response.data) {
@@ -66,6 +66,10 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
     const handleToggleWishlist = async (property: TransformedProperty) => {
         if (typeof window !== 'undefined' && !customerService.isAuthenticated()) {
             toast.error("Please login to manage wishlist");
+            return;
+        }
+        if (customerService.getUserRole() !== 'CUSTOMER') {
+            toast.error("Wishlist is only available for customer accounts");
             return;
         }
 
@@ -318,7 +322,14 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                                 {liveProperties.map((property, idx) => (
                                     <div key={`${property.status}-${property.id}-${idx}`} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-slate-100 group">
                                         <div className="relative">
-                                            <img src={property.image} alt={property.title} className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110" />
+                                            <img 
+                                                src={property.image || '/realestate/real_estate_hero.webp'} 
+                                                alt={property.title} 
+                                                className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = '/realestate/real_estate_hero.webp';
+                                                }}
+                                            />
                                             <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-xs font-bold uppercase tracking-wider text-teal-600 border border-teal-100">
                                                 {property.type.split(' ')[0]}
                                             </div>
@@ -397,7 +408,14 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                                     {closedProperties.map((property, idx) => (
                                         <div key={`${property.status}-${property.id}-${idx}`} className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col border border-slate-100 opacity-90 grayscale-[0.5] hover:grayscale-0 transition-all duration-500 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-0.75rem)] shrink-0">
                                             <div className="relative">
-                                                <img src={property.image} alt={property.title} className="w-full h-40 sm:h-48 object-cover" />
+                                                <img 
+                                                    src={property.image || '/realestate/real_estate_hero.webp'} 
+                                                    alt={property.title} 
+                                                    className="w-full h-40 sm:h-48 object-cover"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = '/realestate/real_estate_hero.webp';
+                                                    }}
+                                                />
                                                 <div className="absolute top-3 left-3 px-2 py-1 bg-slate-900/90 backdrop-blur bg-opacity-90 rounded text-[10px] font-bold uppercase tracking-wider text-white border border-white/20">SUCCESSFULLY CLOSED</div>
                                                 <button 
                                                     onClick={(e) => { e.stopPropagation(); handleToggleWishlist(property); }}
@@ -549,7 +567,7 @@ const PropertiesSection = ({ onPropertySelect, showOnlyLive = false, isDashboard
                 )}
             </div>
 
-            {showFeedbackForm && (<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4" onClick={() => setShowFeedbackForm(false)}><div className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative animate-fade-in" onClick={e => e.stopPropagation()}><button onClick={() => setShowFeedbackForm(false)} className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"><X size={20} /></button><h3 className="text-3xl font-extrabold mb-2 text-brand-gradient">Share Feedback</h3><p className="text-slate-500 mb-8">We value your input! Tell us about your investment experience.</p><form onSubmit={(e) => { e.preventDefault(); alert("Thank you for your valuable feedback! It will be listed after moderation."); setShowFeedbackForm(false); setNewFeedback({ name: '', role: '', text: '', rating: 5 }); }} className="space-y-6"><div><label className="block font-bold text-slate-800 mb-2">Full Name</label><input type="text" required placeholder="Enter your name" value={newFeedback.name} onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors" /></div><div><label className="block font-bold text-slate-800 mb-2">Professional Role</label><input type="text" required placeholder="e.g. Software Engineer" value={newFeedback.role} onChange={(e) => setNewFeedback({ ...newFeedback, role: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors" /></div><div><label className="block font-bold text-slate-800 mb-2">Rating</label><div className="flex gap-2">{[1, 2, 3, 4, 5].map((star) => (<button key={star} type="button" onClick={() => setNewFeedback({ ...newFeedback, rating: star })} className="focus:outline-none transition-transform hover:scale-110"><Star size={32} fill={star <= newFeedback.rating ? "#F59E0B" : "none"} color={star <= newFeedback.rating ? "#F59E0B" : "#cbd5e1"} /></button>))}</div></div><div><label className="block font-bold text-slate-800 mb-2">Your Review</label><textarea required rows={4} placeholder="Share your thoughts..." value={newFeedback.text} onChange={(e) => setNewFeedback({ ...newFeedback, text: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors resize-none"></textarea></div><button type="submit" className="btn-brand w-full py-4 rounded-xl text-base">Submit Feedback</button></form></div></div>)}
+            {showFeedbackForm && (<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4" onClick={() => setShowFeedbackForm(false)}><div className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative animate-fade-in" onClick={e => e.stopPropagation()}><button onClick={() => setShowFeedbackForm(false)} className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"><X size={20} /></button><h3 className="text-3xl font-extrabold mb-2 text-brand-gradient">Share Feedback</h3><p className="text-slate-500 mb-8">We value your input! Tell us about your investment experience.</p><form onSubmit={(e) => { e.preventDefault(); toast.success("Thank you for your valuable feedback! It will be listed after moderation."); setShowFeedbackForm(false); setNewFeedback({ name: '', role: '', text: '', rating: 5 }); }} className="space-y-6"><div><label className="block font-bold text-slate-800 mb-2">Full Name</label><input type="text" required placeholder="Enter your name" value={newFeedback.name} onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors" /></div><div><label className="block font-bold text-slate-800 mb-2">Professional Role</label><input type="text" required placeholder="e.g. Software Engineer" value={newFeedback.role} onChange={(e) => setNewFeedback({ ...newFeedback, role: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors" /></div><div><label className="block font-bold text-slate-800 mb-2">Rating</label><div className="flex gap-2">{[1, 2, 3, 4, 5].map((star) => (<button key={star} type="button" onClick={() => setNewFeedback({ ...newFeedback, rating: star })} className="focus:outline-none transition-transform hover:scale-110"><Star size={32} fill={star <= newFeedback.rating ? "#F59E0B" : "none"} color={star <= newFeedback.rating ? "#F59E0B" : "#cbd5e1"} /></button>))}</div></div><div><label className="block font-bold text-slate-800 mb-2">Your Review</label><textarea required rows={4} placeholder="Share your thoughts..." value={newFeedback.text} onChange={(e) => setNewFeedback({ ...newFeedback, text: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-colors resize-none"></textarea></div><button type="submit" className="btn-brand w-full py-4 rounded-xl text-base">Submit Feedback</button></form></div></div>)}
 
             {/* Real Estate Lead Form Modal */}
             {showRealEstateForm && (

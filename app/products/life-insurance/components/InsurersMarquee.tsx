@@ -46,6 +46,7 @@ const InsurersMarquee = () => {
                                 key={`${partner.name}-${idx}`} // ✅ improved key
                                 className="flex flex-col items-center justify-center gap-3 transition-all duration-300 hover:scale-105 group/item px-4 border-r border-slate-50 last:border-0">
                                 <div className="h-8 md:h-10 flex items-center justify-center mb-1">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         src={partner.logo}
                                         alt={partner.name}

@@ -93,7 +93,6 @@ const EnquiryAdminPage: React.FC = () => {
         setError('Failed to fetch enquiries from server');
       }
     } catch (err: any) {
-      // console.error('Error fetching enquiries:', err);
       setError(err?.message || 'Failed to fetch enquiries. Please try again.');
     } finally {
       setLoading(false);
@@ -198,7 +197,6 @@ const EnquiryAdminPage: React.FC = () => {
       const filename = `enquiries_${activeTab.toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(wb, filename);
     } catch (err) {
-      // console.error('Export error', err);
       toast('Failed to export data. Please try again.');
     } finally {
       setIsExporting(false);
@@ -228,7 +226,6 @@ const EnquiryAdminPage: React.FC = () => {
         throw new Error(res?.message || 'Update failed on server');
       }
     } catch (err: any) {
-      // console.error('Status update failed', err);
       toast('Failed to update status. Please try again.');
       // rollback
       setEnquiries(prev => prev.map(e => (e.id === id ? { ...e, status: original } : e)));

@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
-  ShieldCheck,
   CheckCircle2,
   Percent,
   ArrowRight,

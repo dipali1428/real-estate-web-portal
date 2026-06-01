@@ -35,8 +35,6 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                 setLoading(true);
                 // Integrated the new API call here
                 const response = await DashboardService.getAllClientDetails();
-                // console.log("Fetched client details:", response);
-                
                 // Handle response format: checking for response.data or response directly
                 const rawData = response?.success ? response.data : response;
                 

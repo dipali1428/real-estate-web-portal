@@ -94,7 +94,6 @@ export default function PersonalLoanForm({ onClose, prefilledData, selectedBank 
       await AuthService.createLead(payload);
       setShowSuccess(true);
     } catch (err) {
-      // console.error("Submission error:", err);
       toast.error("Submission failed. Please try again later.");
       // alert("Something went wrong. Please try again.");
     } finally {

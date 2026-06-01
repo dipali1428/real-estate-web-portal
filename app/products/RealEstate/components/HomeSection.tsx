@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, Shield, TrendingUp, CheckCircle, MapPin } from 'lucide-react';
 import { IconArrowLeft, IconBuildingSkyscraper, IconStar, IconCheck } from '@tabler/icons-react';
-import heroIllustration from '../assets/real_estate_hero.png';
+import heroIllustration from '../../../../public/realestate/real_estate_hero.webp';
 import { properties as staticProperties } from '../data/properties';
-
+import { realEstateAPI, RealEstateInvestment } from '../../../services/realestateAPI';
+import toast from "react-hot-toast";
+ 
 interface RealEstateHomeSectionProps {
     onPropertySelect?: (id: string) => void;
 }
@@ -17,10 +20,63 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
     const [searchQuery, setSearchQuery] = useState('');
     const router = useRouter();
 
-    // Featured properties from static data
+    const [apiProperties, setApiProperties] = useState<RealEstateInvestment[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchProperties = async () => {
+        try {
+            setLoading(true);
+            const response = await realEstateAPI.getAllProperties();
+            setApiProperties(response.data);
+        } catch (err) {
+            toast.error("something went wrong.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => { fetchProperties(); }, []);
+
+    const transformedProperties = useMemo(() => {
+        const apiTransformed = apiProperties.map(prop => ({
+            id: prop.id, 
+            title: prop.project_name, 
+            developer_name: prop.developer_name, 
+            location: prop.location,
+            type: prop.project_type || 'Residential',
+            price: prop.total_asset_value ? parseInt(prop.total_asset_value) : parseInt(prop.min_investment) * 10,
+            area: prop.total_area || 500, 
+            rera_reg_no: prop.rera_id || 'RERA-Pending',
+            min_contribution: parseInt(prop.min_investment), 
+            yield_percentage: parseFloat(prop.yield_percentage),
+            irr_percentage: prop.irr_percentage ? parseFloat(prop.irr_percentage) : parseFloat(prop.yield_percentage) * 1.2,
+            image: prop.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(prop.project_name)}&size=400&background=2076C7&color=fff&bold=true`, 
+            status: prop.status === 'ACTIVE' ? 'live' : 'closed'
+        }));
+
+        const staticTransformed = staticProperties.map(p => ({
+            id: p.id, 
+            title: p.title, 
+            developer_name: p.developer, 
+            location: p.location,
+            type: p.type, 
+            price: p.price, 
+            area: p.area, 
+            rera_reg_no: p.rera_reg_no,
+            min_contribution: p.min_contribution, 
+            yield_percentage: p.yield_percentage,
+            irr_percentage: p.irr_percentage, 
+            image: p.image, 
+            status: p.status,
+            description: p.description
+        }));
+
+        return [...apiTransformed, ...staticTransformed.filter(sp => !apiTransformed.some(ap => ap.title === sp.title))];
+    }, [apiProperties]);
+
+    // Featured properties from dynamic API data
     const featuredProperties = useMemo(() => {
-        return staticProperties.filter((p: any) => p.status !== 'closed').slice(0, 3);
-    }, []);
+        return transformedProperties.filter((p: any) => p.status !== 'closed').slice(0, 3);
+    }, [transformedProperties]);
 
     const handleSearch = (e: any) => {
         if (e && e.key && e.key !== 'Enter') return;
@@ -128,10 +184,11 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                                     {/* Subtle Gradient Inner Glow */}
                                     <div className="absolute inset-0 bg-gradient-to-tr from-[#2076C7]/5 to-[#1CADA3]/5" />
 
-                                    <img
-                                        src={heroIllustration.src}
+                                    <Image
+                                        src={heroIllustration}
                                         alt="Real Estate Investment illustration"
-                                        className="w-full h-full object-cover drop-shadow-lg transition-transform duration-700 scale-110"
+                                        fill
+                                        className="object-cover drop-shadow-lg transition-transform duration-700 scale-110"
                                     />
                                 </motion.div>
 
@@ -232,8 +289,14 @@ const RealEstateHomeSection = ({ onPropertySelect }: RealEstateHomeSectionProps)
                     {featuredProperties.map((property: any) => (
                         <div key={property.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group">
                             <div className="relative h-56 overflow-hidden">
-                                <img src={property.image} alt={property.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"/>
-                                <div className="absolute top-4 right-4 px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg border border-white/20 backdrop-blur-sm">
+                                <img
+                                    src={property.image || '/realestate/real_estate_hero.webp'}
+                                    alt={property.title}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 absolute inset-0"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = '/realestate/real_estate_hero.webp';
+                                    }}
+                                /> <div className="absolute top-4 right-4 px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg border border-white/20 backdrop-blur-sm">
                                     {property.type.split(' ')[0]}
                                 </div>
                             </div>

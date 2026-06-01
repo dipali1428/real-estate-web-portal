@@ -126,7 +126,6 @@ export default function LeadDashboard() {
         setLeads([]);
       }
     } catch (error) {
-      // console.error("Error fetching leads:", error);
       toast.error("Failed to fetch leads. Please try again later.");
       setLeads([]);
     } finally {
@@ -147,7 +146,6 @@ export default function LeadDashboard() {
         toast.error(response.message || "Failed to update status. Please try again.");
       }
     } catch (error: any) {
-      // console.error("Error updating status:", error);
       toast.error("Failed to update status. Please try again later.");
     } finally {
       setProcessingId(null);

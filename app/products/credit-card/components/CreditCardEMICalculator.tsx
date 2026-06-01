@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     IconArrowRight,
     IconPlus,
@@ -19,26 +19,42 @@ import {
 export default function CreditCardEMICalculator({ onApplyClick }: { onApplyClick: () => void }) {
     const [loanAmount, setLoanAmount] = useState(50000);
     const [interestRate, setInterestRate] = useState(15);
-    const [tenure, setTenure] = useState(12); // Tenure in months for CC EMI
+    const [tenure, setTenure] = useState(12);
     const [emi, setEmi] = useState(0);
     const [totalInterest, setTotalInterest] = useState(0);
     const [totalPayment, setTotalPayment] = useState(0);
-    const [showAllBanks, setShowAllBanks] = useState(false);
 
-    useEffect(() => {
+    // Calculate EMI using useMemo to avoid setState in effect
+    const calculatedValues = useMemo(() => {
         const r = interestRate / 100 / 12;
         const n = tenure;
+        let emiValue = 0;
+        let totalPaymentValue = 0;
+        let totalInterestValue = 0;
+        
         if (r === 0) {
-            setEmi(loanAmount / n);
-            setTotalPayment(loanAmount);
-            setTotalInterest(0);
+            emiValue = loanAmount / n;
+            totalPaymentValue = loanAmount;
+            totalInterestValue = 0;
         } else {
-            const e = (loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-            setEmi(e);
-            setTotalPayment(e * n);
-            setTotalInterest(e * n - loanAmount);
+            emiValue = (loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            totalPaymentValue = emiValue * n;
+            totalInterestValue = totalPaymentValue - loanAmount;
         }
+        
+        return {
+            emi: emiValue,
+            totalPayment: totalPaymentValue,
+            totalInterest: totalInterestValue
+        };
     }, [loanAmount, interestRate, tenure]);
+
+    // Update state when calculated values change
+    useEffect(() => {
+        setEmi(calculatedValues.emi);
+        setTotalPayment(calculatedValues.totalPayment);
+        setTotalInterest(calculatedValues.totalInterest);
+    }, [calculatedValues]);
 
     const chartData = [
         { name: 'Principal', value: loanAmount },
@@ -68,11 +84,11 @@ export default function CreditCardEMICalculator({ onApplyClick }: { onApplyClick
                             viewport={{ once: true }}
                         >
                             <h2 className="text-3xl md:text-4xl font-extrabold mb-3 bg-linear-to-r from-[#2076C7] to-[#1CADA3] bg-clip-text text-transparent drop-shadow-sm">
-                           Credit Card EMI Calculator
-                        </h2>
-                        <p className="text-gray-600 max-w-3xl mx-auto text-xl md:text-1xl">
-                            Planning a big purchase? Calculate your monthly conversion EMIs
-                        </p>
+                                Credit Card EMI Calculator
+                            </h2>
+                            <p className="text-gray-600 max-w-3xl mx-auto text-xl md:text-1xl">
+                                Planning a big purchase? Calculate your monthly conversion EMIs
+                            </p>
                         </motion.div>
                     </div>
 

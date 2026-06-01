@@ -3,9 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, Download, RefreshCw, X,
-  Briefcase, Calendar, CreditCard, Landmark, 
-  UserCheck, Save, ClipboardList, Wallet, CheckCircle2, AlertCircle,
-  MoreHorizontal
+  Briefcase, CreditCard, Landmark, 
+  UserCheck, Save, ClipboardList, Wallet, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import { AccountService } from '@/app/services/accountsService';
 

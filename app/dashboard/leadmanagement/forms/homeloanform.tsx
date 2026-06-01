@@ -273,8 +273,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
       const result = await DashboardService.createLead(payload);
       
       // --- LOGGING CREATE LEAD API RESPONSE ---
-      // console.log("<<< API RESPONSE: DashboardService.createLead", result);
-      
       const id = result?.detail_lead_id;
 
       if (!id) throw new Error("Lead ID missing");
@@ -286,7 +284,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         setStep(2);
       }
     } catch (err) {
-      // console.error(err);
       setStatusMsg("Failed to create application.");
     } finally {
       setIsSubmitting(false);
@@ -318,7 +315,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
             await DashboardService.uploadLeadDocument(leadId!, formData);
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "success" } : item));
         } catch (err) {
-            // console.error(err);
             toast.error("Failed to upload document. Please try again.");
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "error" } : item));
             setStatusMsg("Upload failed. Please try again.");

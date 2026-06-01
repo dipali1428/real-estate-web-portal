@@ -5,19 +5,9 @@ import React, { useState } from 'react';
 import { useModal } from '../../../context/ModalContext';
 import CustomerService from '../../../services/customerService';
 import { 
-    Send, 
-    X, 
-    User, 
-    Loader2, 
-    Building,
-    Calculator,
+    X,
     CheckCircle, 
-    ArrowRight,
-    Briefcase,
-    MapPin,
-    Mail,
-    Phone,
-    MessageCircle
+    ArrowRight
 } from 'lucide-react';
 
 // Define Enquiry type for API calls matching the backend

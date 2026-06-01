@@ -288,7 +288,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
         setStep(2);
       }
     } catch (err) {
-      // console.error(err);
       setStatusMsg("Failed to create application.");
     } finally {
       setIsSubmitting(false);
@@ -320,7 +319,6 @@ export default function HomeLoanForm({ onClose }: { onClose: () => void }) {
             await DashboardService.uploadLeadDocument(leadId!, formData);
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "success" } : item));
         } catch (err) {
-            // console.error(err);
             toast.error("Failed to upload document. Please try again.");
             setFileQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: "error" } : item));
             setStatusMsg("Upload failed. Please try again.");

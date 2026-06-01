@@ -286,7 +286,7 @@ export default function Wishlist() {
                       ? productData?.risk || "Moderate"
                       : productData?.depository_applicable?.replace(/&amp;/g, "&") || "-",
 
-            logo_url: productData?.logo_url || "",
+            logo_url: productData?.logo_url || (isRealEstate ? (productData as any)?.image_url : '') || "",
 
             coupon: (isBond || isNCD)
               ? String(productData?.coupon || (productData as any)?.interest || item.coupon || 0).replace(/[^0-9.]/g, '')
@@ -682,13 +682,25 @@ export default function Wishlist() {
                         <div className="flex items-center space-x-4">
                           <div className="w-10 h-10 rounded-lg border overflow-hidden bg-white shadow-sm flex-shrink-0">
                             {item.logo_url ? (
-                              <Image
-                                src={item.logo_url}
-                                width={40}
-                                height={40}
-                                alt=""
-                                className="w-full h-full object-contain"
-                              />
+                              item.isRealEstate ? (
+                                <img
+                                  src={item.logo_url}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                    (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs font-bold text-[#2076C7] bg-blue-50">${item.product_name.substring(0,2)}</div>`;
+                                  }}
+                                />
+                              ) : (
+                                <Image
+                                  src={item.logo_url}
+                                  width={40}
+                                  height={40}
+                                  alt=""
+                                  className="w-full h-full object-contain"
+                                />
+                              )
                             ) : item.product_type === 'pms' || item.product_type === 'aif' ? (
                               <div className="w-full h-full flex items-center justify-center bg-blue-50">
                                 <Gem size={18} style={{ color: item.color || '#2076C7' }} />
@@ -854,13 +866,25 @@ export default function Wishlist() {
                     <div className="flex items-center gap-4 flex-1 min-w-0">
                       <div className="w-14 h-14 rounded-2xl border border-slate-100 bg-white flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                         {item.logo_url ? (
-                          <Image
-                            src={item.logo_url}
-                            width={56}
-                            height={56}
-                            className="w-full h-full object-contain p-1.5"
-                            alt={item.product_name}
-                          />
+                          item.isRealEstate ? (
+                            <img
+                              src={item.logo_url}
+                              alt={item.product_name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2076C7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V12L12 2l6 10v10H6z"/><path d="M6 12H2l10-10 10 10h-4"/><path d="M9 22v-4h6v4"/></svg></div>`;
+                              }}
+                            />
+                          ) : (
+                            <Image
+                              src={item.logo_url}
+                              width={56}
+                              height={56}
+                              className="w-full h-full object-contain p-1.5"
+                              alt={item.product_name}
+                            />
+                          )
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2076C7]/10 to-[#1CADA3]/10">
                             {item.isFD ? <Wallet className="text-[#2076C7] w-7 h-7" strokeWidth={1.5} /> : item.product_type === 'pms' || item.product_type === 'aif' ? <Gem className="w-7 h-7" style={{ color: item.color || '#2076C7' }} strokeWidth={1.5} /> : <Building2 className="text-[#2076C7] w-7 h-7" strokeWidth={1.5} />}
