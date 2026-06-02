@@ -376,12 +376,20 @@ export const AdminService = {
    * Upload credit cards (CSV)
    */
   uploadCreditCards: async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
+    const base64Data = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
 
     const response = await api.post(
       "/api/unlisted/admin/credit-card/upload",
-      formData
+      {
+        fileName: file.name,
+        base64Data: base64Data
+      },
+      { headers: { "Content-Type": "application/json" } }
     );
 
     return response.data;
@@ -401,8 +409,11 @@ export const AdminService = {
     const response = await api.delete(`/api/unlisted/admin/credit-card/${id}`);
     return response.data;
   },
+
+
   /**
    * Get all PMS Funds (Admin)
+
    * GET → /api/unlisted/admin/pms/funds
    */
   getPMSFunds: async () => {

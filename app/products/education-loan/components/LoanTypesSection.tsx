@@ -8,64 +8,18 @@ import { useModal } from '../../../context/ModalContext';
 import EMICalculator from './EMICalculator';
 import MarketComparison from './MarketComparision';
 import EducationLoanForm from '@/app/dashboard/leadmanagement/forms/educationloanform';
+import EducationLoanService from '@/app/services/customer/educationLoanService';
+import { useEffect } from 'react';
 
-const loanTypes = [
-    {
-        id: 'edu-domestic',
-        icon: IconSchool,
-        title: 'Domestic Education Loan',
-        subtitle: 'Study in India',
-        amount: 'Up to ₹75 Lakh',
-        rate: '9.0% – 14% p.a.',
-        tenure: 'Up to 15 years',
-        color: 'from-blue-500 to-blue-700',
-        bg: 'bg-blue-50/30',
-        border: 'border-blue-200',
-        features: [
-            'All UG, PG, diploma & professional courses',
-            'IITs, IIMs, NLUs, medical colleges covered',
-            'No collateral up to ₹7.5 lakh',
-            'Moratorium period: course + 6-12 months',
-        ],
-    },
-    {
-        id: 'edu-overseas',
-        icon: IconWorld,
-        title: 'Overseas Education Loan',
-        subtitle: 'Study Abroad',
-        amount: 'Up to ₹1.5 Crore+',
-        rate: '8.5% – 18% p.a.',
-        tenure: 'Up to 15 years',
-        color: 'from-[#2076C7] to-[#1CADA3]',
-        bg: 'bg-gradient-to-br from-blue-50/30 to-teal-50/30',
-        border: 'border-blue-100',
-        featured: true,
-        features: [
-            'USA, UK, Canada, Australia & 35+ countries',
-            'Secured (8.5%+) & Unsecured (10%+) options',
-            'Pre-visa disbursal & tax benefits (Sec 80E)',
-            'Covers 100% tuition, living & travel costs',
-        ],
-    },
-    {
-        id: 'edu-skill',
-        icon: IconBuildingBank,
-        title: 'Skill Development Loan',
-        subtitle: 'Vocational & Short-term',
-        amount: 'Up to ₹1.5 Lakh',
-        rate: '11% – 15% p.a.',
-        tenure: 'Up to 7 years',
-        color: 'from-teal-500 to-teal-700',
-        bg: 'bg-teal-50/30',
-        border: 'border-teal-200',
-        features: [
-            'ITI, polytechnic & short-term courses',
-            'Government certified skill programs',
-            'Quick 3-day approval process',
-            'Minimal documentation required',
-        ],
-    },
-];
+const getCardStyle = (index: number) => {
+    const styles = [
+        { icon: IconSchool, color: 'from-blue-500 to-blue-700', bg: 'bg-blue-50/30', border: 'border-blue-200' },
+        { icon: IconWorld, color: 'from-[#2076C7] to-[#1CADA3]', bg: 'bg-gradient-to-br from-blue-50/30 to-teal-50/30', border: 'border-blue-100' },
+        { icon: IconBuildingBank, color: 'from-teal-500 to-teal-700', bg: 'bg-teal-50/30', border: 'border-teal-200' },
+        { icon: IconAward, color: 'from-indigo-500 to-indigo-700', bg: 'bg-indigo-50/30', border: 'border-indigo-200' }
+    ];
+    return styles[index % styles.length];
+};
 
 const comparison = [
     { feature: 'Loan Amount', domestic: '₹5 Lakh onwards', abroad: '₹4 Lakh onwards', icon: IconCurrencyRupee },
@@ -82,6 +36,24 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
     const { openLogin, openApplyNow } = useModal();
     const [activeTab, setActiveTab] = useState<'plans' | 'details' | 'calculator'>('plans');
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [apiLoans, setApiLoans] = useState<any[]>([]);
+    const [loadingLoans, setLoadingLoans] = useState(true);
+
+    useEffect(() => {
+        const fetchLoans = async () => {
+            try {
+                const res = await EducationLoanService.getAllEducationLoans();
+                if (res && res.data) {
+                    setApiLoans(res.data.filter((l: any) => l.status === 'ACTIVE'));
+                }
+            } catch (err) {
+                console.error('Failed to fetch education loans', err);
+            } finally {
+                setLoadingLoans(false);
+            }
+        };
+        fetchLoans();
+    }, []);
 
     return (
         <section className={isDashboard ? '' : "py-2 bg-white relative overflow-hidden"}>
@@ -187,77 +159,90 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                         >
                             {/* Loan Type Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                                {loanTypes.map((loan, i) => {
-                                    const Icon = loan.icon;
-                                    return (
-                                        <motion.div
-                                            key={loan.title}
-                                            initial={{ opacity: 0, y: 30 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ duration: 0.5, delay: i * 0.1 }}
-                                            className={`relative rounded-[2rem] border ${loan.border} ${loan.bg} p-6 md:p-8 flex flex-col h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group ${loan.featured ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''}`}
-                                        >
-                                            {loan.featured && (
-                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full shadow">
-                                                    Most Popular
+                                {loadingLoans ? (
+                                    <div className="col-span-1 md:col-span-3 text-center py-20 text-gray-500 font-bold uppercase tracking-widest text-sm animate-pulse">
+                                        Loading Education Loans...
+                                    </div>
+                                ) : apiLoans.length === 0 ? (
+                                    <div className="col-span-1 md:col-span-3 text-center py-20 text-gray-400 font-bold text-sm">
+                                        No education loans available at the moment.
+                                    </div>
+                                ) : (
+                                    apiLoans.map((loan, i) => {
+                                        const style = getCardStyle(i);
+                                        const Icon = style.icon;
+                                        const featuresList = loan.features ? loan.features.split('|') : [];
+                                        
+                                        return (
+                                            <motion.div
+                                                key={loan.id || i}
+                                                initial={{ opacity: 0, y: 30 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ duration: 0.5, delay: i * 0.1 }}
+                                                className={`relative rounded-[2rem] border ${style.border} ${style.bg} p-6 md:p-8 flex flex-col h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group ${loan.is_popular ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''}`}
+                                            >
+                                                {loan.is_popular && (
+                                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full shadow">
+                                                        Most Popular
+                                                    </div>
+                                                )}
+                                                <div className="flex flex-col items-center text-center">
+                                                    <div className={`w-14 h-14 bg-gradient-to-br ${style.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
+                                                        <Icon size={28} strokeWidth={1.8} className="text-white" />
+                                                    </div>
+                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{loan.badge || 'EDUCATION LOAN'}</div>
+                                                    <h3 className="text-xl font-extrabold text-gray-700 mb-4 tracking-tight">{loan.loan_type}</h3>
                                                 </div>
-                                            )}
-                                            <div className="flex flex-col items-center text-center">
-                                                <div className={`w-14 h-14 bg-gradient-to-br ${loan.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
-                                                    <Icon size={28} strokeWidth={1.8} className="text-white" />
-                                                </div>
-                                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{loan.subtitle}</div>
-                                                <h3 className="text-xl font-extrabold text-gray-700 mb-4 tracking-tight">{loan.title}</h3>
-                                            </div>
 
-                                            <div className="space-y-2 mb-6">
-                                                <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                                    <span className="text-sm font-bold text-slate-400 uppercase">Max Amount</span>
-                                                    <span className="text-base font-extrabold text-[#2076C7]">{loan.amount}</span>
+                                                <div className="space-y-2 mb-6">
+                                                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                                                        <span className="text-sm font-bold text-slate-400 uppercase">Max Amount</span>
+                                                        <span className="text-base font-extrabold text-[#2076C7]">{loan.max_amount || 'N/A'}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                                                        <span className="text-sm font-bold text-slate-400 uppercase">Interest Rate</span>
+                                                        <span className="text-base font-extrabold text-slate-700">{loan.interest_rate || 'N/A'}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center py-2">
+                                                        <span className="text-sm font-bold text-slate-400 uppercase">Tenure</span>
+                                                        <span className="text-base font-extrabold text-slate-700">{loan.tenure || 'N/A'}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                                    <span className="text-sm font-bold text-slate-400 uppercase">Interest Rate</span>
-                                                    <span className="text-base font-extrabold text-slate-700">{loan.rate}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-2">
-                                                    <span className="text-sm font-bold text-slate-400 uppercase">Tenure</span>
-                                                    <span className="text-base font-extrabold text-slate-700">{loan.tenure}</span>
-                                                </div>
-                                            </div>
 
-                                            <ul className="space-y-2 mb-8 flex-1">
-                                                {loan.features.map((f) => (
-                                                    <li key={f} className="flex items-start gap-2 text-sm font-bold text-slate-600">
-                                                        <IconCheck size={14} className="text-teal-500 shrink-0 mt-0.5" strokeWidth={3} />
-                                                        {f}
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                                <ul className="space-y-2 mb-8 flex-1">
+                                                    {featuresList.map((f: string, idx: number) => (
+                                                        <li key={idx} className="flex items-start gap-2 text-sm font-bold text-slate-600">
+                                                            <IconCheck size={14} className="text-teal-500 shrink-0 mt-0.5" strokeWidth={3} />
+                                                            {f.trim()}
+                                                        </li>
+                                                    ))}
+                                                </ul>
 
-                                            {/* Apply Now Button */}
-                                            <div className="mt-auto flex justify-center">
-                                                <button
-                                                    onClick={() => {
-                                                        if (isDashboard) {
-                                                            setIsFormOpen(true);
-                                                        } else {
-                                                            openApplyNow(loan.title, isDashboard);
-                                                        }
-                                                    }}
-                                                    className="relative inline-flex items-center gap-2 px-10 py-3.5 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group whitespace-nowrap"
-                                                    style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
-                                                >
-                                                    <span className="relative z-6 flex items-center justify-center gap-1">
-                                                        Apply Now
-                                                        <IconArrowRight size={14} className="group-hover:translate-x-1 transition-transform" strokeWidth={3} />
-                                                    </span>
-                                                    <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
-                                                </button>
-                                            </div>
-                                        </motion.div>
-                                    );
-                                })}
+                                                {/* Apply Now Button */}
+                                                <div className="mt-auto flex justify-center">
+                                                    <button
+                                                        onClick={() => {
+                                                            if (isDashboard) {
+                                                                setIsFormOpen(true);
+                                                            } else {
+                                                                openApplyNow(loan.loan_type, isDashboard);
+                                                            }
+                                                        }}
+                                                        className="relative inline-flex items-center gap-2 px-10 py-3.5 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group whitespace-nowrap"
+                                                        style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
+                                                    >
+                                                        <span className="relative z-6 flex items-center justify-center gap-1">
+                                                            Apply Now
+                                                            <IconArrowRight size={14} className="group-hover:translate-x-1 transition-transform" strokeWidth={3} />
+                                                        </span>
+                                                        <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" style={{ background: 'linear-gradient(to right, #189B8D, #1A68B0)' }}></div>
+                                                    </button>
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    })
+                                )}
                             </div>
 
                             {/* --- NEW PUBLIC MARKET COMPARISON --- */}

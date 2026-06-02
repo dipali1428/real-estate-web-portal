@@ -373,7 +373,7 @@ const RealEstateImport: React.FC = () => {
             <input
               type="text"
               placeholder="Search properties by name..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:border-teal-400 focus:ring-1 focus:ring-teal-400 outline-none text-sm transition-all"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:border-teal-400 text-gray-900 bg-white focus:ring-1 focus:ring-teal-400 outline-none text-sm transition-all"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);

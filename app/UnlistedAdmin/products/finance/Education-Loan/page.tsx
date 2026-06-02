@@ -3,147 +3,150 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminService } from '@/app/services/unlistedadminservices';
+import { EducationLoanAdminService } from '@/app/services/admin/educationloanadminservice';
+import EducationLoanService from '@/app/services/customer/educationLoanService';
 import {
   Upload,
   FileSpreadsheet,
   X,
   Zap,
   Loader2,
-  CreditCard,
+  GraduationCap,
   RefreshCw,
   CheckCircle,
   AlertCircle,
   Database,
   Search,
-  Landmark,
   Pencil,
   Trash2,
-  XCircle
+  XCircle,
+  Banknote
 } from "lucide-react";
 
-const CreditCardImport: React.FC = () => {
-  const [propertyFile, setPropertyFile] = useState<File | null>(null);
+const EducationLoanImport: React.FC = () => {
+  const [loanFile, setLoanFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [isClient, setIsClient] = useState(false);
-  const propertyInputRef = useRef<HTMLInputElement>(null);
+  const loanInputRef = useRef<HTMLInputElement>(null);
 
   // Management States
-  const [properties, setProperties] = useState<any[]>([]);
-  const [propertiesLoading, setPropertiesLoading] = useState(true);
+  const [loans, setLoans] = useState<any[]>([]);
+  const [loansLoading, setLoansLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
   // Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  const [selectedLoan, setSelectedLoan] = useState<any>(null);
   const [submitLoading, setSubmitLoading] = useState(false);
 
   // Delete Modal States
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [propertyToDelete, setPropertyToDelete] = useState<any>(null);
+  const [loanToDelete, setLoanToDelete] = useState<any>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    fetchProperties();
+    fetchLoans();
   }, []);
 
- const fetchProperties = async () => {
-  setPropertiesLoading(true);
+  const fetchLoans = async () => {
+    setLoansLoading(true);
 
-  try {
-    const response = await AdminService.getCreditCards();
+    try {
+      const response = await EducationLoanService.getAllEducationLoans();
 
-    if (response && Array.isArray(response.data)) {
-      setProperties(response.data);
+      if (response && Array.isArray(response.data)) {
+        setLoans(response.data);
+
+        setToast({
+          message: "Education loans loaded successfully",
+          type: "success"
+        });
+      } else {
+        setLoans([]);
+
+        setToast({
+          message: "No education loans found",
+          type: "info"
+        });
+      }
+
+    } catch (error) {
+      setLoans([]);
 
       setToast({
-        message: "Credit cards loaded successfully",
-        type: "success"
+        message: "Error fetching education loans",
+        type: "error"
       });
-    } else {
-      setProperties([]);
 
-      setToast({
-        message: "No credit cards found",
-        type: "info"
-      });
+    } finally {
+      setLoansLoading(false);
     }
+  };
 
-  } catch (error) {
-    setProperties([]);
-
-    setToast({
-      message: "Error fetching credit cards",
-      type: "error"
-    });
-
-  } finally {
-    setPropertiesLoading(false);
-  }
-};
-
-  const handleImportProperties = async () => {
-    if (!propertyFile) {
-      setToast({ message: 'Please select a file first', type: 'error' });
+  const handleImportLoans = async () => {
+    if (!loanFile) {
+      setToast({ message: 'Please select an education loan file first', type: 'error' });
       return;
     }
 
     setIsImporting(true);
-    setToast({ message: 'Importing credit cards...', type: 'info' });
+    setToast({ message: 'Importing education loans...', type: 'info' });
 
     try {
-      const response = await AdminService.uploadCreditCards(propertyFile);
+      const response = await EducationLoanAdminService.uploadEducationLoans(loanFile);
 
-      const successMsg = `✓ Credit cards imported successfully (${response?.inserted || 0} records)`;
+      const successMsg = `✓ Education Loans imported successfully (${response.inserted || 0} records)`;
       setToast({ message: successMsg, type: 'success' });
-      setPropertyFile(null);
+      setLoanFile(null);
 
     } catch (err: any) {
-      const errorMsg = `✗ Import failed: ${err.response?.data?.message || err.message}`;
+      const errorMsg = `✗ Education Loan import failed: ${err.response?.data?.message || err.message}`;
       setToast({ message: errorMsg, type: 'error' });
     } finally {
       setIsImporting(false);
       setTimeout(() => setToast(null), 5000);
-      fetchProperties();
+      fetchLoans(); // Refresh the list after import
     }
   };
 
   // Filter and Pagination Logic
-  const filteredProperties = properties.filter(p => 
-    p.card_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.bank_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredLoans = loans.filter(l => 
+    l.loan_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    l.max_amount?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    l.interest_rate?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const paginatedProperties = filteredProperties.slice(
+  const paginatedLoans = filteredLoans.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredLoans.length / itemsPerPage);
 
-  const openEditModal = (property: any) => {
-    setSelectedProperty(property);
+  const openEditModal = (loan: any) => {
+    setSelectedLoan(loan);
     setIsEditModalOpen(true);
   };
 
-  const openDeleteModal = (property: any) => {
-    setPropertyToDelete(property);
+  const openDeleteModal = (loan: any) => {
+    setLoanToDelete(loan);
     setDeleteModalOpen(true);
   };
 
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProperty?.id) return;
+    if (!selectedLoan?.id) return;
     
     setSubmitLoading(true);
     try {
-      await AdminService.updateCreditCard(selectedProperty.id, selectedProperty);
-      setToast({ message: "Credit card updated successfully!", type: 'success' });
+      await EducationLoanAdminService.updateEducationLoan(selectedLoan.id, selectedLoan);
+      setToast({ message: "Education Loan updated successfully!", type: 'success' });
       setIsEditModalOpen(false);
-      fetchProperties();
+      fetchLoans();
     } catch (error: any) {
       setToast({ message: `Update Failed: ${error.response?.data?.message || "Check all fields"}`, type: 'error' });
     } finally {
@@ -153,15 +156,15 @@ const CreditCardImport: React.FC = () => {
   };
 
   const handleDelete = async () => {
-    if (!propertyToDelete?.id) return;
+    if (!loanToDelete?.id) return;
     
     setDeleteLoading(true);
     try {
-      await AdminService.deleteCreditCard(propertyToDelete.id);
-      setToast({ message: "Credit card deleted successfully!", type: 'success' });
+      await EducationLoanAdminService.deleteEducationLoan(loanToDelete.id);
+      setToast({ message: "Education Loan deleted successfully!", type: 'success' });
       setDeleteModalOpen(false);
-      setPropertyToDelete(null);
-      fetchProperties();
+      setLoanToDelete(null);
+      fetchLoans();
     } catch (error: any) {
       setToast({ message: `Delete failed: ${error.response?.data?.message || error.message}`, type: 'error' });
     } finally {
@@ -193,13 +196,13 @@ const CreditCardImport: React.FC = () => {
       >
         <div className="flex items-center gap-3">
           <div className="bg-white/20 p-2 rounded-lg">
-             <Database className="w-6 h-6" />
+             <GraduationCap className="w-6 h-6" />
           </div>
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
-              Credit Card Data Portal
+              Education Loans Portal
             </h2>
-            <p className="text-sm opacity-90">Import & export credit card data</p>
+            <p className="text-sm opacity-90">Import & manage education loan data</p>
           </div>
         </div>
       </motion.div>
@@ -236,78 +239,75 @@ const CreditCardImport: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* SECTION - IMPORT CREDIT CARDS */}
+      {/* SECTION - IMPORT EDUCATION LOANS */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
       >
-        <div className="bg-gradient-to-r from-teal-50 to-emerald-50 px-6 py-4 border-b border-teal-100 flex justify-between items-center">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100 flex justify-between items-center">
           <h3 className="font-bold text-gray-800 flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-teal-600" />
-            Import Credit Card Data
+            <GraduationCap className="w-5 h-5 text-blue-600" />
+            Import Education Loans Data
           </h3>
-          <div className="flex items-center gap-2 bg-white/50 px-3 py-1 rounded-full border border-teal-200">
-            <span className="text-[10px] font-black uppercase text-teal-700">Financial Product</span>
-          </div>
         </div>
 
         <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-1 space-y-4">
-            <div className="p-4 bg-teal-50/50 rounded-2xl border border-teal-100">
-              <h4 className="text-sm font-bold text-teal-800 mb-2 flex items-center gap-2">
+            <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100">
+              <h4 className="text-sm font-bold text-blue-800 mb-2 flex items-center gap-2">
                 <FileSpreadsheet className="w-4 h-4" /> Formatting Guide
               </h4>
               <ul className="space-y-2">
-                {['Card Name', 'Bank Name', 'Card Type', 'Annual Fee', 'Status (ACTIVE/INACTIVE)', 'Image URL'].map((col, i) => (
+                {['Loan Type', 'Max Amount', 'Interest Rate', 'Tenure', 'Status (ACTIVE/INACTIVE)'].map((col, i) => (
                   <li key={i} className="text-xs text-gray-600 flex items-center gap-2">
-                    <div className="w-1 h-1 bg-teal-400 rounded-full" /> {col}
+                    <div className="w-1 h-1 bg-blue-400 rounded-full" /> {col}
                   </li>
                 ))}
               </ul>
             </div>
             <div className="flex items-start gap-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
-              <Zap className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-              <p className="text-xs text-teal-700 leading-relaxed">
-                Cards will be automatically matched by Card Name & Bank. If a card exists, it will be updated.
+              <Zap className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-700 leading-relaxed">
+                Upload your CSV or Excel file containing the education loan plans. Existing plans will not be automatically updated; please manage them below.
               </p>
             </div>
           </div>
 
           <div className="md:col-span-2 space-y-6">
-            {!propertyFile ? (
+            {!loanFile ? (
               <div
-                onClick={() => propertyInputRef.current?.click()}
-                className="border-2 border-dashed border-teal-200 rounded-2xl p-10 text-center cursor-pointer hover:border-teal-400 transition-all group bg-teal-50/20"
+                onClick={() => loanInputRef.current?.click()}
+                className="border-2 border-dashed border-blue-200 rounded-2xl p-10 text-center cursor-pointer hover:border-blue-400 transition-all group bg-blue-50/20"
               >
-                <div className="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-teal-600 group-hover:scale-110 transition-transform">
+                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:scale-110 transition-transform">
                   <Upload className="w-8 h-8" />
                 </div>
-                <h4 className="text-lg font-bold text-gray-700 mb-1">Select Credit Card Excel/CSV</h4>
+                <h4 className="text-lg font-bold text-gray-700 mb-1">Select Education Loan Excel</h4>
                 <p className="text-xs text-slate-500 uppercase font-black tracking-widest">Supports .xlsx, .xls, .csv</p>
                 <input
                   type="file"
-                  ref={propertyInputRef}
-                  onChange={(e) => setPropertyFile(e.target.files?.[0] || null)}
+                  ref={loanInputRef}
+                  onChange={(e) => setLoanFile(e.target.files?.[0] || null)}
                   accept=".csv, .xlsx, .xls"
                   hidden
                 />
               </div>
             ) : (
-              <div className="p-6 bg-teal-50 border border-teal-200 rounded-2xl flex items-center justify-between shadow-sm">
+              <div className="p-6 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-teal-600 shadow-sm">
-                    <CreditCard className="w-6 h-6" />
+                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm">
+                    <GraduationCap className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="font-bold text-gray-800 text-base">{propertyFile.name}</p>
-                    <p className="text-xs text-teal-600 font-medium">Ready to sync data</p>
+                    <p className="font-bold text-gray-800 text-base">{loanFile.name}</p>
+                    <p className="text-xs text-blue-600 font-medium">Ready to sync loans</p>
                   </div>
                 </div>
                 <button
-                  onClick={() => setPropertyFile(null)}
-                  className="p-2 hover:bg-teal-200 rounded-xl transition-colors text-teal-700"
+                  onClick={() => setLoanFile(null)}
+                  className="p-2 hover:bg-blue-200 rounded-xl transition-colors text-blue-700"
                   disabled={isImporting}
                 >
                   <X className="w-5 h-5" />
@@ -316,19 +316,19 @@ const CreditCardImport: React.FC = () => {
             )}
 
             <button
-              onClick={handleImportProperties}
-              disabled={!propertyFile || isImporting}
-              className="w-full py-4 bg-teal-600 text-white font-black uppercase text-xs tracking-widest rounded-xl disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-teal-100 hover:bg-teal-700 transition-all"
+              onClick={handleImportLoans}
+              disabled={!loanFile || isImporting}
+              className="w-full py-4 bg-blue-600 text-white font-black uppercase text-xs tracking-widest rounded-xl disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all"
             >
               {isImporting ? (
                 <>
                   <Loader2 className="animate-spin w-4 h-4" />
-                  Processing Data...
+                  Processing Loans...
                 </>
               ) : (
                 <>
                   <RefreshCw className="w-4 h-4" />
-                  Upload & Sync Credit Cards
+                  Upload & Sync Education Loans
                 </>
               )}
             </button>
@@ -336,37 +336,39 @@ const CreditCardImport: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* SECTION - MANAGE CREDIT CARDS */}
+
+
+      {/* SECTION - MANAGE LOANS */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mt-8"
       >
-        <div className="bg-gradient-to-r from-teal-50 to-emerald-50 px-6 py-4 border-b border-teal-100 flex justify-between items-center">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100 flex justify-between items-center">
           <h3 className="font-bold text-black flex items-center gap-2">
-            <Database className="w-5 h-5 text-teal-600" />
-            Credit Card Management
+            <Database className="w-5 h-5 text-blue-600" />
+            Education Loans Management
           </h3>
           <button 
-            onClick={fetchProperties} 
-            className="p-2 bg-white border border-teal-200 hover:bg-teal-50 rounded-xl transition-all shadow-sm"
+            onClick={fetchLoans} 
+            className="p-2 bg-white border border-blue-200 hover:bg-blue-50 rounded-xl transition-all shadow-sm"
             title="Refresh Data"
           >
-            <RefreshCw className={`w-4 h-4 text-teal-600 ${propertiesLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 text-blue-600 ${loansLoading ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
         <div className="p-4 border-b border-gray-100 bg-gray-50/30 flex justify-between items-center flex-wrap gap-4">
           <span className="text-xs font-black uppercase tracking-widest text-[#2076C7]">
-            Total: {filteredProperties.length} Cards
+            Total: {filteredLoans.length} Loans
           </span>
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search by card or bank name..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:border-teal-400 focus:ring-1 focus:ring-teal-400 outline-none text-gray-900 bg-white text-sm transition-all placeholder:text-gray-400"
+              placeholder="Search by loan type..."
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:border-blue-400 text-gray-900 bg-white focus:ring-1 focus:ring-blue-400 outline-none text-sm transition-all"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -380,52 +382,53 @@ const CreditCardImport: React.FC = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-gray-50 text-gray-400 text-[11px] font-black uppercase tracking-widest border-b border-gray-100">
-                <th className="px-4 py-3">Card Name</th>
-                <th className="px-4 py-3">Bank</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Annual Fee</th>
-                <th className="px-4 py-3">Image URL</th>
+                <th className="px-4 py-3">Loan Type</th>
+                <th className="px-4 py-3">Max Amount</th>
+                <th className="px-4 py-3">Interest Rate</th>
+                <th className="px-4 py-3">Tenure</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3 text-center">Actions</th>
                </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {propertiesLoading ? (
-                <tr><td colSpan={7} className="py-12 text-center animate-pulse text-gray-400 font-bold uppercase text-xs">Loading...</td></tr>
-              ) : paginatedProperties.length > 0 ? (
-                paginatedProperties.map((prop) => (
-                  <tr key={prop.id} className="hover:bg-gray-50/50 transition-colors">
+              {loansLoading ? (
+                <tr><td colSpan={6} className="py-12 text-center animate-pulse text-gray-400 font-bold uppercase text-xs">Loading...</td></tr>
+              ) : paginatedLoans.length > 0 ? (
+                paginatedLoans.map((loan) => (
+                  <tr key={loan.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-4 py-3">
-                      <div className="font-bold text-gray-800 text-sm">{prop.card_name}</div>
+                      <div className="font-bold text-gray-800 text-sm">{loan.loan_type}</div>
+                      {loan.badge && (
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded">
+                          {loan.badge}
+                        </span>
+                      )}
                      </td>
                     <td className="px-4 py-3 text-sm font-medium text-gray-700">
-                      <div className="flex items-center gap-1"><Landmark className="w-4 h-4 text-teal-600"/>{prop.bank_name || '—'}</div>
+                      {loan.max_amount || '—'}
                      </td>
-                    <td className="px-4 py-3 font-medium text-gray-700 text-sm">
-                      {prop.card_type || '—'}
+                    <td className="px-4 py-3 font-bold text-gray-800 text-sm">
+                      {loan.interest_rate || '—'}
                      </td>
-                    <td className="px-4 py-3 font-bold text-teal-600 text-sm">
-                      {prop.annual_fee ? `₹ ${parseFloat(prop.annual_fee).toLocaleString('en-IN')}` : 'Free'}
-                     </td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-700 max-w-[150px] truncate">
-                      {prop.image_url ? <a href={prop.image_url} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Link</a> : '—'}
+                    <td className="px-4 py-3 text-gray-600 text-sm">
+                      {loan.tenure || '—'}
                      </td>
                     <td className="px-4 py-3">
-                      {getStatusBadge(prop.status)}
+                      {getStatusBadge(loan.status)}
                      </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center gap-1">
                         <button 
-                          onClick={() => openEditModal(prop)}
+                          onClick={() => openEditModal(loan)}
                           className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit Card"
+                          title="Edit Loan"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button 
-                          onClick={() => openDeleteModal(prop)}
+                          onClick={() => openDeleteModal(loan)}
                           className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
-                          title="Delete Card"
+                          title="Delete Loan"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -435,9 +438,9 @@ const CreditCardImport: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-gray-400">
-                    <CreditCard className="w-10 h-10 mx-auto mb-2 opacity-20" />
-                    <p className="text-sm font-medium">No credit cards found</p>
+                  <td colSpan={6} className="py-12 text-center text-gray-400">
+                    <GraduationCap className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                    <p className="text-sm font-medium">No education loans found</p>
                   </td>
                 </tr>
               )}
@@ -481,8 +484,8 @@ const CreditCardImport: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
             >
-              <div className="bg-gradient-to-r from-teal-50 to-emerald-50 px-5 py-4 border-b border-teal-100 flex justify-between items-center sticky top-0 z-10">
-                <h3 className="font-bold text-black">Update Credit Card</h3>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-5 py-4 border-b border-blue-100 flex justify-between items-center sticky top-0 z-10">
+                <h3 className="font-bold text-black">Update Education Loan</h3>
                 <button onClick={() => setIsEditModalOpen(false)} className="p-1 hover:bg-white/50 rounded-lg">
                   <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
                 </button>
@@ -491,59 +494,82 @@ const CreditCardImport: React.FC = () => {
               <form onSubmit={handleUpdateSubmit} className="p-5 space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-black">
                   <div className="col-span-2 md:col-span-1 ">
-                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Card Name *</label>
+                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Loan Type *</label>
                     <input 
                       required
-                      className="w-full px-3 py-2  rounded-lg border border-gray-200 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 text-sm"
-                      value={selectedProperty?.card_name || ''}
-                      onChange={e => setSelectedProperty({...selectedProperty, card_name: e.target.value})}
+                      className="w-full px-3 py-2  rounded-lg border border-gray-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm"
+                      value={selectedLoan?.loan_type || ''}
+                      onChange={e => setSelectedLoan({...selectedLoan, loan_type: e.target.value})}
+                      placeholder="e.g. Overseas Education Loan"
                     />
                   </div>
                   <div className="col-span-2 md:col-span-1">
-                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Bank Name</label>
+                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Badge</label>
                     <input 
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 text-sm"
-                      value={selectedProperty?.bank_name || ''}
-                      onChange={e => setSelectedProperty({...selectedProperty, bank_name: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="col-span-2 md:col-span-1">
-                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Card Type</label>
-                    <input 
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 text-sm"
-                      value={selectedProperty?.card_type || ''}
-                      onChange={e => setSelectedProperty({...selectedProperty, card_type: e.target.value})}
-                      placeholder="e.g. Cashback, Travel"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm"
+                      value={selectedLoan?.badge || ''}
+                      onChange={e => setSelectedLoan({...selectedLoan, badge: e.target.value})}
+                      placeholder="e.g. STUDY ABROAD"
                     />
                   </div>
                   
                   <div className="col-span-2 md:col-span-1">
-                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Annual Fee (₹)</label>
+                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Max Amount</label>
                     <input 
-                      type="number"
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 text-sm"
-                      value={selectedProperty?.annual_fee || ''}
-                      onChange={e => setSelectedProperty({...selectedProperty, annual_fee: e.target.value})}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm"
+                      value={selectedLoan?.max_amount || ''}
+                      onChange={e => setSelectedLoan({...selectedLoan, max_amount: e.target.value})}
+                      placeholder="e.g. Up to ₹1.5 Crore+"
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Interest Rate</label>
+                    <input 
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm"
+                      value={selectedLoan?.interest_rate || ''}
+                      onChange={e => setSelectedLoan({...selectedLoan, interest_rate: e.target.value})}
+                      placeholder="e.g. 8.5% - 18% p.a."
                     />
                   </div>
 
                   <div className="col-span-2 md:col-span-1">
-                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Image URL</label>
+                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Tenure</label>
                     <input 
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 text-sm"
-                      value={selectedProperty?.image_url || ''}
-                      onChange={e => setSelectedProperty({...selectedProperty, image_url: e.target.value})}
-                      placeholder="e.g. https://aws-bucket..."
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm"
+                      value={selectedLoan?.tenure || ''}
+                      onChange={e => setSelectedLoan({...selectedLoan, tenure: e.target.value})}
+                      placeholder="e.g. Up to 15 years"
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Is Popular?</label>
+                    <select
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm bg-white"
+                      value={selectedLoan?.is_popular ? 'true' : 'false'}
+                      onChange={e => setSelectedLoan({...selectedLoan, is_popular: e.target.value === 'true'})}
+                    >
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Features (Pipe | separated)</label>
+                    <textarea 
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm"
+                      value={selectedLoan?.features || ''}
+                      onChange={e => setSelectedLoan({...selectedLoan, features: e.target.value})}
+                      placeholder="e.g. USA, UK, Canada|Secured & Unsecured options"
+                      rows={3}
                     />
                   </div>
 
                   <div className="col-span-2 md:col-span-1">
                     <label className="text-[10px] font-black uppercase text-gray-600 mb-1 block">Status</label>
                     <select
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 text-sm bg-white"
-                      value={selectedProperty?.status || 'ACTIVE'}
-                      onChange={e => setSelectedProperty({...selectedProperty, status: e.target.value})}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm bg-white"
+                      value={selectedLoan?.status || 'ACTIVE'}
+                      onChange={e => setSelectedLoan({...selectedLoan, status: e.target.value})}
                     >
                       <option value="ACTIVE">ACTIVE</option>
                       <option value="INACTIVE">INACTIVE</option>
@@ -555,7 +581,7 @@ const CreditCardImport: React.FC = () => {
                   <button 
                     type="submit"
                     disabled={submitLoading}
-                    className="px-10 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-black uppercase tracking-[0.2em] text-xs disabled:opacity-50 flex items-center justify-center gap-2 transition-all shadow-md"
+                    className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase tracking-[0.2em] text-xs disabled:opacity-50 flex items-center justify-center gap-2 transition-all shadow-md"
                   >
                     {submitLoading ? <Loader2 className="animate-spin w-4 h-4" /> : null}
                     {submitLoading ? 'Updating...' : 'Save Changes'}
@@ -585,8 +611,8 @@ const CreditCardImport: React.FC = () => {
               </div>
 
               <div className="p-5">
-                <p className="text-gray-600 text-sm mb-2">Are you sure you want to delete this credit card?</p>
-                <p className="font-bold text-gray-800 text-base mb-4">{propertyToDelete?.card_name}</p>
+                <p className="text-gray-600 text-sm mb-2">Are you sure you want to delete this education loan?</p>
+                <p className="font-bold text-gray-800 text-base mb-4">{loanToDelete?.loan_type}</p>
                 
                 <div className="flex gap-3 mt-4">
                   <button
@@ -614,4 +640,4 @@ const CreditCardImport: React.FC = () => {
   );
 };
 
-export default CreditCardImport;
+export default EducationLoanImport;
