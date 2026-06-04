@@ -60,6 +60,20 @@ export interface CreditCardData {
     featured?: boolean;
 }
 
+const normalizeBankName = (name: string): string => {
+    if (!name) return '';
+    let normalized = name.toLowerCase().trim();
+    // Normalize IndusInd / Induslnd typo (lowercase L vs uppercase I)
+    normalized = normalized.replace(/induslnd/g, 'indusind');
+    // Normalize standard words/suffixes and remove spaces/special chars
+    normalized = normalized
+        .replace(/\bbank\b/g, '')
+        .replace(/\bcard\b/g, '')
+        .replace(/\bcards\b/g, '')
+        .replace(/[^a-z0-9]/g, '');
+    return normalized;
+};
+
 // -- TYPES --
 interface Transaction {
     id: number;
@@ -298,7 +312,9 @@ export default function CardTypesSection({
     const filteredCards = useMemo(() => {
         const filtered = fetchedCards.filter(card => {
             const matchesSearch = card.title.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesBank = selectedBanks.length === 0 || selectedBanks.includes(card.bank);
+            const matchesBank = selectedBanks.length === 0 || selectedBanks.some(selectedBank => 
+                normalizeBankName(selectedBank) === normalizeBankName(card.bank)
+            );
             const matchesCategory = selectedCategories.length === 0 || selectedCategories.some(catId => {
                 if (card.category === catId) return true;
 

@@ -314,6 +314,11 @@ export const sidebarLinks = {
                     label: "Education Loan",
                     href: "/UnlistedAdmin/products/finance/Education-Loan",
                     icon: <GraduationCap className="h-5 w-5 text-neutral-600" />
+                },
+                 {
+                    label: "Cattle Insurance",
+                    href: "/UnlistedAdmin/products/finance/Cattle-Insurance",
+                    icon: <Shield className="h-5 w-5 text-neutral-600" />
                 }
             ],
         },

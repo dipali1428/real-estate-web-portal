@@ -1,107 +1,24 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { IconCheck, IconX, IconArrowRight, IconShieldCheck, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { useModal } from '../../../context/ModalContext';
+import CattleInsuranceService from '@/app/services/customer/cattleInsuranceService';
 import CattleInsuranceForm from '@/app/dashboard/leadmanagement/forms/cattleinsuranceform';
 
-const coverageTypes = [
-    // ... items 1-9
-    {
-        animal: 'Cow (Indigenous/Crossbreed)',
-        maxCover: '₹50,000',
-        premium: '₹400 – ₹1,200/yr',
-        covered: ['Accidental Death', 'Disease', 'Natural Calamity', 'Surgical Operation', 'Lightning Strike'],
-        notCovered: ['Willful Injury', 'War/Nuclear Risk', 'Animals Over Age Limit'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-    },
-    {
-        animal: 'Buffalo',
-        maxCover: '₹60,000',
-        premium: '₹465 – ₹1,500/yr',
-        covered: ['Accidental Death', 'Disease', 'Natural Calamity', 'Surgical Operation', 'Transit Risk'],
-        notCovered: ['Willful Injury', 'Pre-existing Condition', 'Non-empaneled Vet Cases'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-    },
-    {
-        animal: 'Bullock',
-        maxCover: '₹60,000',
-        premium: '₹300 – ₹500/yr',
-        covered: ['Accidental Death', 'Permanent Disability', 'Natural Calamity', 'Snake Bite'],
-        notCovered: ['Theft', 'Intentional Neglect', 'Age Exceeding 12 Years'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-    },
-    {
-        animal: 'Heifer',
-        maxCover: '₹70,000',
-        premium: '₹300 – ₹600/yr',
-        covered: ['Accidental Death', 'Permanent Disability', 'Natural Calamity', 'Snake Bite'],
-        notCovered: ['Theft', 'Intentional Neglect', 'Age Exceeding 12 Years'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-
-    },
-    {
-        animal: 'Goat',
-        maxCover: '₹10,000',
-        premium: '₹25 – ₹100/yr',
-        covered: ['Accidental Death', 'Permanent Disability', 'Natural Calamity', 'Snake Bite'],
-        notCovered: ['Theft', 'Intentional Neglect', 'Age Exceeding 12 Years'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-
-    },
-    {
-        animal: 'Sheep',
-        maxCover: '₹8,000',
-        premium: '₹20– ₹800/yr',
-        covered: ['Accidental Death', 'Epidemic Disease', 'Natural Calamity', 'Predator Attack'],
-        notCovered: ['Theft (standalone)', 'Non-vaccination animals', 'Age below 3 months'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-    },
-    {
-        animal: 'Pig',
-        maxCover: '₹10,000',
-        premium: '₹50 – ₹200/yr',
-        covered: ['Accidental Death', 'Swine Fever', 'Natural Disasters', 'Surgical Operations'],
-        notCovered: ['Malnutrition', 'Failure to Vaccinate', 'Animals over 5 years'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-    },
-    {
-        animal: 'Horse',
-        maxCover: '₹50,000',
-        premium: '₹400 – ₹1,000/yr',
-        covered: ['Accidental Death', 'Disease/Sickness', 'Colic/Strangles', 'Natural Calamity'],
-        notCovered: ['Racing/Hunting Injuries', 'Surgical expenses only', 'Underweight animals'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-    },
-    {
-        animal: 'Mule',
-        maxCover: '₹30,000',
-        premium: '₹300 – ₹800/yr',
-        covered: ['Accidental Death', 'Disease/Sickness', 'Colic/Strangles', 'Natural Calamity'],
-        notCovered: ['Racing/Hunting Injuries', 'Surgical expenses only', 'Underweight animals'],
-        color: 'border-blue-100',
-        badge: 'bg-blue-100 text-blue-700',
-        bg: 'bg-blue-50/30'
-    },
-];
+type CattleInsurancePlan = {
+    animal: string;
+    maxCover: string;
+    premium: string;
+    covered: string[];
+    notCovered: string[];
+    color: string;
+    badge: string;
+    bg: string;
+    badgeText?: string;
+};
 type CoverageTypesProps = {
     isDashboard?: boolean;
 };
@@ -111,6 +28,35 @@ export default function CoverageTypes({
     const { openLogin } = useModal();
     const [showAll, setShowAll] = useState(false);
     const [showForm, setShowForm] = useState(false);
+    const [coverageTypes, setCoverageTypes] = useState<CattleInsurancePlan[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const response = await CattleInsuranceService.getAllCattleInsurance();
+                if (response && response.data) {
+                    const formatted = response.data.map((plan: any) => ({
+                        animal: plan.animal_type || 'Unknown Animal',
+                        maxCover: plan.max_cover || 'Not Specified',
+                        premium: plan.premium || 'Not Specified',
+                        covered: plan.covered ? plan.covered.split('|') : [],
+                        notCovered: plan.not_covered ? plan.not_covered.split('|') : [],
+                        badge: plan.badge ? 'bg-blue-100 text-blue-700' : 'bg-blue-100 text-blue-700',
+                        badgeText: plan.badge,
+                        color: 'border-blue-100',
+                        bg: 'bg-blue-50/30'
+                    }));
+                    setCoverageTypes(formatted);
+                }
+            } catch (error) {
+                console.error("Failed to fetch cattle insurance plans:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPlans();
+    }, []);
 
     const defaultCount = isDashboard ? 4 : 3;
     const visiblePlans = showAll ? coverageTypes : coverageTypes.slice(0, defaultCount);
@@ -134,7 +80,15 @@ export default function CoverageTypes({
                 </motion.div>
 
                 <div className={`grid grid-cols-1 sm:grid-cols-2 ${isDashboard ? 'xl:grid-cols-4 lg:grid-cols-3' : 'lg:grid-cols-3'} gap-5 md:gap-8`}>
-                    {visiblePlans.map((plan, i) => (
+                    {loading ? (
+                        <div className="col-span-full py-12 text-center text-slate-500 font-bold uppercase tracking-widest text-sm animate-pulse">
+                            Loading Cattle Insurance Plans...
+                        </div>
+                    ) : visiblePlans.length === 0 ? (
+                        <div className="col-span-full py-12 text-center text-slate-400 font-bold text-sm">
+                            No cattle insurance plans currently available.
+                        </div>
+                    ) : visiblePlans.map((plan, i) => (
                         <motion.div
                             key={plan.animal}
                             initial={{ opacity: 0, y: 30 }}
@@ -144,7 +98,12 @@ export default function CoverageTypes({
                             className={`bg-white rounded-[2rem] border-2 ${plan.color} shadow-[0_20px_50px_-12px_rgba(32,118,199,0.08)] overflow-hidden hover:shadow-[0_40px_80px_-16px_rgba(32,118,199,0.15)] hover:-translate-y-2 transition-all duration-500 flex flex-col relative group`}
                         >
                             <div className={`p-4 sm:p-6 bg-white border-b border-slate-100 relative overflow-hidden flex flex-col items-center text-center`}>
-                                <div className="bg-blue-50/50 py-3 px-6 rounded-2xl w-full flex flex-col items-center mb-4 relative z-10 font-sans border border-blue-100/30">
+                                <div className="bg-blue-50/50 py-4 px-6 rounded-2xl w-full flex flex-col items-center mb-4 relative z-10 font-sans border border-blue-100/30 mt-3">
+                                    {plan.badgeText && (
+                                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm border border-blue-200 whitespace-nowrap">
+                                            {plan.badgeText}
+                                        </span>
+                                    )}
                                     <span className="text-2xl font-black text-[#2076C7] tracking-tight">{plan.animal.split(' (')[0]}</span>
                                     {plan.animal.includes('(') && (
                                         <span className="text-[11px] font-bold text-blue-500 uppercase tracking-[0.2em]">({plan.animal.split('(')[1]}</span>

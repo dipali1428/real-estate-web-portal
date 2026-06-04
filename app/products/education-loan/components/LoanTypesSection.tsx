@@ -1,4 +1,3 @@
-
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +9,7 @@ import MarketComparison from './MarketComparision';
 import EducationLoanForm from '@/app/dashboard/leadmanagement/forms/educationloanform';
 import EducationLoanService from '@/app/services/customer/educationLoanService';
 import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 const getCardStyle = (index: number) => {
     const styles = [
@@ -38,6 +38,7 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [apiLoans, setApiLoans] = useState<any[]>([]);
     const [loadingLoans, setLoadingLoans] = useState(true);
+    const [showAllPlans, setShowAllPlans] = useState(false);
 
     useEffect(() => {
         const fetchLoans = async () => {
@@ -46,8 +47,8 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                 if (res && res.data) {
                     setApiLoans(res.data.filter((l: any) => l.status === 'ACTIVE'));
                 }
-            } catch (err) {
-                console.error('Failed to fetch education loans', err);
+            } catch (_err) {
+                toast.error("Failed to fetch education loans.");
             } finally {
                 setLoadingLoans(false);
             }
@@ -157,22 +158,27 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                             exit={{ opacity: 0, x: 20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            {/* Loan Type Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-8">
                                 {loadingLoans ? (
-                                    <div className="col-span-1 md:col-span-3 text-center py-20 text-gray-500 font-bold uppercase tracking-widest text-sm animate-pulse">
+                                    <div className="col-span-1 md:col-span-4 text-center py-20 text-gray-500 font-bold uppercase tracking-widest text-sm animate-pulse">
                                         Loading Education Loans...
                                     </div>
                                 ) : apiLoans.length === 0 ? (
-                                    <div className="col-span-1 md:col-span-3 text-center py-20 text-gray-400 font-bold text-sm">
+                                    <div className="col-span-1 md:col-span-4 text-center py-20 text-gray-400 font-bold text-sm">
                                         No education loans available at the moment.
                                     </div>
                                 ) : (
-                                    apiLoans.map((loan, i) => {
+                                    (showAllPlans ? apiLoans : apiLoans.slice(0, 4)).map((loan, i) => {
                                         const style = getCardStyle(i);
                                         const Icon = style.icon;
                                         const featuresList = loan.features ? loan.features.split('|') : [];
-                                        
+
+                                        const loanName = (loan.loan_type || '').toLowerCase();
+                                        const isPopular = loan.is_popular && (
+                                            loanName.includes('domestic education') || 
+                                            loanName.includes('skill development')
+                                        );
+
                                         return (
                                             <motion.div
                                                 key={loan.id || i}
@@ -180,46 +186,46 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                                                 whileInView={{ opacity: 1, y: 0 }}
                                                 viewport={{ once: true }}
                                                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                                                className={`relative rounded-[2rem] border ${style.border} ${style.bg} p-6 md:p-8 flex flex-col h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group ${loan.is_popular ? 'ring-2 ring-[#2076C7]/30 shadow-xl' : ''}`}
+                                                className={`relative rounded-3xl border ${style.border} ${style.bg} p-5 flex flex-col h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group ${isPopular ? 'ring-1 ring-[#2076C7]/30 shadow-lg' : ''}`}
                                             >
-                                                {loan.is_popular && (
-                                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full shadow">
+                                                {isPopular && (
+                                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-[9px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full shadow">
                                                         Most Popular
                                                     </div>
                                                 )}
                                                 <div className="flex flex-col items-center text-center">
-                                                    <div className={`w-14 h-14 bg-gradient-to-br ${style.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
-                                                        <Icon size={28} strokeWidth={1.8} className="text-white" />
+                                                    <div className={`w-12 h-12 bg-gradient-to-br ${style.color} rounded-2xl flex items-center justify-center mb-4 shadow-md group-hover:scale-105 transition-transform`}>
+                                                        <Icon size={24} strokeWidth={1.8} className="text-white" />
                                                     </div>
-                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{loan.badge || 'EDUCATION LOAN'}</div>
-                                                    <h3 className="text-xl font-extrabold text-gray-700 mb-4 tracking-tight">{loan.loan_type}</h3>
+                                                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{loan.badge || 'EDUCATION LOAN'}</div>
+                                                    <h3 className="text-lg font-extrabold text-gray-700 mb-3 tracking-tight leading-tight">{loan.loan_type}</h3>
                                                 </div>
 
-                                                <div className="space-y-2 mb-6">
-                                                    <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                                        <span className="text-sm font-bold text-slate-400 uppercase">Max Amount</span>
-                                                        <span className="text-base font-extrabold text-[#2076C7]">{loan.max_amount || 'N/A'}</span>
+                                                <div className="space-y-1.5 mb-4">
+                                                    <div className="flex justify-between items-center py-1.5 border-b border-black/5">
+                                                        <span className="text-[11px] font-bold text-slate-400 uppercase">Max Amount</span>
+                                                        <span className="text-sm font-extrabold text-[#2076C7]">{loan.max_amount || 'N/A'}</span>
                                                     </div>
-                                                    <div className="flex justify-between items-center py-2 border-b border-black/5">
-                                                        <span className="text-sm font-bold text-slate-400 uppercase">Interest Rate</span>
-                                                        <span className="text-base font-extrabold text-slate-700">{loan.interest_rate || 'N/A'}</span>
+                                                    <div className="flex justify-between items-center py-1.5 border-b border-black/5">
+                                                        <span className="text-[11px] font-bold text-slate-400 uppercase">Interest Rate</span>
+                                                        <span className="text-sm font-extrabold text-slate-700">{loan.interest_rate || 'N/A'}</span>
                                                     </div>
-                                                    <div className="flex justify-between items-center py-2">
-                                                        <span className="text-sm font-bold text-slate-400 uppercase">Tenure</span>
-                                                        <span className="text-base font-extrabold text-slate-700">{loan.tenure || 'N/A'}</span>
+                                                    <div className="flex justify-between items-center py-1.5">
+                                                        <span className="text-[11px] font-bold text-slate-400 uppercase">Tenure</span>
+                                                        <span className="text-sm font-extrabold text-slate-700">{loan.tenure || 'N/A'}</span>
                                                     </div>
                                                 </div>
 
-                                                <ul className="space-y-2 mb-8 flex-1">
+                                                <ul className="space-y-1.5 mb-6 flex-1">
                                                     {featuresList.map((f: string, idx: number) => (
-                                                        <li key={idx} className="flex items-start gap-2 text-sm font-bold text-slate-600">
-                                                            <IconCheck size={14} className="text-teal-500 shrink-0 mt-0.5" strokeWidth={3} />
+                                                        <li key={idx} className="flex items-start gap-1.5 text-xs font-bold text-slate-600 leading-tight">
+                                                            <IconCheck size={12} className="text-teal-500 shrink-0 mt-0.5" strokeWidth={3} />
                                                             {f.trim()}
                                                         </li>
                                                     ))}
                                                 </ul>
 
-                                                {/* Apply Now Button */}
+                                                {/* Apply Now Button - Reduced width & centered at bottom */}
                                                 <div className="mt-auto flex justify-center">
                                                     <button
                                                         onClick={() => {
@@ -229,7 +235,7 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                                                                 openApplyNow(loan.loan_type, isDashboard);
                                                             }
                                                         }}
-                                                        className="relative inline-flex items-center gap-2 px-10 py-3.5 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group whitespace-nowrap"
+                                                        className="relative inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 overflow-hidden cursor-pointer group w-3/5"
                                                         style={{ background: 'linear-gradient(to right, #1CADA3, #2076C7)' }}
                                                     >
                                                         <span className="relative z-6 flex items-center justify-center gap-1">
@@ -244,6 +250,17 @@ export default function LoanTypesSection({ showOnlyLive = false, isDashboard = f
                                     })
                                 )}
                             </div>
+
+                            {!loadingLoans && apiLoans.length > 4 && (
+                                <div className="flex justify-center mb-12">
+                                    <button
+                                        onClick={() => setShowAllPlans(!showAllPlans)}
+                                        className="px-6 py-2.5 rounded-full border border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center gap-2"
+                                    >
+                                        {showAllPlans ? 'View Less' : `View All ${apiLoans.length} Plans`}
+                                    </button>
+                                </div>
+                            )}
 
                             {/* --- NEW PUBLIC MARKET COMPARISON --- */}
                             {!isDashboard && (

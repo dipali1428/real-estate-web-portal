@@ -66,20 +66,20 @@ export default function MarketComparison({ onApplyClick }: { onApplyClick?: () =
                             <motion.div
                                 key={`${plan.id}-${i}`}
                                 onClick={() => setSelectedBank(plan)}
-                                className={`flex flex-col items-center justify-center p-8 bg-white border-2 rounded-[2.5rem] cursor-pointer transition-all hover:shadow-2xl shrink-0 min-w-[220px] md:min-w-[260px] ${
+                                className={`flex flex-col items-center justify-center p-8 bg-white border-2 rounded-[2.5rem] cursor-pointer transition-all hover:shadow-2xl shrink-0 min-w-[220px] md:min-w-[260px] group ${
                                     selectedBank?.id === plan.id ? 'border-[#2076C7] shadow-xl scale-105' : 'border-slate-50 hover:border-blue-100'
                                 }`}
                             >
-                                <div className="w-20 h-20 mb-5 flex items-center justify-center p-3 rounded-3xl bg-slate-50/80 group-hover:bg-white transition-colors">
+                                <div className="w-full h-20 mb-5 flex items-center justify-center bg-transparent relative overflow-hidden">
                                     <Image
                                         src={plan.logo}
                                         alt={plan.name}
-                                        width={80}
+                                        width={160}
                                         height={80}
-                                        className="w-full h-full object-contain transition-all duration-500"
+                                        className="w-full h-full object-contain transition-all duration-500 transform group-hover:scale-105"
                                     />
                                 </div>
-                                <h4 className="text-xs md:text-sm font-black text-slate-800 text-center leading-tight px-2">
+                                <h4 className="text-xs md:text-sm font-black text-slate-800 text-center leading-tight px-2 group-hover:text-[#2076C7] transition-colors">
                                     {plan.name}
                                 </h4>
                             </motion.div>

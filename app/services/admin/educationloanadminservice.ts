@@ -1,24 +1,21 @@
 import api from "../api";
 
 export const EducationLoanAdminService = {
-  /**
-   * Upload Education Loans (CSV/XLSX)
-   */
+
+  // Upload Education Loans (CSV)
   uploadEducationLoans: async (file: File) => {
-    const base64Data = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-      reader.readAsDataURL(file);
-    });
+    const formData = new FormData();
+
+    formData.append("file", file);
 
     const response = await api.post(
       "/api/unlisted/admin/education-loan/upload",
+      formData,
       {
-        fileName: file.name,
-        base64Data: base64Data
-      },
-      { headers: { "Content-Type": "application/json" } }
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
 
     return response.data;
