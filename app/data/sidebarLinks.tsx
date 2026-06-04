@@ -317,7 +317,7 @@ export const sidebarLinks = {
                 },
                  {
                     label: "Cattle Insurance",
-                    href: "/UnlistedAdmin/products/finance/Cattle-Insurance",
+                    href: "/UnlistedAdmin/products/insurance/Cattle-Insurance",
                     icon: <Shield className="h-5 w-5 text-neutral-600" />
                 }
             ],

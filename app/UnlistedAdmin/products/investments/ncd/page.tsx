@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { 
-  Plus, Upload, Trash2, Search, 
-  FileText, CheckCircle2, AlertCircle, 
-  TrendingUp,  Landmark, 
+import {
+  Plus, Upload, Trash2, Search,
+  FileText, CheckCircle2, AlertCircle,
+  TrendingUp, Landmark,
   X, Edit3
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -98,8 +98,8 @@ export default function AdminNCDManagement() {
 
   const filteredNCDs = useMemo(() => {
     return ncds.filter(ncd => {
-      const matchesSearch = ncd.issuer.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           ncd.isin?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = ncd.issuer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ncd.isin?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || ncd.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -111,14 +111,14 @@ export default function AdminNCDManagement() {
       <AnimatePresence>
         {isEditModalOpen && editingNCD && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsEditModalOpen(false)}
               className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
             />
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -129,7 +129,7 @@ export default function AdminNCDManagement() {
                   <h2 className="text-2xl font-black text-slate-900">Edit NCD Details</h2>
                   <p className="text-slate-500 text-sm font-medium">Update issue information for {editingNCD.issuer}</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsEditModalOpen(false)}
                   className="p-2 hover:bg-white rounded-full transition-colors shadow-sm"
                 >
@@ -141,63 +141,63 @@ export default function AdminNCDManagement() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Issuer Name</label>
-                    <input 
-                      type="text" 
-                      value={editingNCD.issuer} 
-                      onChange={(e) => setEditingNCD({...editingNCD, issuer: e.target.value})}
+                    <input
+                      type="text"
+                      value={editingNCD.issuer}
+                      onChange={(e) => setEditingNCD({ ...editingNCD, issuer: e.target.value })}
                       className="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ISIN</label>
-                    <input 
-                      type="text" 
-                      value={editingNCD.isin} 
-                      onChange={(e) => setEditingNCD({...editingNCD, isin: e.target.value})}
+                    <input
+                      type="text"
+                      value={editingNCD.isin}
+                      onChange={(e) => setEditingNCD({ ...editingNCD, isin: e.target.value })}
                       className="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Rating</label>
-                    <input 
-                      type="text" 
-                      value={editingNCD.rating} 
-                      onChange={(e) => setEditingNCD({...editingNCD, rating: e.target.value})}
+                    <input
+                      type="text"
+                      value={editingNCD.rating}
+                      onChange={(e) => setEditingNCD({ ...editingNCD, rating: e.target.value })}
                       className="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Interest / Yield</label>
-                    <input 
-                      type="text" 
-                      value={editingNCD.interest} 
-                      onChange={(e) => setEditingNCD({...editingNCD, interest: e.target.value})}
+                    <input
+                      type="text"
+                      value={editingNCD.interest}
+                      onChange={(e) => setEditingNCD({ ...editingNCD, interest: e.target.value })}
                       className="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tenure</label>
-                    <input 
-                      type="text" 
-                      value={editingNCD.tenure} 
-                      onChange={(e) => setEditingNCD({...editingNCD, tenure: e.target.value})}
+                    <input
+                      type="text"
+                      value={editingNCD.tenure}
+                      onChange={(e) => setEditingNCD({ ...editingNCD, tenure: e.target.value })}
                       className="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Min Investment</label>
-                    <input 
-                      type="text" 
-                      value={editingNCD.minInvest} 
-                      onChange={(e) => setEditingNCD({...editingNCD, minInvest: e.target.value})}
+                    <input
+                      type="text"
+                      value={editingNCD.minInvest}
+                      onChange={(e) => setEditingNCD({ ...editingNCD, minInvest: e.target.value })}
                       className="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Status</label>
-                    <select 
-                      value={editingNCD.status} 
-                      onChange={(e) => setEditingNCD({...editingNCD, status: e.target.value as any})}
+                    <select
+                      value={editingNCD.status}
+                      onChange={(e) => setEditingNCD({ ...editingNCD, status: e.target.value as any })}
                       className="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 appearance-none"
                     >
                       <option value="Open">Open</option>
@@ -208,14 +208,14 @@ export default function AdminNCDManagement() {
                 </div>
 
                 <div className="pt-6 border-t border-slate-100 flex gap-4">
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setIsEditModalOpen(false)}
                     className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-sm hover:bg-slate-200 transition-colors"
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     type="submit"
                     disabled={uploading}
                     className="flex-2 px-10 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all disabled:opacity-50"
@@ -256,11 +256,10 @@ export default function AdminNCDManagement() {
               />
               <label
                 htmlFor="csv-upload"
-                className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all cursor-pointer shadow-sm ${
-                  uploading 
-                  ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
-                  : "bg-white text-slate-700 border border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:shadow-md"
-                }`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all cursor-pointer shadow-sm ${uploading
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-white text-slate-700 border border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:shadow-md"
+                  }`}
               >
                 {uploading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-slate-400 border-t-transparent" />
@@ -270,7 +269,7 @@ export default function AdminNCDManagement() {
                 {uploading ? "Processing..." : "Import CSV"}
               </label>
             </div>
-            
+
             <button className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-200 transition-all shadow-lg shadow-blue-100">
               <Plus size={18} />
               Add NCD
@@ -315,18 +314,17 @@ export default function AdminNCDManagement() {
                 className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500/20 text-sm font-medium"
               />
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="flex p-1 bg-slate-50 rounded-2xl">
                 {["All", "Open", "Upcoming", "Closed"].map((status) => (
                   <button
                     key={status}
                     onClick={() => setStatusFilter(status)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                      statusFilter === status 
-                      ? "bg-white text-blue-600 shadow-sm" 
-                      : "text-slate-500 hover:text-slate-700"
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${statusFilter === status
+                        ? "bg-white text-blue-600 shadow-sm"
+                        : "text-slate-500 hover:text-slate-700"
+                      }`}
                   >
                     {status}
                   </button>
@@ -374,24 +372,23 @@ export default function AdminNCDManagement() {
                       <td className="px-6 py-4 font-black text-slate-700 text-sm">{ncd.interest}</td>
                       <td className="px-6 py-4 font-bold text-slate-600 text-sm">{ncd.minInvest}</td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black border ${
-                          ncd.status === "Open" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
-                          ncd.status === "Upcoming" ? "bg-amber-50 text-amber-700 border-amber-100" :
-                          "bg-slate-50 text-slate-600 border-slate-100"
-                        }`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black border ${ncd.status === "Open" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
+                            ncd.status === "Upcoming" ? "bg-amber-50 text-amber-700 border-amber-100" :
+                              "bg-slate-50 text-slate-600 border-slate-100"
+                          }`}>
                           {ncd.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-mono text-[10px] text-slate-400">{ncd.isin}</td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button 
+                          <button
                             onClick={() => handleEditClick(ncd)}
                             className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                           >
                             <Edit3 size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(ncd.id)}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                           >
