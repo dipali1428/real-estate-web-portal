@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from 'react';
 import { motion } from 'framer-motion';
+import PetInsuranceService from '@/app/services/customer/petInsuranceService';
 import {
     IconCheck,
     IconExternalLink,
@@ -57,9 +58,9 @@ const providers = [
 ];
 
 export function ProviderComparison({ isDashboard = false }: { isDashboard?: boolean } = {}) {
-    const { openLogin, openApplyNow } = useModal();
-    const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+    const { openLogin } = useModal();
     const [selectedProvider, setSelectedProvider] = useState('');
+    const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
     return (
         <section className={`py-10 bg-slate-50 ${isDashboard ? '' : 'px-4 sm:px-6'}`}>
             <div className={isDashboard ? 'w-full px-2' : 'max-w-7xl mx-auto px-2 lg:px-4'}>
@@ -131,7 +132,7 @@ export function ProviderComparison({ isDashboard = false }: { isDashboard?: bool
                                     </td>
                                     <td className="p-4 md:p-6 text-center">
                                         <button
-                                            onClick={() => { setSelectedProvider(provider.name); setIsEnquiryOpen(true); }}
+                                            onClick={() => { setSelectedProvider(provider.name); isDashboard ? setIsEnquiryOpen(true) : openLogin(); }}
                                             className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-[#1CADA3] hover:text-white transition-all"
                                         >
                                             <IconExternalLink size={20} />
@@ -143,16 +144,19 @@ export function ProviderComparison({ isDashboard = false }: { isDashboard?: bool
                     </table>
                 </div>
                 <p className="text-center text-xs text-slate-400 mt-6">Disclaimer: Comparison based on market data for 2024. Payouts and network size vary by plan type and pet profile.</p>
+
+            </div>
+            {isDashboard && (
                 <EnquiryModal
                     isOpen={isEnquiryOpen}
                     onClose={() => setIsEnquiryOpen(false)}
                     productType="PET_INSURANCE"
                     productName={selectedProvider}
                     productId={0}
-                    sourcePage="/products/pet-insurance"
+                    sourcePage="/customer/dashboard/pet-insurance"
                     preFillMessage={`I am interested in the ${selectedProvider} pet insurance. Please provide more details.`}
                 />
-            </div>
+            )}
         </section>
     );
 }
@@ -206,9 +210,54 @@ export const plans = [
 ];
 
 export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } = {}) {
-    const { openLogin, openApplyNow } = useModal();
+    const { openLogin } = useModal();
     const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState('');
+    const [selectedPlanName, setSelectedPlanName] = useState('');
+    const [plansList, setPlansList] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const response = await PetInsuranceService.getAllPetInsurance();
+                if (response && response.success && Array.isArray(response.data)) {
+                    setPlansList(response.data);
+                } else if (response && Array.isArray(response.data)) {
+                    setPlansList(response.data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch pet insurance plans", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPlans();
+    }, []);
+
+    const planIcons = [IconFeather, IconVaccine, IconHeart, IconWheelchair];
+
+    const displayPlans = plansList.length > 0 ? plansList.map((plan, idx) => {
+        let price = plan.premium || '';
+        if (price && !price.startsWith('₹')) {
+            price = '₹' + price;
+        }
+        let duration = plan.premium_period || 'per month';
+        if (duration.startsWith('/')) {
+            duration = duration.substring(1);
+        }
+
+        return {
+            icon: planIcons[idx % planIcons.length] || IconFeather,
+            title: plan.plan_name,
+            tagline: plan.subtitle || '',
+            desc: plan.description || '',
+            features: plan.features ? plan.features.split('|') : [],
+            price: price,
+            duration: duration,
+            popular: plan.is_popular === true || plan.is_popular === 'true' || plan.is_popular === 'TRUE',
+            gradient: 'from-[#2076C7] to-[#1CADA3]',
+        };
+    }) : plans; // fallback to hardcoded plans if empty
 
     return (
         <section id="plans" className={`py-10 ${isDashboard ? '' : 'bg-white px-4 sm:px-6'}`}>
@@ -228,74 +277,82 @@ export function PetPlanTypes({ isDashboard = false }: { isDashboard?: boolean } 
                     </div>
                 </motion.div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {plans.map((plan, idx) => (
-                        <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="relative overflow-hidden rounded-3xl border-2 border-blue-200 bg-white hover:border-blue-400 transition-all duration-500 shadow-[0_10px_30px_-10px_rgba(32,118,199,0.15)] hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.25)] flex flex-col h-full"
-                        >
-                            <div className="p-5 sm:p-8 flex flex-col h-full items-center text-center">
-                                {/* Centered Icon Container */}
-                                <div className="flex flex-col items-center gap-4 mb-6">
-                                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
-                                        <plan.icon size={28} />
+                {loading && plansList.length === 0 ? (
+                    <div className="text-center py-12 text-[#2076C7] font-bold uppercase tracking-widest text-sm animate-pulse">
+                        Loading plans...
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {displayPlans.map((plan, idx) => (
+                            <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="relative rounded-3xl border-2 border-blue-200 bg-white hover:border-blue-400 transition-all duration-500 shadow-[0_10px_30px_-10px_rgba(32,118,199,0.15)] hover:shadow-[0_20px_50px_-12px_rgba(32,118,199,0.25)] flex flex-col h-full"
+                            >
+                                {plan.popular && (
+                                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3.5 py-1 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-md whitespace-nowrap z-10 border border-white/20">
+                                        Most Popular
+                                    </span>
+                                )}
+                                <div className="p-5 sm:p-8 flex flex-col h-full items-center text-center">
+                                    {/* Centered Icon Container */}
+                                    <div className="flex flex-col items-center gap-4 mb-6">
+                                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
+                                            <plan.icon size={28} />
+                                        </div>
                                     </div>
-                                    {plan.popular && (
-                                        <span className="text-[10px] font-black underline decoration-2 underline-offset-4 text-slate-600 uppercase tracking-widest">
-                                            (Most Popular)
-                                        </span>
-                                    )}
-                                </div>
 
-                                <h3 className="text-xl md:text-2xl font-extrabold text-[#1CADA3]">{plan.title}</h3>
-                                <p className="text-xs md:text-sm text-slate-500 font-medium mt-1">{plan.tagline}</p>
-                                <p className="text-sm text-slate-600 mt-4 leading-relaxed min-h-[60px]">{plan.desc}</p>
+                                    <h3 className="text-xl md:text-2xl font-extrabold text-[#1CADA3]">{plan.title}</h3>
+                                    <p className="text-xs md:text-sm text-slate-500 font-medium mt-1">{plan.tagline}</p>
+                                    <p className="text-sm text-slate-600 mt-4 leading-relaxed min-h-[60px]">{plan.desc}</p>
 
-                                <div className="w-full mt-6 border-t border-slate-100 pt-6">
-                                    <div className="flex items-baseline justify-center gap-1">
-                                        <span className="text-3xl font-extrabold text-slate-900">{plan.price}</span>
-                                        <span className="text-sm text-slate-400 font-medium">/{plan.duration}</span>
+                                    <div className="w-full mt-6 border-t border-slate-100 pt-6">
+                                        <div className="flex items-baseline justify-center gap-1">
+                                            <span className="text-3xl font-extrabold text-slate-900">{plan.price}</span>
+                                            <span className="text-sm text-slate-400 font-medium">/{plan.duration}</span>
+                                        </div>
                                     </div>
+
+                                    <ul className="mt-6 space-y-3 flex-grow text-left w-full">
+                                        {plan.features.map((f: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined, i: Key | null | undefined) => (
+                                            <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                                                <div className="w-5 h-5 bg-teal-50 text-[#1CADA3] rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                                                        <path d="M8.5 2.5L4 7.5L1.5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                                                    </svg>
+                                                </div>
+                                                {f}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {/* Apply Now — opens login on public, enquiry on dashboard */}
+                                    <button
+                                        onClick={() => { setSelectedPlanName(plan.title); isDashboard ? setIsEnquiryOpen(true) : openLogin(); }}
+                                        className="mt-8 w-full block text-center py-3.5 rounded-xl font-bold transition-all bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                                    >
+                                        Apply Now
+                                    </button>
                                 </div>
-
-                                <ul className="mt-6 space-y-3 flex-grow text-left w-full">
-                                    {plan.features.map((f, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
-                                            <div className="w-5 h-5 bg-teal-50 text-[#1CADA3] rounded-full flex items-center justify-center flex-shrink-0">
-                                                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-                                                    <path d="M8.5 2.5L4 7.5L1.5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                            </div>
-                                            {f}
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                {/* Standardized Color for All Buttons */}
-                                <button
-                                    onClick={() => { setSelectedPlan(plan.title); setIsEnquiryOpen(true); }}
-                                    className="mt-8 w-full block text-center py-3.5 rounded-xl font-bold transition-all bg-linear-to-r from-[#2076C7] to-[#1CADA3] text-white shadow-lg hover:shadow-xl hover:scale-[1.02]"
-                                >
-                                    Apply Now
-                                </button>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+            </div>
+            {isDashboard && (
                 <EnquiryModal
                     isOpen={isEnquiryOpen}
                     onClose={() => setIsEnquiryOpen(false)}
                     productType="PET_INSURANCE"
-                    productName={selectedPlan}
+                    productName={selectedPlanName}
                     productId={0}
-                    sourcePage="/products/pet-insurance"
-                    
+                    sourcePage="/customer/dashboard/pet-insurance"
+                    preFillMessage={`I am interested in the ${selectedPlanName} pet insurance plan. Please provide more details.`}
                 />
-            </div>
+            )}
         </section>
     );
 }

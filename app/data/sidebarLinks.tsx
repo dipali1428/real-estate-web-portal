@@ -48,6 +48,7 @@ import {
     BriefcaseBusiness,
     SquareChartGantt,
     GraduationCap,
+    PawPrint,
 } from "lucide-react";
 
 export const sidebarLinks = {
@@ -319,6 +320,11 @@ export const sidebarLinks = {
                     label: "Cattle Insurance",
                     href: "/UnlistedAdmin/products/insurance/Cattle-Insurance",
                     icon: <Shield className="h-5 w-5 text-neutral-600" />
+                },
+                {
+                    label: "Pet Insurance",
+                    href: "/UnlistedAdmin/products/insurance/Pet-Insurance",
+                    icon: <PawPrint className="h-5 w-5 text-neutral-600" />
                 }
             ],
         },

@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import Link from 'next/link';
 import { useModal } from '../../../context/ModalContext';
+import EnquiryModal from '@/app/customer/orderform/EnquiryModal';
 
 // --- Pet Calculator Data ---
 interface PetType {
@@ -67,6 +68,7 @@ export default function PetInsuranceCalculator({
     const [sumInsured, setSumInsured] = useState(SUM_INSURED_OPTIONS[0]);
     const [hasOPD, setHasOPD] = useState(false);
     const [showPlans, setShowPlans] = useState(false);
+    const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
     const baseCalculated = petType.baseRate * ageGroup.multiplier * sumInsured.factor;
     const premiumWithAddons = hasOPD ? baseCalculated * 1.3 : baseCalculated;
@@ -327,7 +329,7 @@ export default function PetInsuranceCalculator({
                                         </div>
 
                                         <button
-                                            onClick={isDashboard ? undefined : openLogin}
+                                            onClick={() => isDashboard ? setIsEnquiryOpen(true) : openLogin()}
                                             className="w-full mt-auto py-5 bg-gradient-to-r from-[#2076C7] to-[#1CADA3] text-white rounded-2xl font-black uppercase tracking-widest text-sm md:text-base shadow-[0_20px_40px_-10px_rgba(32,118,199,0.3)] hover:shadow-[0_25px_50px_-10px_rgba(32,118,199,0.4)] hover:-translate-y-1.5 transition-all duration-500 group"
                                         >
                                             Apply For Pet Insurance
@@ -420,6 +422,17 @@ export default function PetInsuranceCalculator({
                     </section>
                 )}
             </AnimatePresence>
+            {isDashboard && (
+                <EnquiryModal
+                    isOpen={isEnquiryOpen}
+                    onClose={() => setIsEnquiryOpen(false)}
+                    productType="PET_INSURANCE"
+                    productName={petName ? `${petName} (${petType.label})` : `${petType.label} Insurance`}
+                    productId={0}
+                    sourcePage="/customer/dashboard/pet-insurance"
+                    preFillMessage={`I am interested in Pet Insurance for my pet named ${petName || 'pet'} (${petType.label}, Breed: ${petSubType || 'not specified'}, Age: ${ageGroup.label}). Sum Insured: ${sumInsured.label}. Please provide more details.`}
+                />
+            )}
         </>
     );
 }
